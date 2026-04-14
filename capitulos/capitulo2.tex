@@ -1,0 +1,71 @@
+\chapter{Capítulo Segundo - Antecedentes y Justificación  }
+\section{Situación actual del sector de gasolineras}
+En los últimos años el sector energético vinculado a la movilidad ha experimentado una transformación impulsada por factores económicos, regulatorios y medioambientales. La volatilidad del precio de los combustibles fósiles, el aumento progresivo del parque de vehículos eléctricos y las políticas de transición energética han incrementado la necesidad de información precisa para la toma de decisiones de repostaje y recarga \cite{expansion_motor_2026_01_12}.
+
+La coexistencia de distintas fuentes energéticas (gasolina, diésel, GLP, electricidad) introduce mayor complejidad en el proceso de decisión del usuario. Además, los precios presentan variaciones relevantes entre estaciones de servicio cercanas e incluso fluctuaciones temporales a corto plazo.
+
+Desde las administraciones públicas se ha promovido la publicación de datos abiertos sobre precios de carburantes y localización de puntos de recarga\cite{datosgob_carburantes,geoportal_gasolineras}, lo que ha facilitado el desarrollo de herramientas digitales de consulta.
+
+\section{Problemas detectados}
+
+Tras un análisis del estado actual de las soluciones tecnológicas en el sector de la movilidad, se han identificado las siguientes deficiencias técnicas y funcionales que motivan el desarrollo de este proyecto:
+
+\begin{itemize}
+    \item \textbf{Heterogeneidad y dispersión de datos:} La información de precios y puntos de carga reside en silos aislados (OpenData gubernamental, APIs privadas, \textit{scrapers}), lo que dificulta una visión unificada y coherente en tiempo real.
+    \item \textbf{Carácter estático de la consulta:} Las plataformas actuales funcionan como visores de datos puntuales, careciendo de un análisis histórico que permita comprender las fluctuaciones del mercado.
+    \item \textbf{Ausencia de capacidad predictiva:} No se integran modelos de inteligencia artificial que asistan al usuario en la toma de decisiones anticipadas (¿conviene repostar hoy o esperar a mañana?).
+    \item \textbf{Desconexión con la planificación geoespacial:} La búsqueda de estaciones suele ser radial o por cercanía, ignorando la optimización del coste energético total en función de una ruta planificada.
+    \item \textbf{Brecha digital entre energías:} Existe una fragmentación tecnológica entre los sistemas de gestión de combustibles tradicionales y la infraestructura de movilidad eléctrica (EV), impidiendo una gestión híbrida eficiente.
+    \item \textbf{Falta de asistencia inteligente:} La interacción usuario-sistema sigue patrones rígidos de formularios, desaprovechando las capacidades actuales de los sistemas conversacionales y el procesamiento de lenguaje natural (NLP).
+\end{itemize}
+
+Estos problemas representan una oportunidad para diseñar una arquitectura que no solo centralice la información, sino que aplique capas de inteligencia de datos para transformar la información bruta en conocimiento accionable.
+
+\section{Estado del arte}
+
+\section{Soluciones existentes y limitaciones}
+
+
+
+\section{Origen del proyecto y evolución}
+El presente proyecto parte de un prototipo académico desarrollado por el autor en la asignatura \textit{Desarrollo Avanzado de Aplicaciones para la Web de Datos} \cite{Alvis2025TankGo}. Dicho sistema inicial, denominado \textit{TankGo}, permitía la consulta de precios de estaciones de servicio mediante la federación de fuentes de datos abiertos y una visualización geoespacial básica. No obstante, aquel desarrollo presentaba una arquitectura acotada a objetivos formativos, con limitaciones en escalabilidad, persistencia histórica y capacidad de procesamiento inteligente.
+El actual Trabajo de Fin de Grado retoma esa base tecnológica para transformarla en una plataforma robusta y profesional. Esta evolución no es meramente incremental, sino que supone una redefinición integral del sistema bajo tres ejes estratégicos alineados con tendencias recientes de la industria del \textit{software}, especialmente en adopción de IA y arquitecturas de plataforma escalables en entornos \textit{cloud} \cite{Gartner2026Trends}.
+
+\begin{enumerate}
+    \item \textbf{Infraestructura y Persistencia Escalable:} Se migra hacia una arquitectura \textit{cloud-native} capaz de procesar datos masivos, alineándose con la necesidad de cimientos digitales adaptativos \cite{Gartner2026Trends}. Esto permite la ingesta de flujos de datos en tiempo real, una capacidad crítica para mitigar riesgos en el sector energético \cite{s24124013}.
+    \item \textbf{Inteligencia de Datos y Modelado Predictivo:} Se incorpora un motor de pronóstico de precios. A diferencia del prototipo original, se plantea una evaluación comparativa de distintos modelos (p. ej., LightGBM, XGBoost y enfoques de \textit{Deep Learning}) para seleccionar la alternativa con mejor equilibrio entre precisión, coste computacional e interpretabilidad en el contexto del proyecto \cite{LAHMIRI2024105008,s24124013}.
+    \item \textbf{Formalización y Gestión de Ingeniería:} Se evoluciona de un ejercicio académico a una solución de ingeniería robusta. Se aborda la complejidad de factores externos (geopolíticos y macroeconómicos) mediante una planificación formal y una evaluación técnica rigurosa \cite{LAHMIRI2024105008}.
+\end{enumerate}
+
+Con este enfoque, el sistema evoluciona de una herramienta informativa hacia un sistema de apoyo a la decisión, alineado con las exigencias de un sistema de información avanzado.
+
+\section{Justificación técnica y académica}
+
+Desde el punto de vista \textbf{técnico}, el proyecto trasciende la implementación de software para convertirse en un ejercicio de integración de múltiples disciplinas de la Ingeniería Informática. La solución se fundamenta en la convergencia de:
+\begin{itemize}
+    \item \textbf{Arquitectura de Sistemas:} Diseño de una infraestructura modular \textit{cloud-native} que garantiza escalabilidad y disponibilidad.
+    \item \textbf{Gestión de Datos y Analítica:} Implementación de flujos de ingesta y persistencia políglota para el tratamiento de series temporales de precios.
+    \item \textbf{Inteligencia Computacional:} Incorporación de modelos predictivos que, como sugiere la literatura reciente \cite{LAHMIRI2024105008}, son esenciales para transformar datos brutos en conocimiento accionable en el sector energético.
+    \item \textbf{Ingeniería de Interfaces:} Desarrollo de sistemas de interacción avanzada, incluyendo asistencia conversacional y visualización geoespacial compleja.
+\end{itemize}
+
+Desde la \textbf{perspectiva académica}, este trabajo se justifica como una síntesis integral de las competencias del Grado en Ingeniería Informática. El proyecto no solo valida la capacidad técnica del autor, sino su madurez metodológica al:
+\begin{itemize}
+    \item \textbf{Sintetizar conocimientos:} Unificar áreas como la Inteligencia Artificial, el Desarrollo Web y la Gestión de Proyectos en un único ecosistema coherente.
+    \item \textbf{Rigor investigativo:} Fundamentar las decisiones de diseño en un análisis del estado del arte y tendencias tecnológicas globales para 2026 \cite{Gartner2026Trends}.
+    \item \textbf{Gestión de Ingeniería:} Aplicar una planificación formal, estimación de costes operativos (OpEx) y una evaluación técnica basada en métricas de rendimiento y calidad de software.
+    \item \textbf{Pensamiento crítico:} Evaluar de forma objetiva las limitaciones del sistema y proponer líneas de evolución futura dentro de la ética profesional y la sostenibilidad.
+\end{itemize}
+
+\subsection{Alineación con los Objetivos de Desarrollo Sostenible (ODS)}
+
+La Agenda 2030 de las Naciones Unidas establece una hoja de ruta global hacia la sostenibilidad a través de 17 objetivos \cite{onu_ods_goals}. Aunque el presente trabajo es de naturaleza técnica y computacional, su despliegue en el sector de la movilidad inteligente (\textit{Smart Mobility}) permite una alineación estratégica con las siguientes metas:
+
+\begin{itemize}
+    \item \textbf{ODS 7 (Energía asequible y no contaminante):} El sistema contribuye a la meta 7.3 (eficiencia energética) mediante la democratización y transparencia de datos. Al integrar en una única interfaz precios de combustibles y puntos de recarga eléctrica, se facilita la transición hacia modelos de movilidad más sostenibles y económicamente eficientes.
+    \item \textbf{ODS 9 (Industria, innovación e infraestructura):} Esta es la vinculación más directa del proyecto. La transformación de fuentes de datos heterogéneas en un Sistema de Soporte a la Decisión (DSS) mediante \textit{cloud computing} e Inteligencia Artificial promueve el desarrollo de infraestructuras digitales resilientes e innovadoras \cite{mitma_esmovilidad}. Se fomenta el uso de tecnologías abiertas y estándares de interoperabilidad, pilares de la industria 4.0.
+    \item \textbf{ODS 12 (Producción y consumo responsables):} La plataforma empodera al usuario final con herramientas de analítica predictiva \cite{LAHMIRI2024105008}, permitiendo un consumo más racional. La optimización de rutas basada en el coste energético reduce el desperdicio de recursos y fomenta una planificación logística más consciente.
+    \item \textbf{ODS 13 (Acción por el clima):} Al facilitar la localización y gestión de puntos de recarga eléctrica frente a los combustibles fósiles, el proyecto actúa como un catalizador tecnológico para la reducción de emisiones de CO2 en el transporte por carretera, alineándose con las estrategias europeas de descarbonización.
+\end{itemize}
+
+Es importante destacar que, si bien el impacto directo es modesto debido al carácter académico del proyecto, la arquitectura propuesta demuestra cómo la digitalización y el procesamiento inteligente de datos son habilitadores críticos para alcanzar las metas de sostenibilidad nacional e internacional \cite{gob_agenda2030_espana}.
