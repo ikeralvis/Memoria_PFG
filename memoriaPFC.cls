@@ -17,8 +17,21 @@
 \RequirePackage[T1]{fontenc}     % Codificación de fuente
 \RequirePackage[utf8]{inputenc}  % Codificación de entrada
 \RequirePackage[spanish,english]{babel}  % Idioma
+\RequirePackage{csquotes} % Proporciona el entorno \enquote{...}
 \RequirePackage{setspace}        % Interlineado
-\RequirePackage[default]{sourcesanspro} % Fuente moderna sans-serif
+% Intentar cargar Source Sans (sourcesanspro / sourcesans). Si no está
+% disponible, usar una combinación segura con lmodern + helvet para evitar
+% que pdflatex falle por fuentes faltantes en MiKTeX.
+\IfFileExists{sourcesanspro.sty}{%
+  \RequirePackage[default]{sourcesanspro}%
+}{%
+  \IfFileExists{sourcesans.sty}{%
+    \RequirePackage{sourcesans}%
+  }{%
+    \RequirePackage{lmodern}% fuentes Latin Modern como fallback
+    \RequirePackage{helvet}% usar Helvetica como sans-serif disponible
+  }%
+}
 \renewcommand{\familydefault}{\sfdefault} % Fuente por defecto sans-serif
 \RequirePackage{url}             % URLs
 \RequirePackage{fancybox}        % Recuadros
@@ -77,12 +90,12 @@
 %% Definición de metadatos y formato general
 %% ------------------------------
 \makeatletter
-\newcommand{\@autorUno}{Nombre del autor}
+\newcommand{\@autorUno}{Iker Alvis Veloso}
 \newcommand{\@autorDos}{}
 \newcommand{\@autores}{\@autorUno}
 \newcommand{\autores}[2]{\def\@autorUno{#1}\def\@autorDos{#2}}
 \newcommand{\titulacion}[1]{\def\@titulacion{#1}}
-\newcommand{\director}[1]{\def\@director{Director: #1}}
+\newcommand{\director}[1]{\def\@director{Director: Diego López de Ipiña}}
 \newcommand{\directora}[1]{\def\@director{Directora: #1}}
 \gdef\@resumen{}
 \gdef\@descriptores{}
@@ -110,7 +123,7 @@
 %% ------------------------------
 \RequirePackage[a4paper,
   top=1.0cm,
-  headheight=0.2cm,
+  headheight=12.0pt,
   headsep=2.4cm,
   bottom=1.2cm,
   footskip=3.3cm,

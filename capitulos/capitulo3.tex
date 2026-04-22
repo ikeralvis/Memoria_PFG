@@ -1,0 +1,242 @@
+\chapter{Capítulo Tercero - Objetivos y Alcance}
+
+Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita
+el alcance del sistema resultante. Se definen tanto el objetivo general como los objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones explícitas para evitar ambigüedades en la evaluación del trabajo realizado. Esta sección es fundamental para orientar el desarrollo técnico y garantizar que el proyecto se mantenga enfocado en la entrega de valor dentro de los recursos y el tiempo disponibles.
+
+\section{Objetivo general}
+
+Diseñar, desarrollar y desplegar una plataforma software cloud-native que integre,
+en un único sistema, la consulta y comparación de precios de combustibles
+y puntos de recarga eléctrica en España, incorporando capacidades de análisis
+histórico, predicción de precios a corto plazo, recomendación de repostaje basada
+en rutas y asistencia conversacional, con el fin de transformar datos energéticos
+dispersos en conocimiento accesible para el usuario final.
+
+\section{Objetivos específicos y medibles}
+
+Los objetivos específicos desglosan el objetivo general en metas concretas,
+verificables y acotadas en el tiempo, siguiendo el criterio SMART
+(\textit{Specific, Measurable, Achievable, Relevant, Time-bound})
+\cite{doran1981there}. Se organizan en torno a los cinco ejes funcionales
+del sistema:
+
+\subsection{Ingesta y gestión de datos}
+
+\begin{itemize}
+    \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
+          con la API REST del Ministerio de Industria (MinITUR) que garantice la
+          disponibilidad de datos de precios actualizados con una frecuencia mínima
+          diaria, con persistencia histórica en base de datos relacional.
+
+    \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
+          eléctrica (mapareve.es) en el mismo modelo de datos que los combustibles
+          convencionales, permitiendo consultas unificadas sobre ambas fuentes
+          energéticas.
+
+    \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
+          datos históricos en formato Apache Parquet hacia Google Cloud Storage,
+          como base de datos de entrenamiento reproducible para los modelos de
+          aprendizaje automático.
+\end{itemize}
+
+\subsection{Consulta y visualización geoespacial}
+
+\begin{itemize}
+    \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
+          con mapa interactivo que permita la búsqueda y filtrado de estaciones
+          por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
+          (español, inglés y euskera).
+
+    \item \textbf{OE-05.} Implementar la visualización del historial de
+          precios por estación mediante gráficos temporales interactivos.
+\end{itemize}
+
+\subsection{Predicción de precios}
+
+\begin{itemize}
+    \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
+          de precios basado en modelos de \textit{gradient boosting} (LightGBM)
+          con regresión cuantílica, incorporando el precio del crudo Brent como
+          variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
+          predicciones individualizadas por estación de servicio.
+
+    \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
+          seleccionado frente a alternativas (XGBoost, regresión lineal como
+          \textit{baseline}) mediante métricas estándar de regresión
+          (MAE, RMSE, $R^2$) \cite{s24124013}.
+\end{itemize}
+
+\subsection{Recomendación basada en rutas}
+
+\begin{itemize}
+    \item \textbf{OE-08.} Implementar un servicio de recomendación de
+          gasolineras para rutas A$\rightarrow$B que calcule un corredor geométrico
+          alrededor del trayecto planificado mediante geometría vectorial
+          (Shapely) y evalúe las estaciones dentro del corredor según una
+          función de puntuación ponderada por precio y desvío.
+
+    \item \textbf{OE-09.} Integrar al menos dos backends de enrutamiento
+          intercambiables (OpenRouteService y OSRM) para garantizar la
+          disponibilidad del servicio de recomendación ante fallos o
+          restricciones de cuota de la API principal.
+\end{itemize}
+
+\subsection{Arquitectura, despliegue y calidad}
+
+\begin{itemize}
+    \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
+          microservicios con API Gateway centralizado, donde cada servicio
+          sea independientemente desplegable y escalable, siguiendo los
+          principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
+
+    \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
+          Google Cloud Run mediante pipelines de integración y entrega continua
+          (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
+          independientes (uno por servicio).
+
+    \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
+          basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
+          para autenticación OAuth 2.0 mediante Google y gestión de perfiles
+          de usuario persistentes.
+
+    \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
+          en tiempo real mediante WebSocket con capacidad de \textit{tool calling}
+          sobre la API del sistema, utilizando Gemini 2.5 Flash como modelo
+          de lenguaje subyacente.
+\end{itemize}
+
+\section{Alcance del sistema}
+
+El alcance define los límites funcionales y técnicos del sistema desarrollado,
+estableciendo qué está incluido en la solución entregada.
+
+\subsection{Ámbito geográfico y de datos}
+
+El sistema cubre la totalidad del territorio español continental e insular,
+utilizando como fuente primaria de datos de carburantes la API pública del
+Ministerio de Industria, Turismo y Comercio (MinITUR) \cite{datosgob_carburantes},
+que publica precios de aproximadamente 11.000 estaciones de servicio activas
+en España. Los puntos de recarga eléctrica se obtienen del portal
+mapareve.es, complementando la oferta de datos de movilidad eléctrica
+disponible institucionalmente \cite{mitma_esmovilidad}.
+
+\subsection{Componentes funcionales incluidos}
+
+La plataforma entregada comprende los siguientes componentes funcionales:
+
+\begin{enumerate}
+    \item \textbf{Servicio de gasolineras:} ingesta, normalización, persistencia
+          y consulta de precios de carburantes con historial temporal.
+
+    \item \textbf{Servicio de usuarios:} registro, autenticación (tradicional
+          y OAuth Google), gestión de perfiles con preferencias de combustible
+          y vehículo, y sistema de favoritos sincronizado.
+
+    \item \textbf{Servicio de recomendación:} cálculo de rutas óptimas de
+          repostaje para trayectos A$\rightarrow$B con función de coste ponderada.
+
+    \item \textbf{Servicio de predicción:} generación de predicciones de
+          precio a corto plazo por estación, basadas en modelos LightGBM
+          entrenados sobre datos históricos.
+
+    \item \textbf{Asistente de voz:} interfaz conversacional en tiempo real
+          con acceso a las capacidades del sistema mediante \textit{tool calling}.
+
+    \item \textbf{Servidor MCP:} exposición de las herramientas del sistema
+          como servidor \textit{Model Context Protocol} para integración con
+          agentes LLM externos.
+
+    \item \textbf{API Gateway:} punto de entrada único con documentación
+          OpenAPI agregada, gestión de autenticación y bridge WebSocket.
+
+    \item \textbf{Frontend PWA:} aplicación web progresiva instalable con
+          soporte \textit{offline}, modo oscuro e internacionalización.
+\end{enumerate}
+
+\subsection{Entorno de despliegue}
+
+La plataforma se despliega íntegramente en Google Cloud Platform (GCP),
+utilizando Cloud Run como servicio de ejecución de contenedores serverless,
+Artifact Registry para el almacenamiento de imágenes Docker, Cloud Build
+para la automatización del pipeline CI/CD y Secret Manager para la
+gestión segura de credenciales en producción. La base de datos relacional
+se externaliza en Neon (PostgreSQL gestionado) y el almacenamiento de
+objetos para el pipeline de ML se realiza en Google Cloud Storage.
+
+\section{Limitaciones}
+
+Las limitaciones recogen aquellos aspectos que, estando dentro del alcance
+conceptual del proyecto, presentan restricciones técnicas o de recursos
+conocidas en la versión entregada.
+
+\begin{itemize}
+    \item \textbf{Frecuencia de actualización de precios:} La API del
+          Ministerio de Industria publica datos con una frecuencia que puede
+          variar entre actualizaciones horarias y diarias según la estación,
+          por lo que el sistema no puede garantizar precios en tiempo real
+          estricto, sino \textit{near real-time} con un desfase máximo
+          determinado por la fuente oficial.
+
+    \item \textbf{Cobertura del modelo predictivo:} El servicio de
+          predicción genera modelos únicamente para las estaciones con
+          suficiente historial de precios almacenado y para aquellas
+          marcadas como favoritas por los usuarios del sistema, priorizando
+          la relevancia sobre la cobertura total.
+
+    \item \textbf{Precisión de la recomendación por ruta:} La calidad
+          de la recomendación depende de la disponibilidad y precisión del
+          backend de enrutamiento seleccionado. El fallback a distancia
+          en línea recta, activable mediante configuración, reduce la
+          precisión del corredor geométrico calculado.
+
+    \item \textbf{Escalabilidad del asistente de voz:} El servicio de
+          voz está sujeto a los límites de cuota de la API de Gemini y al
+          rate limiting configurado (40 peticiones por minuto por IP),
+          lo que limita su uso concurrente intensivo.
+
+    \item \textbf{Disponibilidad de datos de recarga eléctrica:}
+          La información de puntos de recarga eléctrica procede de una
+          fuente de terceros (mapareve.es) cuya disponibilidad y
+          completitud no están garantizadas de forma institucional,
+          a diferencia de los datos de carburantes del Ministerio.
+\end{itemize}
+
+\section{Exclusiones}
+
+Las exclusiones delimitan explícitamente lo que queda fuera del alcance
+del presente proyecto, evitando ambigüedades en la evaluación del
+trabajo realizado.
+
+\begin{itemize}
+    \item \textbf{Aplicación móvil nativa:} El sistema se entrega como
+          PWA instalable, pero no se desarrolla una aplicación nativa para
+          iOS o Android. La PWA cubre los casos de uso de movilidad mediante
+          el navegador del dispositivo.
+
+    \item \textbf{Integración con navegadores GPS:} No se integra con
+          sistemas de navegación en tiempo real tipo Google Maps o Waze para
+          guía turn-by-turn. La recomendación de ruta se limita al cálculo
+          de la estación óptima, no a la navegación posterior.
+
+    \item \textbf{Pagos y reservas:} El sistema no contempla
+          funcionalidades de pago, reserva de surtidores ni integración
+          con sistemas de fidelización de las cadenas de gasolineras.
+
+    \item \textbf{Predicción de precios de electricidad:} El módulo
+          predictivo se centra exclusivamente en combustibles líquidos
+          (gasolina y diésel). La predicción del coste de recarga eléctrica,
+          que depende de tarifas horarias (PVPC) y contratos de operador,
+          queda fuera del alcance de esta versión.
+
+    \item \textbf{Soporte multipaís:} La plataforma está diseñada
+          y calibrada para el mercado español. La extensión a otros mercados
+          europeos requeriría adaptaciones en las fuentes de datos,
+          la normalización de formatos y la cobertura geográfica de los
+          servicios de enrutamiento.
+
+    \item \textbf{Panel de administración:} No se desarrolla una
+          interfaz de administración gráfica para la gestión de usuarios,
+          sincronizaciones o modelos ML. La administración se realiza
+          mediante endpoints protegidos por \textit{internal secret}
+          y acceso directo a la base de datos.
+\end{itemize}

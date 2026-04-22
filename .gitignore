@@ -12,6 +12,8 @@
 *.lot
 *.run.xml
 *.bcf
+*.lol
+
 
 # El PDF (opcional: coméntalo con # si quieres que el profe lo vea en GitHub)
 # *.pdf
