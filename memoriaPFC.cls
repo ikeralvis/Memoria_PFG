@@ -53,6 +53,7 @@
 \RequirePackage{bookmark}        % Mejoras para PDF
 \RequirePackage{xcolor}          % Más colores
 
+
 %% ------------------------------
 %% Configuración listings (código)
 %% ------------------------------
@@ -272,3 +273,9 @@
 \renewcommand*{\paragraphformat}{\theparagraph.\enskip}
 
 \RedeclareSectionCommand[runin=false]{subparagraph}
+
+\usepackage{pgfgantt}      % Para el diagrama de Gantt
+\usepackage{booktabs}      % Para \toprule, \midrule, \bottomrule en tablas
+\usepackage{multirow}      % Para las celdas combinadas en la tabla
+\usepackage{float}         % Para [H] en figuras y tablas
+\usepackage{lscape}   % en vez de pdflscape

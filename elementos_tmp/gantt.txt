@@ -1,0 +1,51 @@
+%%{init: { 
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#ffffff',
+
+    'primaryColor': '#2f5d8a',
+    'primaryTextColor': '#1a2a3a',   /* texto general oscuro */
+    'primaryBorderColor': '#2f5d8a',
+
+    'lineColor': '#cfd8dc',
+
+    'ganttTitleFontSize': '24px',
+    'ganttTitleColor': '#1a2a3a',
+
+    'ganttSectionBkgColor': '#f4f7fa',
+    'ganttSectionLabelColor': '#1a2a3a',
+
+    'ganttBarBkgColor': '#2f5d8a',
+    'ganttBarLabelColor': '#ffffff', /* SOLO dentro de barras */
+
+    'ganttMilestoneBkgColor': '#1a2a3a',
+    'ganttMilestoneBorderColor': '#1a2a3a'
+  }
+}}%%
+
+gantt
+    title Proyecto TankGo - Planificación
+    dateFormat  YYYY-MM
+    axisFormat  %b %Y
+    tickInterval 1month
+
+    section Fase 1: Prototipo
+    Alcance y arquitectura    :2025-10, 1M
+    Módulo gasolineras        :2025-10, 2M
+    Módulo usuarios           :2025-11, 1M
+    API Gateway               :2025-11, 1M
+    Frontend                  :2025-11, 2M
+    Despliegue Render         :2025-12, 1M
+
+    section Fase 2: PFG
+    Migración a GCP           :2026-01, 2M
+    Módulo electromovilidad   :2026-01, 3M
+    Agente conversacional     :2026-01, 3M
+    Sistema de rutado         :2026-02, 3M
+    Módulo ML (predicción)    :2026-02, 4M
+    Refinamiento interfaz     :2026-03, 3M
+    Correcciones y mejoras    :2026-03, 3M
+    Refinamiento rutado       :2026-04, 2M
+    Documentación y memoria   :2026-04, 2M
+
+    Entrega final             :milestone, 2026-06, 1d
