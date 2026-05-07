@@ -30,7 +30,7 @@ El estudio del estado del arte en este trabajo abarca tres ámbitos tecnológico
 
 La predicción de precios en mercados energéticos es un problema ampliamente estudiado en la literatura. Los enfoques clásicos basados en modelos estadísticos como ARIMA o GARCH han sido gradualmente desplazados por técnicas de aprendizaje automático que capturan relaciones no lineales y dependencias temporales complejas.
 
-En el contexto de los carburantes, estudios recientes demuestran que los modelos de \textit{gradient boosting} —en particular LightGBM y XGBoost— ofrecen un rendimiento superior en tareas de regresión sobre series temporales de precios al incorporar variables exógenas como el precio del crudo Brent, la estacionalidad o indicadores macroeconómicos \cite{LAHMIRI2024105008}. Lahmiri y Bekiros destacan que la incorporación de datos de mercados financieros como covariables mejora significativamente la capacidad predictiva de estos modelos frente a enfoques univariantes.
+En el contexto de los carburantes, estudios recientes demuestran que los modelos de \textit{gradient boosting} (en particular LightGBM) ofrecen un rendimiento superior en tareas de regresión sobre series temporales de precios al incorporar variables exógenas como el precio del crudo Brent, la estacionalidad o indicadores macroeconómicos \cite{LAHMIRI2024105008}. Lahmiri y Bekiros destacan que la incorporación de datos de mercados financieros como covariables mejora significativamente la capacidad predictiva de estos modelos frente a enfoques univariantes.
 
 Paralelamente, la literatura señala la utilidad de los modelos de regresión cuantílica para estimar no solo el valor esperado del precio futuro, sino intervalos de confianza que permiten una toma de decisiones más informada \cite{s24124013}. Este enfoque resulta especialmente relevante en el contexto de la presente plataforma, donde la incertidumbre del precio es tan relevante como la predicción puntual.
 
@@ -40,7 +40,7 @@ Los enfoques de \textit{Deep Learning}, como las redes LSTM (\textit{Long Short-
 
 Los sistemas de recomendación aplicados a la movilidad han evolucionado desde soluciones basadas en proximidad geográfica (\textit{nearest neighbor}) hacia enfoques que integran múltiples criterios: coste, disponibilidad, tiempo de desvío y preferencias del usuario. En el ámbito de los puntos de recarga eléctrica, la literatura recoge modelos de optimización multicriterio que consideran la autonomía del vehículo, la disponibilidad de conectores y el coste de la energía \cite{mitma_esmovilidad}.
 
-En el contexto de gasolineras, la recomendación basada en rutas —a diferencia de la búsqueda por cercanía— implica la definición de un corredor geométrico alrededor del trayecto planificado y la evaluación de estaciones dentro de dicho corredor según una función de puntuación ponderada. Este enfoque, adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste energético del trayecto.
+En el contexto de gasolineras, la recomendación basada en rutas (a diferencia de la búsqueda por cercanía) implica la definición de un corredor geométrico alrededor del trayecto planificado y la evaluación de estaciones dentro de dicho corredor según una función de puntuación ponderada. Este enfoque, adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste energético del trayecto.
 
 La integración de servicios de enrutamiento como OpenRouteService (ORS) u OSRM como backends intercambiables es una práctica consolidada en el desarrollo de aplicaciones de movilidad de código abierto, permitiendo flexibilidad entre precisión y coste operativo.
 
@@ -65,7 +65,14 @@ El mercado actual de aplicaciones para la consulta de precios de combustibles y 
 
 \subsection{Plataformas gubernamentales}
 
-El Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO) mantiene el \textit{Geoportal de la Energía} \cite{geoportal_gasolineras}, que ofrece una interfaz de consulta de precios de carburantes en tiempo real basada en los datos del Ministerio de Industria. Si bien constituye la fuente de referencia oficial y su API REST es de acceso público \cite{datosgob_carburantes}, la interfaz de usuario presenta limitaciones notables: no dispone de funcionalidad de comparación histórica, no integra información de puntos de recarga eléctrica y carece de cualquier capacidad predictiva o de recomendación.
+El Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO) mantiene el 
+\textit{Geoportal de la Energía} \cite{geoportal_gasolineras}, que ofrece una interfaz de 
+consulta de precios de carburantes en tiempo real basada en los datos del Ministerio de Industria. 
+Si bien constituye la fuente de referencia oficial y su API REST es de acceso público 
+\cite{datosgob_carburantes}, la interfaz de usuario presenta limitaciones notables: 
+no dispone de funcionalidad de comparación histórica, no integra información de puntos 
+de recarga eléctrica y carece de cualquier capacidad predictiva o de recomendación, asi como la falta de una experiencia de
+usuario moderna e interactiva. La plataforma se limita a mostrar datos puntuales sin ofrecer herramientas de análisis o soporte a la decisión, lo que reduce su utilidad para el usuario final.
 
 De forma análoga, la plataforma \textit{es-Movilidad} del MITECO \cite{mitma_esmovilidad} agrega información sobre infraestructura de recarga eléctrica, pero opera como un sistema independiente y no integrado con la información de combustibles convencionales, reproduciendo la fragmentación ya señalada en el análisis de problemas.
 
