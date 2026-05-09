@@ -1,23 +1,27 @@
 \chapter{Capítulo Tercero - Objetivos y Alcance}
 
 Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita
-el alcance del sistema resultante. Se definen tanto el objetivo general como los objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones explícitas para evitar ambigüedades en la evaluación del trabajo realizado. Esta sección es fundamental para orientar el desarrollo técnico y garantizar que el proyecto se mantenga enfocado en la entrega de valor dentro de los recursos y el tiempo disponibles.
+el alcance del sistema resultante. Se definen tanto el objetivo general como los
+objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y
+viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones
+explícitas para evitar ambigüedades en la evaluación del trabajo realizado.
 
 \section{Objetivo general}
 
-Diseñar, desarrollar y desplegar una plataforma software cloud-native que integre,
-en un único sistema, la consulta y comparación de precios de combustibles
+Diseñar, desarrollar y desplegar una plataforma software \textit{cloud-native} que
+integre, en un único sistema, la consulta y comparación de precios de combustibles
 y puntos de recarga eléctrica en España, incorporando capacidades de análisis
 histórico, predicción de precios a corto plazo, recomendación de repostaje basada
 en rutas y asistencia conversacional, con el fin de transformar datos energéticos
 dispersos en conocimiento accesible para el usuario final.
+
 
 \section{Objetivos específicos y medibles}
 
 Los objetivos específicos desglosan el objetivo general en metas concretas,
 verificables y acotadas en el tiempo, siguiendo el criterio SMART
 (\textit{Specific, Measurable, Achievable, Relevant, Time-bound})
-\cite{criterios_smart_wikipedia_2026}. Se organizan en torno a los cinco ejes funcionales
+\cite{doran1981there}. Se organizan en torno a los cinco ejes funcionales
 del sistema:
 
 \subsection{Ingesta y gestión de datos}
@@ -29,9 +33,8 @@ del sistema:
           diaria, con persistencia histórica en base de datos relacional.
 
     \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
-          eléctrica (mapareve.es) en el mismo modelo de datos que los combustibles
-          convencionales, permitiendo consultas unificadas sobre ambas fuentes
-          energéticas.
+          eléctrica en el mismo modelo de datos que los combustibles convencionales,
+          permitiendo consultas unificadas sobre ambas fuentes energéticas.
 
     \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
           datos históricos en formato Apache Parquet hacia Google Cloud Storage,
@@ -69,16 +72,18 @@ del sistema:
 \subsection{Recomendación basada en rutas}
 
 \begin{itemize}
-    \item \textbf{OE-08.} Implementar un servicio de recomendación de
-          gasolineras para rutas A$\rightarrow$B que calcule un corredor geométrico
-          alrededor del trayecto planificado mediante geometría vectorial
-          (Shapely) y evalúe las estaciones dentro del corredor según una
-          función de puntuación ponderada por precio y desvío.
-
-    \item \textbf{OE-09.} Integrar al menos dos backends de enrutamiento
-          intercambiables (OpenRouteService y OSRM) para garantizar la
-          disponibilidad del servicio de recomendación ante fallos o
-          restricciones de cuota de la API principal.
+      \item \textbf{OE-08.} Implementar un servicio de recomendación de
+          gasolineras para rutas A$\rightarrow$B que identifique candidatos
+          mediante consultas geoespaciales PostGIS (ST\_DWithin,
+          ST\_LineLocatePoint), calcule desvíos mediante la API Matrix de
+          OpenRouteService y evalúe las estaciones según una función de
+          puntuación ponderada por precio y desvío, con soporte de geometría
+          vectorial (Shapely) y distancias geodésicas (Haversine).
+      
+      \item \textbf{OE-09.} Integrar OpenRouteService como backend único de
+          enrutamiento en el entorno de producción cloud, con gestión de
+          cuotas mediante semáforo y mecanismos de resiliencia ante
+          indisponibilidad de la API externa.
 \end{itemize}
 
 \subsection{Arquitectura, despliegue y calidad}
@@ -100,9 +105,10 @@ del sistema:
           de usuario persistentes.
 
     \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
-          en tiempo real mediante WebSocket con capacidad de \textit{tool calling}
-          sobre la API del sistema, utilizando Gemini 2.5 Flash como modelo
-          de lenguaje subyacente.
+          basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
+          sobre la API REST de Google GenAI (Gemini 2.5 Flash), con capacidad
+          de \textit{tool calling} para consultar precios y estaciones cercanas
+          en tiempo real a través del API Gateway del sistema.
 \end{itemize}
 
 \section{Alcance del sistema}

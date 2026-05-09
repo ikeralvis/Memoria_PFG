@@ -1,158 +1,227 @@
 % !TEX root = ../main.tex
-\chapter{Capítulo Segundo - Antecedentes y Justificación  }
+\chapter{Capítulo Segundo - Antecedentes y Justificación}
+
 \section{Situación actual del sector de gasolineras}
-En los últimos años el sector energético vinculado a la movilidad ha experimentado una transformación impulsada por factores económicos, regulatorios y medioambientales. La volatilidad del precio de los combustibles fósiles, el aumento progresivo del parque de vehículos eléctricos y las políticas de transición energética han incrementado la necesidad de información precisa para la toma de decisiones de repostaje y recarga \cite{expansion_motor_2026_01_12}.
 
-La coexistencia de distintas fuentes energéticas (gasolina, diésel, GLP, electricidad) introduce mayor complejidad en el proceso de decisión del usuario. Además, los precios presentan variaciones relevantes entre estaciones de servicio cercanas e incluso fluctuaciones temporales a corto plazo.
+En los últimos años el sector energético vinculado a la movilidad ha experimentado una 
+transformación impulsada por factores económicos, regulatorios y medioambientales. La 
+volatilidad del precio de los combustibles fósiles, el crecimiento progresivo del parque de 
+vehículos eléctricos y las políticas de transición energética han incrementado la necesidad 
+de información precisa para la toma de decisiones de repostaje y recarga 
+\cite{expansion_motor_2026_01_12}.
 
-Desde las administraciones públicas se ha promovido la publicación de datos abiertos sobre precios de carburantes y localización de puntos de recarga\cite{datosgob_carburantes,geoportal_gasolineras}, lo que ha facilitado el desarrollo de herramientas digitales de consulta.
-
-\section{Problemas detectados}
-
-Tras un análisis del estado actual de las soluciones tecnológicas en el sector de la movilidad, se han identificado las siguientes deficiencias técnicas y funcionales que motivan el desarrollo de este proyecto:
-
-\begin{itemize}
-    \item \textbf{Heterogeneidad y dispersión de datos:} La información de precios y puntos de carga reside en silos aislados (OpenData gubernamental, APIs privadas, \textit{scrapers}), lo que dificulta una visión unificada y coherente en tiempo real.
-    \item \textbf{Carácter estático de la consulta:} Las plataformas actuales funcionan como visores de datos puntuales, careciendo de un análisis histórico que permita comprender las fluctuaciones del mercado.
-    \item \textbf{Ausencia de capacidad predictiva:} No se integran modelos de inteligencia artificial que asistan al usuario en la toma de decisiones anticipadas (¿conviene repostar hoy o esperar a mañana?).
-    \item \textbf{Desconexión con la planificación geoespacial:} La búsqueda de estaciones suele ser radial o por cercanía, ignorando la optimización del coste energético total en función de una ruta planificada.
-    \item \textbf{Brecha digital entre energías:} Existe una fragmentación tecnológica entre los sistemas de gestión de combustibles tradicionales y la infraestructura de movilidad eléctrica (EV), impidiendo una gestión híbrida eficiente.
-    \item \textbf{Falta de asistencia inteligente:} La interacción usuario-sistema sigue patrones rígidos de formularios, desaprovechando las capacidades actuales de los sistemas conversacionales y el procesamiento de lenguaje natural (NLP).
-\end{itemize}
-
-Estos problemas representan una oportunidad para diseñar una arquitectura que no solo centralice la información, sino que aplique capas de inteligencia de datos para transformar la información bruta en conocimiento accionable.
+La coexistencia de distintas fuentes energéticas (gasolina, diésel, GLP, 
+electricidad) introduce mayor complejidad en el proceso de decisión del usuario. Los 
+precios presentan variaciones entre estaciones cercanas y fluctuaciones 
+temporales a corto plazo que el usuario raramente puede anticipar. Desde las 
+administraciones públicas se ha impulsado la publicación de datos abiertos sobre precios 
+de carburantes y localización de puntos de recarga \cite{datosgob_carburantes, 
+geoportal_gasolineras}, facilitando el desarrollo de herramientas digitales de consulta. 
+Sin embargo, como se analiza en las secciones siguientes, la oferta actual presenta 
+limitaciones estructurales que justifican la propuesta de este trabajo.
 
 \section{Estado del arte}
 
-El estudio del estado del arte en este trabajo abarca tres ámbitos tecnológicos diferenciados que convergen en la solución propuesta: la predicción de precios energéticos mediante aprendizaje automático, los sistemas de recomendación geoespacial aplicados a la movilidad y las arquitecturas cloud orientadas al procesamiento de datos en tiempo real.
+El estudio del estado del arte abarca tres ámbitos tecnológicos que convergen en la 
+solución propuesta: la predicción de precios energéticos mediante aprendizaje automático, 
+los sistemas de recomendación geoespacial aplicados a la movilidad y las arquitecturas 
+\textit{cloud} orientadas al procesamiento de datos en tiempo real.
 
 \subsection{Predicción de precios de combustibles}
 
-La predicción de precios en mercados energéticos es un problema ampliamente estudiado en la literatura. Los enfoques clásicos basados en modelos estadísticos como ARIMA o GARCH han sido gradualmente desplazados por técnicas de aprendizaje automático que capturan relaciones no lineales y dependencias temporales complejas.
+La predicción de precios en mercados energéticos es un problema ampliamente estudiado. 
+Los enfoques clásicos basados en modelos estadísticos como ARIMA o GARCH han sido 
+progresivamente desplazados por técnicas de aprendizaje automático que capturan 
+relaciones no lineales y dependencias temporales complejas \cite{8945584}.
 
-En el contexto de los carburantes, estudios recientes demuestran que los modelos de \textit{gradient boosting} (en particular LightGBM) ofrecen un rendimiento superior en tareas de regresión sobre series temporales de precios al incorporar variables exógenas como el precio del crudo Brent, la estacionalidad o indicadores macroeconómicos \cite{LAHMIRI2024105008}. Lahmiri y Bekiros destacan que la incorporación de datos de mercados financieros como covariables mejora significativamente la capacidad predictiva de estos modelos frente a enfoques univariantes.
+En el contexto de mercados energéticos, estudios recientes demuestran que los modelos de 
+\textit{gradient boosting} (en particular LightGBM) ofrecen un rendimiento superior en 
+tareas de regresión sobre series temporales de precios al incorporar variables exógenas 
+como el precio del crudo Brent o indicadores macroeconómicos \cite{LAHMIRI2024105008}. 
+Paralelamente, la regresión cuantílica permite estimar no solo el valor esperado del 
+precio futuro, sino intervalos de confianza que habilitan una toma de decisiones más 
+informada \cite{s24124013}, enfoque adoptado en la presente plataforma.
 
-Paralelamente, la literatura señala la utilidad de los modelos de regresión cuantílica para estimar no solo el valor esperado del precio futuro, sino intervalos de confianza que permiten una toma de decisiones más informada \cite{s24124013}. Este enfoque resulta especialmente relevante en el contexto de la presente plataforma, donde la incertidumbre del precio es tan relevante como la predicción puntual.
-
-Los enfoques de \textit{Deep Learning}, como las redes LSTM (\textit{Long Short-Term Memory}), han mostrado capacidad para modelar dependencias temporales a largo plazo. Sin embargo, su coste computacional y menor interpretabilidad los posicionan como alternativas a evaluar de forma comparativa frente a los modelos de \textit{gradient boosting}, cuya eficiencia en datos tabulares y series temporales cortas está ampliamente documentada \cite{LAHMIRI2024105008}.
+Los modelos de \textit{Deep Learning} como las redes LSTM han mostrado capacidad para 
+modelar dependencias temporales a largo plazo \cite{8945584}, pero su mayor coste 
+computacional y menor interpretabilidad los posicionan como alternativa secundaria frente 
+a los modelos de \textit{gradient boosting} en series temporales con datos tabulares y 
+variables exógenas \cite{LAHMIRI2024105008}.
 
 \subsection{Sistemas de recomendación en movilidad}
 
-Los sistemas de recomendación aplicados a la movilidad han evolucionado desde soluciones basadas en proximidad geográfica (\textit{nearest neighbor}) hacia enfoques que integran múltiples criterios: coste, disponibilidad, tiempo de desvío y preferencias del usuario. En el ámbito de los puntos de recarga eléctrica, la literatura recoge modelos de optimización multicriterio que consideran la autonomía del vehículo, la disponibilidad de conectores y el coste de la energía \cite{mitma_esmovilidad}.
+Los sistemas de recomendación aplicados a la movilidad han evolucionado desde soluciones 
+basadas en proximidad geográfica hacia enfoques que integran múltiples criterios: coste, 
+disponibilidad, tiempo de desvío y preferencias del usuario \cite{mitma_esmovilidad}.
 
-En el contexto de gasolineras, la recomendación basada en rutas (a diferencia de la búsqueda por cercanía) implica la definición de un corredor geométrico alrededor del trayecto planificado y la evaluación de estaciones dentro de dicho corredor según una función de puntuación ponderada. Este enfoque, adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste energético del trayecto.
+  En el contexto de gasolineras, la recomendación basada en rutas implica la definición de 
+  un corredor geométrico alrededor del trayecto planificado y la evaluación de estaciones 
+  dentro de dicho corredor mediante una función de puntuación ponderada. Este enfoque, 
+  adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste 
+  energético del trayecto. La integración de servicios de enrutamiento, como OpenRouteService 
+  (ORS) a través de su API, es una práctica consolidada en aplicaciones de movilidad de código 
+  abierto, ya que permite ajustar la relación entre precisión y coste operativo.
 
-La integración de servicios de enrutamiento como OpenRouteService (ORS) u OSRM como backends intercambiables es una práctica consolidada en el desarrollo de aplicaciones de movilidad de código abierto, permitiendo flexibilidad entre precisión y coste operativo.
+\subsection{Arquitecturas \textit{cloud} para datos en tiempo real}
 
-\subsection{Arquitecturas cloud para datos en tiempo real}
+Las arquitecturas de microservicios desplegadas en entornos \textit{cloud-native} se han 
+consolidado como el paradigma dominante para plataformas de datos a escala. Frente a las 
+arquitecturas monolíticas, el modelo de microservicios ofrece desacoplamiento funcional, 
+escalabilidad independiente por componente y resiliencia ante fallos parciales 
+\cite{Gartner2026Trends}.
 
-Las arquitecturas de microservicios desplegadas en entornos \textit{cloud-native} se han consolidado como el paradigma dominante para el desarrollo de plataformas de datos a escala. Frente a las arquitecturas monolíticas tradicionales, el modelo de microservicios ofrece desacoplamiento funcional, escalabilidad independiente por componente y resiliencia ante fallos parciales \cite{Gartner2026Trends}.
-
-En el ámbito de la ingesta de datos abiertos gubernamentales, la federación de fuentes heterogéneas (APIs REST, portales de datos abiertos, servicios de terceros) requiere capas de normalización y persistencia que garanticen la coherencia del dato. La adopción de formatos columnar como Apache Parquet para la exportación de datos históricos y su almacenamiento en servicios de objeto (\textit{blob storage}) como Google Cloud Storage es una práctica ampliamente adoptada en pipelines de \textit{machine learning} que requieren reproducibilidad y versionado del dato \cite{s24124013}.
-
-El despliegue serverless mediante contenedores en plataformas como Google Cloud Run representa una tendencia creciente que reduce la carga operativa de gestión de infraestructura, permitiendo al equipo de desarrollo centrarse en la lógica de negocio. Esta aproximación se alinea con los patrones de arquitectura adaptativa que Gartner identifica como prioritarios para el ciclo 2025-2026 \cite{Gartner2026Trends}.
+La adopción de formatos columnares como Apache Parquet para la exportación de datos 
+históricos y su almacenamiento en servicios de objeto como Google Cloud Storage es 
+práctica habitual en \textit{pipelines} de \textit{machine learning} que requieren 
+reproducibilidad y versionado del dato \cite{s24124013}. El despliegue \textit{serverless} 
+mediante contenedores en plataformas como Google Cloud Run reduce la carga operativa 
+de gestión de infraestructura y se alinea con los patrones de arquitectura adaptativa 
+identificados por Gartner como prioritarios para el ciclo 2025--2026 
+\cite{Gartner2026Trends}.
 
 \subsection{Asistentes conversacionales en aplicaciones de dominio específico}
 
-El uso de modelos de lenguaje de gran escala (LLM) como componente de interfaces conversacionales en aplicaciones de dominio específico ha experimentado una adopción acelerada. La integración mediante protocolos estandarizados como el \textit{Model Context Protocol} (MCP) permite exponer capacidades del sistema backend como herramientas (\textit{tools}) invocables por el modelo, habilitando una capa de razonamiento sobre datos en tiempo real sin comprometer la arquitectura subyacente.
-
-En el contexto de la movilidad, los asistentes de voz con capacidad de \textit{tool calling} representan una evolución respecto a los chatbots basados en flujos predefinidos, al poder responder a consultas abiertas del tipo \enquote{¿cuál es la gasolinera más barata en mi ruta a Bilbao?} mediante la composición dinámica de llamadas a la API del sistema.
-
+El uso de modelos de lenguaje de gran escala (LLM) como componente de interfaces 
+conversacionales en aplicaciones de dominio específico ha experimentado una adopción 
+acelerada. En este proyecto no se emplea el \textit{Model Context Protocol} (MCP); el 
+sistema realiza peticiones HTTPS a la API de Gemini. Además, dispone de un conjunto 
+de herramientas internas que orientan la toma de decisiones y la orquestación de acciones 
+(por ejemplo, consultas a bases de datos o invocación de APIs del sistema) en función 
+de las peticiones de los usuarios. De este modo puede atender consultas abiertas, como 
+\enquote{¿cuál es la gasolinera más barata?}, componiendo llamadas a 
+las APIs del sistema cuando sea necesario para generar una respuesta adecuada.
 
 \section{Soluciones existentes y limitaciones}
 
-El mercado actual de aplicaciones para la consulta de precios de combustibles y puntos de recarga eléctrica en España ofrece diversas soluciones tanto de carácter oficial como de terceros. Su análisis permite identificar el espacio de mejora que justifica la propuesta de este proyecto.
-
 \subsection{Plataformas gubernamentales}
 
-El Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO) mantiene el 
-\textit{Geoportal de la Energía} \cite{geoportal_gasolineras}, que ofrece una interfaz de 
-consulta de precios de carburantes en tiempo real basada en los datos del Ministerio de Industria. 
-Si bien constituye la fuente de referencia oficial y su API REST es de acceso público 
-\cite{datosgob_carburantes}, la interfaz de usuario presenta limitaciones notables: 
-no dispone de funcionalidad de comparación histórica, no integra información de puntos 
-de recarga eléctrica y carece de cualquier capacidad predictiva o de recomendación, asi como la falta de una experiencia de
-usuario moderna e interactiva. La plataforma se limita a mostrar datos puntuales sin ofrecer herramientas de análisis o soporte a la decisión, lo que reduce su utilidad para el usuario final.
+El ecosistema de herramientas oficiales en España ha evolucionado significativamente en 
+los últimos meses. El \textit{Geoportal de Hidrocarburos} del MITECO 
+\cite{geoportal_gasolineras} constituye la fuente de referencia para precios de 
+carburantes, con API REST de acceso público \cite{datosgob_carburantes}. Su interfaz web 
+permite la consulta de precios actuales pero carece de análisis histórico, capacidad 
+predictiva y recomendación basada en ruta.
 
-De forma análoga, la plataforma \textit{es-Movilidad} del MITECO \cite{mitma_esmovilidad} agrega información sobre infraestructura de recarga eléctrica, pero opera como un sistema independiente y no integrado con la información de combustibles convencionales, reproduciendo la fragmentación ya señalada en el análisis de problemas.
+La aplicación móvil \textbf{Ruta-e}, evolución de la anterior GeoGasolineras, integra en 
+una sola plataforma datos de estaciones de servicio y puntos de recarga eléctrica, con 
+filtros por tipo de combustible, precio y horario. Supone un avance respecto a la 
+fragmentación previa, aunque sigue siendo una herramienta de consulta estática sin 
+capacidad analítica ni predictiva.
+
+En el ámbito de la recarga eléctrica, el \textbf{mapa REVE} (Red de Puntos de Recarga 
+para Vehículos Eléctricos), desarrollado por Red Eléctrica por mandato del MITECO e 
+impulsado bajo el Real Decreto-ley 4/2024, ofrece desde abril de 2025 información 
+dinámica en tiempo real sobre disponibilidad y tarifas de más de 40.000 puntos de 
+recarga. En diciembre de 2025 lanzó su aplicación móvil con planificador de rutas 
+básico para vehículos eléctricos. Se trata de la iniciativa oficial más avanzada en este 
+ámbito, aunque centrada exclusivamente en recarga eléctrica y sin integración con 
+combustibles convencionales ni capacidad predictiva.
 
 \subsection{Aplicaciones de terceros}
 
-Existen aplicaciones móviles ampliamente utilizadas como \textit{Gasolineras España}, \textit{Waze} (con integración parcial de precios) o \textit{GasBuddy} en otros mercados, que abordan parcialmente el problema de la búsqueda por proximidad. No obstante, estas soluciones presentan limitaciones estructurales comunes:
-
-\begin{itemize}
-    \item \textbf{Ausencia de predicción:} Ninguna de las soluciones identificadas incorpora modelos de predicción de precios a corto plazo que orienten la decisión temporal de repostaje.
-    \item \textbf{Recomendación por ruta limitada:} La optimización basada en trayectos planificados (corredor de ruta con función de coste ponderado) no está presente en las soluciones de referencia analizadas.
-    \item \textbf{Fragmentación entre energías:} La gestión conjunta de combustibles convencionales y puntos de recarga eléctrica en una única interfaz unificada es inexistente en las soluciones actuales del mercado español.
-    \item \textbf{Falta de interacción conversacional:} La interacción mediante lenguaje natural para consultas complejas no está disponible en ninguna de las plataformas analizadas.
-    \item \textbf{Dependencia de datos crowdsourced:} Algunas plataformas dependen de aportaciones de usuarios para actualizar precios, introduciendo latencia y potencial sesgo en la información.
-\end{itemize}
+Existen aplicaciones ampliamente utilizadas como \textit{Gasolineras España}, 
+\textit{Waze} (con integración parcial de precios) o \textit{GasBuddy} en otros mercados 
+anglosajones, que abordan parcialmente la búsqueda por proximidad. Estas soluciones 
+presentan limitaciones estructurales comunes: dependencia de datos \textit{crowdsourced} 
+con la consiguiente latencia y sesgo potencial, ausencia de modelos predictivos y 
+recomendación por ruta limitada a criterios de proximidad simple.
 
 \subsection{Síntesis comparativa}
 
-La Tabla~\ref{tab:comparativa_soluciones} resume de forma esquemática las capacidades de las principales soluciones existentes frente a las funcionalidades que incorpora el sistema propuesto.
+La Tabla~\ref{tab:comparativa_soluciones} resume las capacidades de las principales 
+soluciones existentes frente al sistema propuesto.
 
 \begin{table}[h]
 \centering
 \caption{Comparativa de funcionalidades entre soluciones existentes y TankGo}
 \label{tab:comparativa_soluciones}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \hline
-\textbf{Funcionalidad} & \textbf{Geoportal} & \textbf{Apps móviles} & \textbf{es-Movilidad} & \textbf{TankGo (PFG)} \\
+\textbf{Funcionalidad} & \textbf{Geoportal} & \textbf{Ruta-e} & \textbf{REVE} 
+  & \textbf{Apps terceros} & \textbf{TankGo} \\
 \hline
-Precios en tiempo real     & \checkmark & \checkmark & --         & \checkmark \\
-Historial de precios       & --         & Parcial    & --         & \checkmark \\
-Predicción de precios      & --         & --         & --         & \checkmark \\
-Recomendación por ruta     & --         & Parcial    & --         & \checkmark \\
-Integración EV             & --         & --         & \checkmark & \checkmark \\
-Asistente conversacional   & --         & --         & --         & \checkmark \\
-API pública documentada    & \checkmark & --         & --         & \checkmark \\
-Arquitectura cloud-native  & --         & --         & --         & \checkmark \\
+Precios combustible en tiempo real  & \checkmark & \checkmark & --         
+  & \checkmark & \checkmark \\
+Historial de precios                & --         & --         & --         
+  & Parcial    & \checkmark \\
+Predicción de precios               & --         & --         & --         
+  & --         & \checkmark \\
+Recomendación por ruta              & --         & \checkmark         & Parcial EV 
+  & Parcial    & \checkmark \\
+Integración combustible + EV        & --         & \checkmark & --         
+  & --         & \checkmark \\
+Asistente conversacional            & --         & --         & --         
+  & --         & \checkmark \\
+API pública documentada             & \checkmark & --         & --         
+  & --         & \checkmark \\
+Arquitectura \textit{cloud-native}  & --         & --         & --         
+  & --         & \checkmark \\
 \hline
 \end{tabular}
 \end{table}
 
-Esta síntesis pone de manifiesto que, si bien existen soluciones parciales para cada funcionalidad de forma aislada, ninguna plataforma del mercado español integra el conjunto de capacidades propuesto en este trabajo. La propuesta de valor de TankGo reside precisamente en esa integración, que trasciende la suma de las partes para ofrecer un sistema de soporte a la decisión coherente y orientado al usuario.
-
+La síntesis pone de manifiesto que, si bien las iniciativas oficiales recientes (Ruta-e, 
+REVE) han reducido la fragmentación entre energías, ninguna plataforma integra análisis 
+histórico, predicción de precios y recomendación de ruta con soporte conversacional en 
+un único sistema. La propuesta de valor de TankGo reside precisamente en esa 
+integración, que transforma datos de consulta en un sistema de apoyo a la decisión.
 
 \section{Origen del proyecto y evolución}
-El presente proyecto parte de un prototipo académico desarrollado por el autor en la asignatura \textit{Desarrollo Avanzado de Aplicaciones para la Web de Datos} \cite{Alvis2025TankGo}. Dicho sistema inicial, denominado \textit{TankGo}, permitía la consulta de precios de estaciones de servicio mediante la federación de fuentes de datos abiertos y una visualización geoespacial básica. No obstante, aquel desarrollo presentaba una arquitectura acotada a objetivos formativos.
-El actual Trabajo de Fin de Grado retoma esa base tecnológica para transformarla en una plataforma robusta y profesional. Esta evolución no es meramente incremental, sino que supone una redefinición del sistema bajo tres ejes estratégicos alineados con tendencias recientes de la industria del \textit{software}, especialmente en adopción de IA y arquitecturas de plataforma escalables en entornos \textit{cloud} \cite{Gartner2026Trends}.
+
+El presente proyecto parte de un prototipo académico desarrollado por el autor en la 
+asignatura \textit{Desarrollo Avanzado de Aplicaciones para la Web de Datos} 
+\cite{Alvis2025TankGo}. Dicho sistema permitía la consulta de precios mediante la 
+federación de fuentes de datos abiertos y una visualización geoespacial básica, con una 
+arquitectura acotada a objetivos formativos.
+
+El actual Trabajo de Fin de Grado transforma esa base en una plataforma profesional bajo 
+tres ejes estratégicos alineados con tendencias recientes de la industria 
+\cite{Gartner2026Trends}:
 
 \begin{enumerate}
-    \item \textbf{Infraestructura y persistencia escalable:} Se migra hacia una arquitectura \textit{cloud-native} capaz de procesar datos masivos. Esto permite la ingesta de flujos de datos en tiempo real, una capacidad crítica para mitigar riesgos en el sector energético \cite{s24124013}.
-    \item \textbf{Inteligencia de datos y modelado predictivo:} Se incorpora un motor de pronóstico de precios. A diferencia del prototipo original, se plantea una evaluación comparativa de distintos modelos (p. ej., LightGBM, XGBoost y enfoques de \textit{Deep Learning}) para seleccionar la alternativa con mejor equilibrio entre precisión, coste computacional e interpretabilidad en el contexto del proyecto \cite{LAHMIRI2024105008,s24124013}.
+    \item \textbf{Infraestructura escalable:} migración hacia arquitectura 
+    \textit{cloud-native} con capacidad de procesamiento de datos masivos e ingesta 
+    en tiempo real, capacidad crítica para mitigar riesgos en el sector energético 
+    \cite{s24124013}.
+    \item \textbf{Inteligencia de datos:} incorporación de un motor de predicción de 
+    precios basado en LightGBM con regresión cuantílica, seleccionado por su equilibrio 
+    entre precisión, coste computacional e interpretabilidad 
+    \cite{LAHMIRI2024105008, s24124013}.
+    \item \textbf{Interacción conversacional:} integración de un asistente de voz 
+    mediante MCP, que habilita consultas en lenguaje natural sobre datos en tiempo real 
+    sin modificar la arquitectura subyacente.
 \end{enumerate}
 
-Con este enfoque, el sistema evoluciona de una herramienta informativa hacia un sistema de apoyo a la decisión, alineado con las exigencias de un sistema de información avanzado.
+Con este enfoque, el sistema evoluciona de herramienta informativa a sistema de apoyo 
+a la decisión.
 
 \section{Justificación técnica y académica}
 
-Desde el punto de vista \textbf{técnico}, el proyecto trasciende la implementación de software para convertirse en un ejercicio de integración de múltiples disciplinas de la Ingeniería Informática. La solución se fundamenta en la convergencia de:
-\begin{itemize}
-    \item \textbf{Arquitectura de Sistemas:} Diseño de una infraestructura modular \textit{cloud-native} que garantiza escalabilidad y disponibilidad.
-    \item \textbf{Gestión de Datos y Analítica:} Implementación de flujos de ingesta y persistencia políglota para el tratamiento de series temporales de precios.
-    \item \textbf{Inteligencia Computacional:} Incorporación de modelos predictivos que, como sugiere la literatura reciente \cite{LAHMIRI2024105008}, son esenciales para transformar datos brutos en conocimiento accionable en el sector energético.
-    \item \textbf{Ingeniería de Interfaces:} Desarrollo de sistemas de interacción avanzada, incluyendo asistencia conversacional y visualización geoespacial compleja.
-\end{itemize}
+Desde el punto de vista \textbf{técnico}, el proyecto integra múltiples disciplinas de 
+la Ingeniería Informática: arquitectura de sistemas \textit{cloud-native}, gestión de 
+datos y series temporales, inteligencia computacional aplicada \cite{LAHMIRI2024105008} 
+e ingeniería de interfaces con visualización geoespacial y asistencia conversacional.
 
-Desde la \textbf{perspectiva académica}, este trabajo se justifica como una síntesis integral de las competencias del Grado en Ingeniería Informática. El proyecto no solo valida la capacidad técnica del autor, sino su madurez metodológica al:
-\begin{itemize}
-    \item \textbf{Sintetizar conocimientos:} Unificar áreas como la Inteligencia Artificial, el Desarrollo Web y la Gestión de Proyectos en un único ecosistema coherente.
-    \item \textbf{Rigor investigativo:} Fundamentar las decisiones de diseño en un análisis del estado del arte y tendencias tecnológicas globales para 2026 \cite{Gartner2026Trends}.
-    \item \textbf{Gestión de Ingeniería:} Aplicar una planificación formal, estimación de costes operativos (OpEx) y una evaluación técnica basada en métricas de rendimiento y calidad de software.
-    \item \textbf{Pensamiento crítico:} Evaluar de forma objetiva las limitaciones del sistema y proponer líneas de evolución futura dentro de la ética profesional y la sostenibilidad.
-\end{itemize}
+Desde la \textbf{perspectiva académica}, este trabajo se justifica como síntesis integral 
+de las competencias del Grado en Ingeniería Informática. El proyecto demuestra madurez 
+metodológica al fundamentar las decisiones de diseño en el análisis del estado del arte 
+\cite{Gartner2026Trends}, aplicar planificación formal con estimación de costes y evaluar 
+de forma crítica las limitaciones del sistema y sus líneas de evolución futura.
 
-\subsection{Alineación con los Objetivos de Desarrollo Sostenible (ODS)}
+\subsection{Alineación con los Objetivos de Desarrollo Sostenible}
 
-La Agenda 2030 de las Naciones Unidas establece una hoja de ruta global hacia la sostenibilidad a través de 17 objetivos \cite{onu_ods_goals}. Aunque el presente trabajo es de naturaleza técnica y computacional, su despliegue en el sector de la movilidad inteligente (\textit{Smart Mobility}) permite una alineación estratégica con las siguientes metas:
+La Agenda 2030 \cite{onu_ods_goals} establece el marco global de referencia en 
+sostenibilidad. La plataforma se alinea con dos objetivos directamente relevantes 
+para el ámbito de la movilidad inteligente:
 
 \begin{itemize}
-    \item \textbf{ODS 7 (Energía asequible y no contaminante):} El sistema contribuye a la meta 7.3 (eficiencia energética) mediante la democratización y transparencia de datos. Al integrar en una única interfaz precios de combustibles y puntos de recarga eléctrica, se facilita la transición hacia modelos de movilidad más sostenibles y económicamente eficientes.
-    \item \textbf{ODS 9 (Industria, innovación e infraestructura):} Esta es la vinculación más directa del proyecto. La transformación de fuentes de datos heterogéneas en un Sistema de Soporte a la Decisión (DSS) mediante \textit{cloud computing} e Inteligencia Artificial promueve el desarrollo de infraestructuras digitales resilientes e innovadoras \cite{mitma_esmovilidad}. Se fomenta el uso de tecnologías abiertas y estándares de interoperabilidad, pilares de la industria 4.0.
-    \item \textbf{ODS 12 (Producción y consumo responsables):} La plataforma empodera al usuario final con herramientas de analítica predictiva \cite{LAHMIRI2024105008}, permitiendo un consumo más racional. La optimización de rutas basada en el coste energético reduce el desperdicio de recursos y fomenta una planificación logística más consciente.
-    \item \textbf{ODS 13 (Acción por el clima):} Al facilitar la localización y gestión de puntos de recarga eléctrica frente a los combustibles fósiles, el proyecto actúa como un catalizador tecnológico para la reducción de emisiones de CO2 en el transporte por carretera, alineándose con las estrategias europeas de descarbonización.
+    \item \textbf{ODS 7 (Energía asequible y no contaminante):} al integrar en una 
+    única interfaz precios de combustibles y puntos de recarga eléctrica, la plataforma 
+    facilita la transición hacia modelos de movilidad más sostenibles y promueve la 
+    eficiencia energética en el transporte por carretera.
+    \item \textbf{ODS 9 (Industria, innovación e infraestructura):} la transformación de 
+    fuentes de datos heterogéneas en un sistema de soporte a la decisión mediante 
+    \textit{cloud computing} e inteligencia artificial promueve infraestructuras digitales 
+    resilientes e innovadoras \cite{mitma_esmovilidad}, en línea con los principios de 
+    la Agenda Digital española \cite{gob_agenda2030_espana}.
 \end{itemize}
-
-Es importante destacar que, si bien el impacto directo es modesto debido al carácter académico del proyecto, la arquitectura propuesta demuestra cómo la digitalización y el procesamiento inteligente de datos son habilitadores críticos para alcanzar las metas de sostenibilidad nacional e internacional \cite{gob_agenda2030_espana}.
