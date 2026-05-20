@@ -1,275 +1,244 @@
-\chapter{Capítulo Cuarto - Planificación del Proyecto}
+\chapter{Capítulo Cuarto - Objetivos y Alcance}
 
-Este capítulo describe cómo se organizó y gestionó el desarrollo de TankGo a lo largo de sus
-dos fases. Se detalla la metodología elegida, la descomposición del trabajo en tareas, la
-estimación de tiempos, el cronograma seguido, los hitos alcanzados y las replanificaciones
-que surgieron durante el proceso.
+Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita
+el alcance del sistema resultante. Se definen tanto el objetivo general como los
+objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y
+viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones
+explícitas para evitar ambigüedades en la evaluación del trabajo realizado.
 
-% ─────────────────────────────────────────────
-\section{Metodología de desarrollo elegida y justificación}
-% ─────────────────────────────────────────────
+\section{Objetivo general}
 
-Para el desarrollo de TankGo se adoptó una metodología ágil basada en \textbf{Kanban}. Esta elección responde
-a las características particulares del trabajo: un equipo unipersonal, un alcance que evolucionó
-de forma incremental y la necesidad de compatibilizar el desarrollo con otras obligaciones
-académicas.
-
-Kanban es un método de gestión visual del flujo de trabajo originalmente formulado en el
-ámbito de la manufactura y posteriormente adaptado al desarrollo de software~\cite{anderson2010kanban}.
-Su principal ventaja frente a metodologías más prescriptivas como Scrum es que no impone
-cadencias fijas de iteración (\textit{sprints}), lo que resulta idóneo cuando el ritmo de
-trabajo varía semana a semana. En su lugar, el trabajo se organiza en un tablero con columnas
-que representan los estados del flujo (\textit{Pendiente}, \textit{En progreso},
-\textit{En revisión}, \textit{Completado}), y las tareas avanzan a medida que se van
-finalizando, sin necesidad de sincronizarlas en bloques temporales.
-
-Durante la \textbf{primera fase} del proyecto (octubre-diciembre de 2025), la planificación se
-realizó principalmente en Notion para definir el alcance inicial, y en Todoist para el
-seguimiento diario de tareas. En la \textbf{segunda fase} (enero-mayo de 2026), coincidiendo
-con la formalización del proyecto como PFG, se incorporó un tablero en Trello para visualizar
-el estado global del desarrollo, manteniendo Todoist como herramienta de gestión cotidiana.
-Esta combinación permitió distinguir entre la visión macro del proyecto y la operativa diaria.
-
-Las reuniones de seguimiento con el director del proyecto actuaron como puntos de control
-periódicos, permitiendo validar los avances, ajustar prioridades y detectar desviaciones con
-suficiente antelación.
-
-% ─────────────────────────────────────────────
-\section{Descomposición en tareas (EDT)}
-% ─────────────────────────────────────────────
-
-La Estructura de Descomposición del Trabajo (\textit{Work Breakdown Structure}, WBS) organiza
-el proyecto en bloques funcionales que reflejan la evolución real del desarrollo. Se distinguen
-dos grandes fases, cada una subdividida en paquetes de trabajo.
-
-\begin{description}
-  \item \textbf{Fase 1 - Prototipo inicial (octubre-diciembre 2025)}
-  \begin{enumerate}
-    \item \textbf{Definición del alcance y arquitectura inicial.}
-      Estudio de fuentes de datos disponibles, definición de objetivos del sistema y diseño
-      de la arquitectura de microservicios.
-    \item \textbf{Módulo de gasolineras.}
-      Integración con la API del Ministerio para obtener datos de precios en tiempo real,
-      diseño del modelo de datos y desarrollo del microservicio correspondiente.
-    \item \textbf{Módulo de usuarios.}
-      Implementación del sistema de autenticación, gestión de perfiles y preferencias.
-    \item \textbf{API Gateway.}
-      Configuración del gateway como punto de entrada unificado para los distintos
-      microservicios.
-    \item \textbf{Interfaz de usuario (frontend).}
-      Diseño UX/UI y desarrollo de la aplicación web para consulta y comparación de precios.
-    \item \textbf{Primer despliegue (Render PaaS).}
-      Puesta en producción del sistema en la plataforma Render como validación del
-      funcionamiento integral.
-  \end{enumerate}
-
-  \item \textbf{Fase 2 - Ampliación como PFG (enero-mayo 2026)}
-  \begin{enumerate}
-    \setcounter{enumi}{6}
-    \item \textbf{Migración y mejora del despliegue a GCP.}
-      Reconfiguración de la infraestructura en Google Cloud Platform, incluyendo Cloud Run,
-      Cloud Storage, asi como mantener la base de datos de Neon Tech.
-    \item \textbf{Módulo de electromovilidad.}
-      Integración de puntos de recarga de vehículos eléctricos como extensión del dominio
-      de datos del sistema.
-    \item \textbf{Sistema de recomendación de rutas.}
-      Desarrollo del módulo de rutado que sugiere paradas de repostaje óptimas en función
-      de la ruta del usuario.
-    \item \textbf{Módulo de predicción de precios (ML).}
-      Entrenamiento y despliegue del modelo LightGBM para la estimación de precios futuros
-      de carburante.
-    \item \textbf{Asistente conversacional.}
-      Implementación del agente de voz para la interacción en lenguaje natural
-      con el sistema.
-    \item \textbf{Mejora y refinamiento del sistema de rutado.}
-      Optimización de los algoritmos de recomendación y validación con casos de uso reales.
-    \item \textbf{Documentación y memoria del PFG.}
-      Redacción de la memoria técnica, preparación de la presentación y revisión final.
-  \end{enumerate}
-
-\end{description}
-
-% ─────────────────────────────────────────────
-\section{Estimación de tiempos}
-% ─────────────────────────────────────────────
-
-La estimación de tiempos se realizó de forma incremental: la Fase~1 contó con una dedicación
-intensiva propia de una asignatura de proyecto, mientras que la Fase~2 se desarrolló a un
-ritmo de entre 10 y 15 horas semanales, compatibilizando el trabajo con otras actividades
-académicas y la colaboración con el grupo de investigación NextEdge de la Universidad de Deusto.
-
-La tabla siguiente recoge la estimación de horas por paquete de trabajo:
-
-\begin{table}[H]
-  \centering
-  \caption{Estimación de horas por paquete de trabajo}
-  \label{tab:estimacion_horas}
-  \begin{tabular}{llr}
-    \toprule
-    \textbf{Fase} & \textbf{Paquete de trabajo} & \textbf{Horas estimadas} \\
-    \midrule
-    \multirow{6}{*}{Fase 1}
-      & Definición del alcance y arquitectura     & 15 \\
-      & Módulo de gasolineras                     & 30 \\
-      & Módulo de usuarios                        & 20 \\
-      & API Gateway                               & 15 \\
-      & Frontend                                  & 45 \\
-      & Despliegue en Render                      & 10 \\
-    \midrule
-    \multirow{7}{*}{Fase 2}
-      & Migración a GCP                           & 25 \\
-      & Módulo de electromovilidad                & 10 \\
-      & Sistema de recomendación de rutas         & 50 \\
-      & Módulo de predicción (ML)                 & 40 \\
-      & Asistente conversacional                  & 35 \\
-      & Refinamiento del rutado                   & 25 \\
-      & Refinamiento del la interfaz              & 15 \\
-      & Correcciones y mejoras                    & 25 \\
-      & Documentación y memoria                   & 40 \\
-    \midrule
-    \multicolumn{2}{l}{\textbf{Total estimado}}   & \textbf{400} \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Las estimaciones recogidas en la tabla constituyen una aproximación retrospectiva al esfuerzo 
-real invertido, elaborada a partir del registro de tareas y del seguimiento del tablero Kanban. 
-La naturaleza incremental del proyecto hace que la estimación prospectiva de horas presente 
-mayor incertidumbre que en proyectos con alcance cerrado desde el inicio; por ello, las cifras 
-reflejan el tiempo efectivamente dedicado con mayor fidelidad que una planificación previa 
-al desarrollo.
+Diseñar, desarrollar y desplegar una plataforma software \textit{cloud-native} que
+integre, en un único sistema, la consulta y comparación de precios de combustibles
+y puntos de recarga eléctrica en España, incorporando capacidades de análisis
+histórico, predicción de precios a corto plazo, recomendación de repostaje basada
+en rutas y asistencia conversacional, con el fin de transformar datos energéticos
+dispersos en conocimiento accionable y accesible para el usuario final.
 
 
-% ─────────────────────────────────────────────
-\section{Cronograma (Diagrama de Gantt)}
-% ─────────────────────────────────────────────
+\section{Objetivos específicos y medibles}
 
-El cronograma del proyecto abarca el período comprendido entre octubre de 2025 y mayo de 2026.
-La figura~\ref{fig:gantt} representa el diagrama de Gantt con las principales tareas del
-proyecto distribuidas en el tiempo.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{imgs/gantt.png}
-  \caption{Diagrama de Gantt del proyecto TankGo}
-  \label{fig:gantt}
-\end{figure}
+Los objetivos específicos desglosan el objetivo general en metas concretas,
+verificables y acotadas en el tiempo, siguiendo el criterio SMART
+(\textit{Specific, Measurable, Achievable, Relevant, Time-bound})
+\cite{Doran1981}. Se organizan en torno a los cinco ejes funcionales
+del sistema:
 
-% ─────────────────────────────────────────────
-\section{Hitos del proyecto}
-% ─────────────────────────────────────────────
+\subsection{Ingesta y gestión de datos}
 
-A lo largo del proyecto se definieron tres hitos principales que marcaron el cierre de etapas
-significativas y sirvieron como puntos de validación con el director:
+\begin{itemize}
+    \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
+          con la API REST del Ministerio de Industria (MinITUR) que garantice la
+          disponibilidad de datos de precios actualizados con una frecuencia mínima
+          diaria, con persistencia histórica en base de datos relacional.
 
-\begin{description}
-  \item[M1 - Prototipo funcional (diciembre 2025).] Finalización de la primera versión
-    operativa del sistema, con los módulos de gasolineras, usuarios, gateway y frontend
-    integrados y desplegados en Render. Este hito cerró la fase correspondiente a la
-    asignatura de proyecto y sentó las bases del PFG.
+    \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
+          eléctrica en el mismo modelo de datos que los combustibles convencionales,
+          permitiendo consultas unificadas sobre ambas fuentes energéticas.
 
-  \item[M2 - Sistema completo en GCP (mayo 2026).] Finalización de todos los módulos
-    avanzados: migración a Google Cloud Platform, sistema de recomendación de rutas, módulo
-    de predicción de precios con LightGBM y asistente conversacional. Este hito supuso la
-    validación funcional del sistema en su versión completa.
+    \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
+          datos históricos en formato Apache Parquet hacia Google Cloud Storage,
+          como base de datos de entrenamiento reproducible para los modelos de
+          aprendizaje automático.
+\end{itemize}
 
-  \item[M3 - Entrega del PFG (junio 2026).] Cierre del proyecto con la entrega de la memoria
-    técnica y la presentación ante el tribunal. Este hito incluye la revisión final de la
-    documentación y la preparación de la defensa.
-\end{description}
+\subsection{Consulta y visualización geoespacial}
 
-% ─────────────────────────────────────────────
-\section{Encadenamiento de actividades}
-% ─────────────────────────────────────────────
+\begin{itemize}
+    \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
+          con mapa interactivo que permita la búsqueda y filtrado de estaciones
+          por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
+          (español, inglés y euskera).
 
-El encadenamiento de actividades refleja las dependencias lógicas entre los distintos paquetes
-de trabajo, es decir, qué tareas deben completarse antes de que otras puedan comenzar. Dado que
-el proyecto siguió un enfoque incremental, muchas dependencias son secuenciales dentro de cada
-módulo, aunque algunas tareas de la segunda fase podían abordarse en paralelo una vez
-estabilizado el núcleo del sistema.
+    \item \textbf{OE-05.} Implementar la visualización del historial de
+          precios por estación mediante gráficos temporales interactivos.
+\end{itemize}
 
-La \textbf{definición del alcance y la arquitectura} constituye la actividad de partida del
-proyecto: ningún módulo puede iniciarse sin tener clara la estructura general del sistema y las
-fuentes de datos a integrar. A partir de ella, el \textbf{módulo de gasolineras} y el
-\textbf{módulo de usuarios} pueden desarrollarse en paralelo, ya que ambos son funcionalmente
-independientes. El primero es el componente central de la plataforma y su finalización es
-prerequisito para el desarrollo del frontend, que consume los datos que expone. El
-\textbf{API Gateway}, por su parte, se desarrolló de forma incremental conforme se añadían
-nuevos microservicios, requiriendo que al menos uno de ellos estuviera operativo para poder
-configurar el enrutamiento. El \textbf{frontend} no puede estabilizarse hasta que tanto el
-gateway como los módulos principales expongan contratos de API consolidados. El
-\textbf{despliegue en Render} cierra la Fase~1 y requiere que todos los componentes anteriores
-estén integrados y probados.
+\subsection{Predicción de precios}
 
-La \textbf{migración a GCP} abre la Fase~2 y es prerequisito para cualquier componente
-avanzado, ya que la nueva infraestructura proporciona los servicios de cómputo, base de datos
-y orquestación sobre los que se apoya el resto del sistema. Una vez completada, el
-\textbf{módulo de electromovilidad} y el \textbf{agente conversacional} pueden desarrollarse
-en paralelo, al tratarse de extensiones independientes. El \textbf{sistema de recomendación
-de rutas} depende de que los datos de gasolineras y puntos de recarga estén disponibles y
-correctamente modelados, mientras que el \textbf{módulo de predicción} (LightGBM) requiere
-además disponer de series históricas de precios almacenadas en GCP. El
-\textbf{refinamiento del rutado} se inicia una vez que el sistema de recomendación está
-operativo y se han identificado sus limitaciones mediante pruebas. Finalmente, la
-\textbf{documentación y memoria} se elabora en paralelo con el desarrollo técnico de la
-Fase~2, aunque con una intensidad creciente hacia el cierre del proyecto.
+\begin{itemize}
+    \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
+          de precios basado en modelos de \textit{gradient boosting} (LightGBM)
+          con regresión cuantílica, incorporando el precio del crudo Brent como
+          variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
+          predicciones individualizadas por estación de servicio en un periodo de 7 días.
 
-% ─────────────────────────────────────────────
-\section{Plan de recursos humanos}
-% ─────────────────────────────────────────────
+    \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
+          seleccionado frente a alternativas (XGBoost, regresión lineal como
+          \textit{baseline}) mediante métricas estándar de regresión
+          (MAE, RMSE, $R^2$) \cite{s24124013}.
+\end{itemize}
 
-El proyecto TankGo ha sido desarrollado íntegramente por un único alumno, con la supervisión
-periódica del director del PFG. Los dos roles principales son el del alumno como desarrollador
-y el del director como tutor académico, a los que se suma una colaboración externa de carácter
-consultivo con el grupo de investigación NextEdge de la Universidad de Deusto.
+\subsection{Recomendación basada en rutas}
 
-El \textbf{alumno} ha asumido la responsabilidad íntegra del diseño, implementación, pruebas y
-documentación del sistema, así como las tareas propias de gestión del proyecto: planificación
-de tareas, seguimiento del tablero Kanban y coordinación con los agentes externos. La
-dedicación fue de aproximadamente 10--15 horas semanales durante la Fase~2. 
+\begin{itemize}
+      \item \textbf{OE-08.} Implementar un servicio de recomendación de
+          gasolineras para rutas A$\rightarrow$B que identifique candidatos
+          mediante consultas geoespaciales PostGIS (ST\_DWithin,
+          ST\_LineLocatePoint), calcule desvíos mediante la API Matrix de
+          OpenRouteService y evalúe las estaciones según una función de
+          puntuación ponderada por precio y desvío, con soporte de geometría
+          vectorial (Shapely) y distancias geodésicas (Haversine).
+      
+      \item \textbf{OE-09.} Integrar OpenRouteService como backend único de
+          enrutamiento en el entorno de producción cloud, con gestión de
+          cuotas mediante semáforo y mecanismos de resiliencia ante
+          indisponibilidad de la API externa.
+\end{itemize}
 
-El \textbf{director del PFG} ha ejercido la supervisión técnica y académica del proyecto mediante
-reuniones periódicas de seguimiento, orientación en las decisiones de diseño y revisión de los
-entregables, con una dedicación estimada de 1--2 horas semanales a lo largo de todo el
-proyecto.
+\subsection{Arquitectura, despliegue y calidad}
 
-Adicionalmente, el proyecto ha contado con la colaboración del grupo de investigación
-  	\textbf{NextEdge} de la Universidad de Deusto, dirigido por el Dr.\ Diego López-de-Ipiña y
-  la Dra. Oihane Gómez Carmona. El grupo mostró un interés activo en la solución y ha promovido
-  el desarrollo del módulo de recomendación: han proporcionado orientación sobre requisitos y realizaron
-  consultas periódicas. Su implicación ha orientado decisiones de
-  diseño y ha motivado la incorporación del módulo de electromovilidad y del sistema de predicción
-  de precios, ampliando así la funcionalidad y el alcance de TankGo.
+\begin{itemize}
+    \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
+          microservicios con API Gateway centralizado, donde cada servicio
+          sea independientemente desplegable y escalable, siguiendo los
+          principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
 
-% ─────────────────────────────────────────────
-\section{Replanificaciones realizadas}
-% ─────────────────────────────────────────────
+    \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
+          Google Cloud Run mediante pipelines de integración y entrega continua
+          (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
+          independientes (uno por servicio).
 
-A lo largo del proyecto se han producido varias replanificaciones que modificaron el alcance
-inicial. Estas desviaciones no respondieron a fallos de planificación,
-sino a la naturaleza exploratoria del proyecto y a oportunidades de colaboración que surgieron
-durante el desarrollo.
+    \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
+          basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
+          para autenticación OAuth 2.0 mediante Google y gestión de perfiles
+          de usuario persistentes.
 
-\textbf{Ampliación del dominio de datos.} El sistema ha sido concebido inicialmente como una
-plataforma de consulta de precios de gasolineras en tiempo real. A raíz de la colaboración
-con NextEdge y de la identificación de casos de uso más completos, el alcance se amplió para
-incluir puntos de recarga de vehículos eléctricos. Este cambio implicó la creación de un nuevo
-módulo y la revisión del modelo de datos para acomodar entidades heterogéneas.
+    \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
+          basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
+          sobre la API REST de Google GenAI (Gemini 2.5 Flash), con capacidad
+          de \textit{tool calling} para consultar precios y estaciones cercanas
+          en tiempo real a través del API Gateway del sistema.
+\end{itemize}
 
-\textbf{Incorporación de datos históricos y predicción.} El planteamiento original no
-contemplaba el almacenamiento de series históricas ni la predicción de precios. La disponibilidad
-de datos suficientes y el interés por ofrecer una propuesta de mayor valor añadido motivaron
-la incorporación del módulo de predicción basado en LightGBM, lo que requirió rediseñar la
-capa de persistencia y añadir una nueva tarea de entrenamiento y evaluación del modelo.
+\section{Alcance del sistema}
 
-\textbf{Adición del asistente conversacional.} El agente de voz no figuraba en
-la planificación de la segunda fase. Su incorporación ha respondido al interés por explorar las
-posibilidades de interacción en lenguaje natural con el sistema, en línea con las tendencias
-actuales en interfaces conversacionales para aplicaciones de información geolocalizada.
+El alcance define los límites funcionales y técnicos del sistema desarrollado,
+estableciendo qué está incluido en la solución entregada.
 
-\textbf{Cambio de plataforma de despliegue.} El primer despliegue se realizó en Render como
-solución de validación rápida. La migración posterior a Google Cloud Platform supuso un
-esfuerzo de reconfiguración no previsto inicialmente, pero proporcionó una infraestructura más
-robusta, escalable y alineada con los objetivos de cloud-native del proyecto.
+\subsection{Ámbito geográfico y de datos}
 
-En conjunto, estas replanificaciones han resultado en un incremento del alcance respecto al
-prototipo inicial, sin comprometer los objetivos académicos ni los plazos de entrega del PFG.
+El sistema cubre la totalidad del territorio español continental e insular,
+utilizando como fuente primaria de datos de carburantes la API pública del
+Ministerio de Industria, Turismo y Comercio (MinITUR) \cite{datosgob_carburantes},
+que publica precios de aproximadamente 11.000 estaciones de servicio activas
+en España. Los puntos de recarga eléctrica se obtienen del portal
+mapareve.es, complementando la oferta de datos de movilidad eléctrica
+disponible institucionalmente \cite{mitma_esmovilidad}.
+
+\subsection{Componentes funcionales incluidos}
+
+La plataforma entregada comprende los siguientes componentes funcionales:
+
+\begin{enumerate}
+    \item \textbf{Servicio de gasolineras:} ingesta, normalización, persistencia
+          y consulta de precios de carburantes con historial temporal.
+
+    \item \textbf{Servicio de usuarios:} registro, autenticación (tradicional
+          y OAuth Google), gestión de perfiles con preferencias de combustible
+          y vehículo, y sistema de favoritos sincronizado.
+
+    \item \textbf{Servicio de recomendación:} cálculo de rutas óptimas de
+          repostaje para trayectos A$\rightarrow$B con función de coste ponderada.
+
+    \item \textbf{Servicio de predicción:} generación de predicciones de
+          precio a corto plazo por estación, basadas en modelos LightGBM
+          entrenados sobre datos históricos.
+
+    \item \textbf{Asistente de voz:} interfaz conversacional en tiempo real
+          con acceso a las capacidades del sistema mediante \textit{tool calling}.
+
+    \item \textbf{API Gateway:} punto de entrada único con documentación
+          OpenAPI agregada, gestión de autenticación y bridge WebSocket.
+
+    \item \textbf{Frontend PWA:} aplicación web progresiva instalable con
+          soporte \textit{offline}, modo oscuro e internacionalización.
+\end{enumerate}
+
+\subsection{Entorno de despliegue}
+
+La plataforma se despliega íntegramente en Google Cloud Platform (GCP),
+utilizando Cloud Run como servicio de ejecución de contenedores serverless,
+Artifact Registry para el almacenamiento de imágenes Docker, Cloud Build
+para la automatización del pipeline CI/CD y Secret Manager para la
+gestión segura de credenciales en producción. La base de datos relacional
+se externaliza en Neon (PostgreSQL gestionado) y el almacenamiento de
+objetos para el pipeline de ML se realiza en Google Cloud Storage.
+
+\section{Limitaciones}
+
+Las limitaciones recogen aquellos aspectos que, estando dentro del alcance
+conceptual del proyecto, presentan restricciones técnicas o de recursos
+conocidas en la versión entregada.
+
+\begin{itemize}
+    \item \textbf{Frecuencia de actualización de precios:} La API del
+          Ministerio de Industria publica datos con una frecuencia que puede
+          variar entre actualizaciones horarias y diarias según la estación,
+          por lo que el sistema no puede garantizar precios en tiempo real
+          estricto, sino \textit{near real-time} con un desfase máximo
+          determinado por la fuente oficial.
+
+    \item \textbf{Cobertura del modelo predictivo:} El servicio de
+          predicción genera modelos únicamente para las estaciones con
+          suficiente historial de precios almacenado y para aquellas
+          marcadas como favoritas por los usuarios del sistema, priorizando
+          la relevancia sobre la cobertura total.
+
+    \item \textbf{Precisión de la recomendación por ruta:} La calidad
+          de la recomendación depende de la disponibilidad y precisión del
+          backend de enrutamiento seleccionado. El fallback a distancia
+          en línea recta, activable mediante configuración, reduce la
+          precisión del corredor geométrico calculado.
+
+    \item \textbf{Escalabilidad del asistente de voz:} El servicio de
+          voz está sujeto a los límites de cuota de la API de Gemini y al
+          rate limiting configurado (40 peticiones por minuto por IP),
+          lo que limita su uso concurrente intensivo.
+
+    \item \textbf{Disponibilidad de datos de recarga eléctrica:}
+          La información de puntos de recarga eléctrica procede de una
+          fuente de terceros (mapareve.es) cuya disponibilidad y
+          completitud no están garantizadas de forma institucional,
+          a diferencia de los datos de carburantes del Ministerio.
+\end{itemize}
+
+\section{Exclusiones}
+
+Las exclusiones delimitan explícitamente lo que queda fuera del alcance
+del presente proyecto, evitando ambigüedades en la evaluación del
+trabajo realizado.
+
+\begin{itemize}
+    \item \textbf{Aplicación móvil nativa:} El sistema se entrega como
+          PWA instalable, pero no se desarrolla una aplicación nativa para
+          iOS o Android. La PWA cubre los casos de uso de movilidad mediante
+          el navegador del dispositivo.
+
+    \item \textbf{Integración con navegadores GPS:} No se integra con
+          sistemas de navegación en tiempo real tipo Google Maps o Waze para
+          guía turn-by-turn. La recomendación de ruta se limita al cálculo
+          de la estación óptima, no a la navegación posterior.
+
+    \item \textbf{Pagos y reservas:} El sistema no contempla
+          funcionalidades de pago, reserva de surtidores ni integración
+          con sistemas de fidelización de las cadenas de gasolineras.
+
+    \item \textbf{Predicción de precios de electricidad:} El módulo
+          predictivo se centra exclusivamente en combustibles líquidos
+          (gasolina y diésel). La predicción del coste de recarga eléctrica,
+          que depende de tarifas horarias (PVPC) y contratos de operador,
+          queda fuera del alcance de esta versión.
+
+    \item \textbf{Soporte multipaís:} La plataforma está diseñada
+          y configurada para el mercado español. La extensión a otros mercados
+          europeos requeriría adaptaciones en las fuentes de datos,
+          la normalización de formatos y la cobertura geográfica de los
+          servicios de enrutamiento.
+
+    \item \textbf{Panel de administración:} No se desarrolla una
+          interfaz de administración gráfica para la gestión de usuarios,
+          sincronizaciones o modelos ML. La administración se realiza
+          mediante endpoints protegidos por \textit{internal secret}
+          y acceso directo a la base de datos.
+\end{itemize}

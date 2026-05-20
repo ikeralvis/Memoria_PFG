@@ -12,7 +12,7 @@ de información precisa para la toma de decisiones de repostaje y recarga
 
 La coexistencia de distintas fuentes energéticas (gasolina, diésel, GLP, 
 electricidad) introduce mayor complejidad en el proceso de decisión del usuario. Los 
-precios presentan variaciones entre estaciones cercanas y fluctuaciones 
+precios presentan variaciones entre estaciones cercanas geográficamente y fluctuaciones 
 temporales a corto plazo que el usuario raramente puede anticipar. Desde las 
 administraciones públicas se ha impulsado la publicación de datos abiertos sobre precios 
 de carburantes y localización de puntos de recarga \cite{datosgob_carburantes, 
@@ -59,7 +59,7 @@ disponibilidad, tiempo de desvío y preferencias del usuario \cite{mitma_esmovil
   dentro de dicho corredor mediante una función de puntuación ponderada. Este enfoque, 
   adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste 
   energético del trayecto. La integración de servicios de enrutamiento, como OpenRouteService 
-  (ORS) a través de su API, es una práctica consolidada en aplicaciones de movilidad de código 
+  (ORS) \cite{osm_wiki_routers}a través de su API, es una práctica consolidada en aplicaciones de movilidad de código 
   abierto, ya que permite ajustar la relación entre precisión y coste operativo.
 
 \subsection{Arquitecturas \textit{cloud} para datos en tiempo real}
@@ -70,18 +70,18 @@ arquitecturas monolíticas, el modelo de microservicios ofrece desacoplamiento f
 escalabilidad independiente por componente y resiliencia ante fallos parciales 
 \cite{Gartner2026Trends}.
 
-La adopción de formatos columnares como Apache Parquet para la exportación de datos 
+La adopción de formatos columnares como Apache Parquet \cite{databricks_parquet} para la exportación de datos 
 históricos y su almacenamiento en servicios de objeto como Google Cloud Storage es 
 práctica habitual en \textit{pipelines} de \textit{machine learning} que requieren 
 reproducibilidad y versionado del dato \cite{s24124013}. El despliegue \textit{serverless} 
-mediante contenedores en plataformas como Google Cloud Run reduce la carga operativa 
+mediante contenedores en plataformas como Google Cloud Run \cite{cloud_run2026} reduce la carga operativa 
 de gestión de infraestructura y se alinea con los patrones de arquitectura adaptativa 
 identificados por Gartner como prioritarios para el ciclo 2025--2026 
 \cite{Gartner2026Trends}.
 
 \subsection{Asistentes conversacionales en aplicaciones de dominio específico}
 
-El uso de modelos de lenguaje de gran escala (LLM) como componente de interfaces 
+El uso de modelos de lenguaje de gran escala (LLM) como motores de interfaces 
 conversacionales en aplicaciones de dominio específico ha experimentado una adopción 
 acelerada. En este proyecto no se emplea el \textit{Model Context Protocol} (MCP); el 
 sistema realiza peticiones HTTPS a la API de Gemini. Además, dispone de un conjunto 
@@ -187,8 +187,8 @@ tres ejes estratégicos alineados con tendencias recientes de la industria
     precios basado en LightGBM con regresión cuantílica, seleccionado por su equilibrio 
     entre precisión, coste computacional e interpretabilidad 
     \cite{LAHMIRI2024105008, s24124013}.
-    \item \textbf{Interacción conversacional:} integración de un asistente de voz 
-    mediante MCP, que habilita consultas en lenguaje natural sobre datos en tiempo real 
+    \item \textbf{Interacción conversacional:} integración de un asistente de voz , 
+    que habilita consultas en lenguaje natural sobre datos en tiempo real 
     sin modificar la arquitectura subyacente.
 \end{enumerate}
 

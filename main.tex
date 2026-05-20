@@ -23,14 +23,13 @@ combina el precio actual, la evolución prevista y la desviación necesaria resp
 recorrido, evaluando el coste total del desplazamiento.
 Los datos son gestionados mediante Neon Tech como almacén analítico principal y Cloud Storage 
 para la persistencia de modelos y artefactos. La plataforma es accesible desde dispositivos 
-móviles mediante una interfaz web responsive y contempla adicionalmente un asistente conversacional 
-por voz construido sobre el protocolo MCP (Model Context Protocol), priorizando en todo momento la 
+móviles mediante una interfaz web responsive y contempla adicionalmente un asistente conversacional, priorizando en todo momento la 
 experiencia de usuario.
 El proyecto integra competencias de ingeniería de software, análisis de datos e inteligencia 
 artificial aplicada, constituyendo una solución tecnológica orientada al ahorro económico, 
 la eficiencia energética y la toma de decisiones basada en datos.}
 
-\descriptores{Proyecto, Ingeniería, Desarrollo, Documentación, Evaluación}
+\descriptores{Computación en la nube, predicción de precios, plataforma de carburantes, recomendación geoespacial.}
 
 
 %% ---------------------------------------------------
@@ -52,28 +51,27 @@ la eficiencia energética y la toma de decisiones basada en datos.}
 %\includepdf[pages=1]{../portada_firmada.pdf}  % Portada firmada (opcional)
 
 \resumenPersonalizado{
-Este proyecto abordó el diseño e implementación de \textit{TankGo}, una plataforma
-cloud-native de comparación de precios de carburantes y puntos de recarga eléctrica
-en España, extendida con capacidades de inteligencia artificial y recomendación
-geoespacial. El trabajo se enmarca en el área de la ingeniería del software y los
-sistemas inteligentes, con aplicación directa de técnicas de análisis de datos,
-aprendizaje automático y computación en la nube.
-
-El desarrollo comprendió las siguientes fases: estudio del estado del arte y análisis
-de soluciones existentes; planificación y definición de requisitos; diseño de la
-arquitectura del sistema; implementación del backend con \textit{FastAPI} y base de
-datos \textit{PostgreSQL} serverless sobre \textit{Neon Tech}; desarrollo del frontend
-con \textit{React}; despliegue de la infraestructura en \textit{Google Cloud Platform}
-mediante \textit{Cloud Run} y \textit{Cloud Functions}; e integración de un modelo
-predictivo de precios basado en \textit{LightGBM} con horizonte de siete días.
-
-El alcance específico del proyecto incluyó: la ingesta automatizada de datos desde la
-API oficial del Ministerio para la Transición Ecológica, un módulo de recomendación
-de repostaje en ruta apoyado en la API de Google Maps, una interfaz web
-\textit{responsive} accesible desde dispositivos móviles, y un asistente conversacional
-por voz construido sobre el protocolo MCP (\textit{Model Context Protocol}). El sistema
-resultante constituye una solución funcional, escalable y orientada al ahorro
-económico y la eficiencia energética en el transporte.
+Este proyecto tiene como objetivo el diseño e implementación de un sistema inteligente integrado 
+en una plataforma digital de comparación de precios de carburantes, desarrollada sobre Google 
+Cloud Platform con una arquitectura de microservicios desplegada mediante Cloud Run y 
+Cloud Functions. La solución, implementada con FastAPI en el backend y React en el frontend, 
+permite a los usuarios consultar precios actualizados en tiempo real a partir de la API oficial 
+del Ministerio para la Transición Ecológica, acceder a históricos de precios por estación 
+de servicio y visualizar predicciones a siete días generadas mediante modelos de machine 
+learning basados en LightGBM.
+Más allá de la simple visualización de información, el sistema incorpora un módulo de 
+recomendación de repostaje en ruta que, apoyándose en la API de Google Maps para el 
+análisis geoespacial y la optimización de recorridos, determina qué estación resulta más 
+conveniente económicamente para un trayecto definido por el usuario. Esta recomendación 
+combina el precio actual, la evolución prevista y la desviación necesaria respecto al 
+recorrido, evaluando el coste total del desplazamiento.
+Los datos son gestionados mediante Neon Tech como almacén analítico principal y Cloud Storage 
+para la persistencia de modelos y artefactos. La plataforma es accesible desde dispositivos 
+móviles mediante una interfaz web responsive y contempla adicionalmente un asistente conversacional, priorizando en todo momento la 
+experiencia de usuario.
+El proyecto integra competencias de ingeniería de software, análisis de datos e inteligencia 
+artificial aplicada, constituyendo una solución tecnológica orientada al ahorro económico, 
+la eficiencia energética y la toma de decisiones basada en datos.
 }{Computación en la nube, predicción de precios, plataforma de carburantes, recomendación geoespacial.}
 
 %% Índices
@@ -97,10 +95,10 @@ económico y la eficiencia energética en el transporte.
 \input{capitulos/capitulo2.tex}
 \input{capitulos/capitulo3.tex}
 \input{capitulos/capitulo4.tex}
-%\input{capitulos/capitulo5.tex}
-%\input{capitulos/capitulo6.tex}
+\input{capitulos/capitulo5.tex}
+\input{capitulos/capitulo6.tex}
 %\input{capitulos/capitulo7.tex}
-%\input{capitulos/capitulo8.tex}
+\input{capitulos/capitulo8.tex}
 
 
 %% ----------------------

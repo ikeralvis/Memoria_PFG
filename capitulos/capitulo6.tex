@@ -1,290 +1,286 @@
-\chapter{Capítulo Sexto - Desarrollo del Sistema}
-Este capítulo recoge la especificación, el diseño y la implementación de TankGo, así como
-el plan de pruebas y el manual de usuario. Es el núcleo técnico del proyecto y documenta
-las decisiones de arquitectura, las tecnologías empleadas y el resultado final del sistema.
+\chapter{Capítulo Sexto - Presupuesto y evaluación de costes}
 
-% ═════════════════════════════════════════════
-\section{Especificación de Requisitos}
-% ═════════════════════════════════════════════
 
-\subsection{Contexto del sistema}
+En este capítulo se realiza una evaluación económica del proyecto TankGo desde dos perspectivas
+complementarias. Por un lado, se estima el \textbf{coste teórico} del proyecto, es decir, lo que hubiera
+supuesto contratar en el mercado el trabajo técnico realizado. Por otro lado, se detalla el
+\textbf{coste real} incurrido durante el desarrollo, que en gran medida se ha mantenido en valores
+mínimos gracias al uso estratégico de herramientas gratuitas y niveles de uso libres de coste
+(\textit{free tiers}) de los principales proveedores cloud.
 
-TankGo es una plataforma de inteligencia de datos orientada a la movilidad y la eficiencia
-energética. Su propósito es transformar los datos abiertos del Geoportal de Gasolineras del
-Ministerio para la Transición Ecológica~\cite{geoportal_gasolineras} en información
-accionable para el conductor, añadiendo capas de valor mediante análisis histórico,
-predicción de precios y recomendación geoespacial de repostaje.
+La diferencia entre ambas magnitudes es en sí misma un resultado relevante del proyecto: demuestra
+que es posible construir y desplegar una plataforma de microservicios cloud-native de complejidad
+real con una inversión económica muy reducida durante la fase de desarrollo y prototipado.
 
-El sistema actúa como intermediario entre las fuentes de datos públicos y el usuario final,
-operando en un entorno cloud que permite tanto la consulta en tiempo real como el
-entrenamiento y servicio de modelos de machine learning. A diferencia de un visor estático,
-TankGo integra en una única plataforma la consulta de gasolineras y electrolineras, la
-estimación de precios futuros y un asistente conversacional por voz para interacción en
-manos libres.
+% ------------------------------------------------------------
+\section{Costes laborales}
+% ------------------------------------------------------------
 
-\subsection{Identificación de usuarios}
+El coste laboral constituye la partida más significativa del proyecto, dado que TankGo ha sido
+desarrollado en su totalidad por un único estudiante. A lo largo del proyecto, el autor ha desempeñado
+simultáneamente varios roles técnicos, cuyas horas se desglosan a continuación.
 
-El sistema contempla dos perfiles de usuario diferenciados. El \textbf{usuario no registrado}
-puede acceder a las funciones de consulta pública: visualización de gasolineras y
-electrolineras en mapa y tabla, detalle de cada estación y precios actuales. El
-\textbf{usuario registrado} dispone, además, de la gestión de estaciones favoritas, el
-acceso al histórico de precios de cada estación y las predicciones a 7 días generadas por
-el modelo de machine learning.
+\subsection{Roles y tarifa de referencia}
 
-Dentro de estos perfiles, los casos de uso más representativos son el conductor particular
-que busca repostar barato en su área, el transportista profesional que planifica rutas de
-larga distancia con criterios de coste, y el usuario de vehículo eléctrico que necesita
-localizar puntos de recarga en ruta.
+Para estimar el coste de mercado del trabajo realizado se emplea una tarifa de referencia de
+\textbf{30 €/hora}, correspondiente al perfil de un Ingeniero de Software Junior con conocimientos en
+desarrollo fullstack, arquitecturas cloud y aprendizaje automático. Esta cifra es coherente con las
+tablas salariales publicadas para perfiles similares en el mercado español en 2025--2026
+\cite{infojobs2025salarios}.
 
-\subsection{Requisitos funcionales}
+\subsection{Distribución de horas por rol}
 
-Los requisitos funcionales definen las capacidades que el sistema debe ofrecer al
-usuario~\cite{sommerville2011}. La tabla~\ref{tab:rf} recoge los requisitos identificados
-para TankGo.
+La Tabla~\ref{tab:costes_laborales} recoge la distribución estimada de horas invertidas por rol técnico
+durante los aproximadamente nueve meses de desarrollo del proyecto (octubre de 2025 a junio de 2026).
+La estimación parte de los registros de actividad y los hitos del diagrama de Gantt presentado en el
+Capítulo~4.
+
 \begin{table}[H]
-  \centering
-  \caption{Requisitos funcionales del sistema}
-  \label{tab:rf}
-  \begin{tabular}{llp{9cm}}
-    \toprule
-    \textbf{ID} & \textbf{Requisito} & \textbf{Descripción} \\
-    \midrule
-    RF-01 & Consulta de gasolineras     & El sistema muestra las estaciones de servicio cercanas a la ubicación del usuario en tabla y mapa interactivo, con detalle de precios por tipo de combustible. \\
-    RF-02 & Consulta de electrolineras  & El sistema muestra los puntos de recarga eléctrica disponibles en un mapa independiente. \\
-    RF-03 & Histórico de precios        & Para cada estación, el sistema permite visualizar la evolución histórica del precio de cada combustible. \\
-    RF-04 & Predicción de precios       & El sistema estima el precio de combustible para los próximos 7 días en las estaciones marcadas como favoritas por el usuario. \\
-    RF-05 & Gestión de favoritos        & El usuario registrado puede marcar y gestionar sus estaciones de servicio favoritas. \\
-    RF-06 & Recomendación en ruta       & El sistema sugiere paradas de repostaje óptimas a lo largo de una ruta, ponderando precio y desvío. \\
-    RF-07 & Asistente conversacional    & El sistema permite realizar consultas en lenguaje natural mediante voz, como localizar la gasolinera más barata en la zona. \\
-    RF-08 & Autenticación de usuarios   & El sistema permite el registro e inicio de sesión mediante Google OAuth. \\
-    \bottomrule
-  \end{tabular}
+\centering
+\caption{Distribución de horas por rol y coste laboral estimado}
+\label{tab:costes_laborales}
+\begin{tabular}{lrrc}
+\hline
+\textbf{Rol} & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
+\hline
+Arquitecto de software / diseño del sistema   & 80  & 30 & 2.400 \\
+Desarrollador backend (Python/FastAPI)        & 120 & 30 & 3.600 \\
+Desarrollador backend (Node.js/Fastify/Hono)  & 80  & 30 & 2.400 \\
+Desarrollador frontend (React/TypeScript)     & 70  & 30 & 2.100 \\
+Ingeniería de datos / ML (LightGBM, pipeline) & 60  & 30 & 1.800 \\
+DevOps / cloud / CI-CD (GCP, Docker)          & 50  & 30 & 1.500 \\
+Análisis de requisitos y documentación        & 40  & 30 & 1.200 \\
+\hline
+\textbf{Total estudiante}                     & \textbf{500} & 30 & \textbf{15.000} \\
+\hline
+\end{tabular}
 \end{table}
 
-\subsection{Requisitos no funcionales}
+\subsection{Coste del director del proyecto}
 
-Los requisitos no funcionales establecen las propiedades de calidad del sistema, no
-directamente relacionadas con las funciones que ofrece, sino con cómo las
-ofrece~\cite{sommerville2011}.
+La normativa del PFG establece que debe incluirse también el coste del equipo de soporte,
+concretamente el del director. Se estima una dedicación media de 1 hora semanal de reunión y
+seguimiento a lo largo de 36 semanas de proyecto, más un período de revisión de la memoria. La
+tarifa de referencia para un perfil de Profesor Titular es de 60~€/hora.
 
-\textbf{Disponibilidad (RNF-01):} Al tratarse de una plataforma de consulta en ruta, el
-sistema debe garantizar un tiempo de actividad superior al 99\%, respaldado por la
-infraestructura de Google Cloud Platform.
+\begin{table}[H]
+\centering
+\caption{Coste del director del proyecto}
+\label{tab:coste_director}
+\begin{tabular}{lrrc}
+\hline
+\textbf{Concepto} & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
+\hline
+Reuniones y seguimiento semanal & 36 & 60 & 2.160 \\
+Revisión de la memoria          & 10 & 60 &   600 \\
+\hline
+\textbf{Total director}         & \textbf{46} & 60 & \textbf{2.760} \\
+\hline
+\end{tabular}
+\end{table}
 
-\textbf{Latencia (RNF-02):} El tiempo de respuesta de las consultas de precios y el
-asistente conversacional no deben ser muy elevados, requisito crítico para garantizar
-la seguridad vial en uso móvil.
+% ------------------------------------------------------------
+\section{Material, herramientas e infraestructura}
+% ------------------------------------------------------------
 
-\textbf{Escalabilidad (RNF-03):} La arquitectura de microservicios y el despliegue en
-Cloud Run permiten escalar cada componente de forma independiente según la demanda, sin
-afectar al resto del sistema.
+\subsection{Hardware}
 
-\textbf{Usabilidad (RNF-04):} El frontend está diseñado con criterio \textit{mobile-first}
-y es completamente responsivo, priorizando la experiencia en dispositivos móviles sin
-renunciar a la usabilidad en escritorio.
+El único elemento hardware empleado ha sido el ordenador personal del autor, un equipo portátil
+de uso general valorado en 1.200~€. Se aplica una amortización lineal a 4 años, con un uso
+dedicado al proyecto de aproximadamente el 60\% del tiempo durante 9 meses:
 
-\textbf{Seguridad (RNF-05):} Las comunicaciones se realizan sobre HTTPS, la autenticación
-se gestiona mediante tokens JWT y el acceso a los microservicios internos está restringido
-a través del API Gateway.
+%\[
+%\text{Amortización} = \frac{1200}{48}\times 9 \times 0{,}60 \approx 135\,\text{€}
+%\]
 
-\subsection{Restricciones}
+\subsection{Software y herramientas de desarrollo}
 
-El sistema opera bajo tres restricciones principales. En primer lugar, existe una
-\textbf{dependencia de fuentes externas}: los datos de gasolineras provienen de la API
-pública del Ministerio para la Transición Ecológica~\cite{datosgob_carburantes}, cuya
-disponibilidad y frecuencia de actualización están fuera del control del sistema. En segundo
-lugar, las funciones de consulta, predicción y recomendación requieren \textbf{conectividad
-activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
-\textbf{asistente conversacional} está diseñado para responder consultas puntuales, no para
-mantener diálogos extendidos mientras se conduce, en línea con las directrices de seguridad
-vial aplicables. El sistema de recomendacion de rutas tambien añade una dependecia esta fuera del control del sistema, ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
+La práctica totalidad del software empleado en el proyecto es de código abierto o gratuito, lo que
+ha supuesto una ventaja económica significativa. La Tabla~\ref{tab:sw_herramientas} recoge las
+principales herramientas utilizadas.
 
-% ═════════════════════════════════════════════
-\section{Diseño del Sistema}
-% ═════════════════════════════════════════════
+\begin{table}[H]
+\centering
+\caption{Herramientas de software y su coste}
+\label{tab:sw_herramientas}
+\begin{tabular}{llr}
+\hline
+\textbf{Herramienta} & \textbf{Uso} & \textbf{Coste} \\
+\hline
+Python, Node.js, React      & Lenguajes y frameworks principales   & Gratuito \\
+Docker Desktop              & Contenedores y orquestación local    & Gratuito \\
+Visual Studio Code          & Editor de código                     & Gratuito \\
+Git / GitHub                & Control de versiones y CI/CD         & Gratuito \\
+Overleaf                    & Edición de la memoria en \LaTeX{}    & Gratuito \\
+\hline
+\textbf{Total software}     &                                      & \textbf{0 €} \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Alternativas exploradas y decisiones tecnológicas}
-Las decisiones tecnológicas de TankGo responden a criterios de adecuación funcional,
-rendimiento en entornos cloud y familiaridad del equipo de desarrollo. A continuación se
-justifican las elecciones más relevantes.
+\subsection{Infraestructura cloud — coste real durante el desarrollo}
+\label{subsec:infra_real}
 
-Para el \textbf{API Gateway} se evaluaron opciones como Kong, AWS API Gateway y soluciones
-basadas en Nginx. Se optó por \textbf{Hono sobre Node.js} por su bajo consumo de recursos,
-su rendimiento en entornos serverless y su sintaxis próxima a Express, lo que simplificó la
-curva de aprendizaje~\cite{hono}. Hono permite implementar enrutamiento, middleware de
-autenticación y políticas CORS con un código mínimo y muy legible.
+Uno de los resultados más destacados desde el punto de vista económico es que la infraestructura
+cloud utilizada durante todo el ciclo de desarrollo se ha mantenido dentro de los niveles gratuitos
+ofrecidos por los proveedores. La Tabla~\ref{tab:infra_real} detalla los servicios empleados y su
+coste efectivo.
 
-Para los \textbf{microservicios de dominio} se utilizaron dos tecnologías según el
-lenguaje más adecuado para cada caso. El servicio de usuarios se implementó con
-\textbf{Fastify (Node.js)}, un framework orientado al alto rendimiento con una gestión
-eficiente del esquema de validación. Los servicios de gasolineras,
-recomendación y predicción se implementaron con \textbf{FastAPI (Python)}, elección
-motivada por la integración nativa con el ecosistema de machine learning de Python
-(scikit-learn, LightGBM, pandas) y su capacidad para generar documentación OpenAPI
-automáticamente.
+\begin{table}[H]
+\centering
+\caption{Infraestructura cloud — coste real durante el desarrollo}
+\label{tab:infra_real}
+\begin{tabular}{lp{5.5cm}r}
+\hline
+\textbf{Servicio} & \textbf{Descripción del uso} & \textbf{Coste real} \\
+\hline
+Neon (PostgreSQL serverless) &
+  Base de datos compartida para gasolineras, usuarios e historial de precios.
+  El plan gratuito incluye 0,5 GiB de almacenamiento y cómputo bajo demanda. &
+  0 € \\
+Google Cloud Run &
+  Despliegue de los microservicios (gateway, gasolineras, usuarios, recomendación).
+  El tráfico del proyecto académico no ha superado los umbrales de facturación
+  en ningún mes. &
+  0 € \\
+Google Cloud Storage &
+  Almacenamiento de snapshots Parquet para el pipeline de ML y artefactos
+  de modelos LightGBM. Uso inferior a 5 GiB, cubierto por el nivel gratuito. &
+  0 € \\
+Google Cloud Build &
+  Pipelines de CI/CD (7 pipelines independientes). Los primeros 120 minutos
+  de construcción al día son gratuitos, suficientes para el ritmo de despliegues
+  del proyecto. &
+  0 € \\
+Artifact Registry &
+  Registro de imágenes Docker. El nivel gratuito incluye 0,5 GiB por región,
+  suficiente para imágenes de desarrollo. &
+  $\approx$ 0 € \\
+Google AI Studio (Gemini 2.5 Flash) &
+  Asistente de voz con pipeline STT-LLM-TTS. Utilizado con la capa gratuita
+  de Google AI Studio durante el desarrollo y pruebas. &
+  0 € \\
+Dominio \texttt{tankgo.dev} &
+  Registro anual del dominio. &
+  $\approx$ 11 € \\
+\hline
+\textbf{Total infraestructura} & & \textbf{$\approx$ 11 €} \\
+\hline
+\end{tabular}
+\end{table}
 
-Para el \textbf{frontend} se optó por \textbf{React con TypeScript y Vite}, combinación
-que ofrece tipado estático, tiempos de compilación reducidos y un ecosistema de componentes
-amplio. La aplicación está construida como \textit{Progressive Web App} (PWA), lo que
-permite su uso en dispositivos móviles con comportamiento nativo.
+Es importante señalar que el coste efectivamente nulo de los servicios cloud se debe al carácter
+académico del proyecto y a la escala de tráfico durante la fase de desarrollo. En un escenario de
+producción con usuarios reales, estos costes se incrementarían de forma proporcional al uso, tal
+como se analiza en la sección~\ref{subsec:infra_prod}.
 
-La \textbf{base de datos} es PostgreSQL, desplegada en Neon Cloud. Se eligió PostgreSQL por su solidez,
-soporte de extensiones geoespaciales y compatibilidad con los ORM utilizados en ambos
-stacks tecnológicos.
+% ------------------------------------------------------------
+\section{Coste total estimado del proyecto}
+% ------------------------------------------------------------
 
+La Tabla~\ref{tab:coste_total} consolida todas las partidas descritas en las secciones anteriores
+para obtener el coste total estimado del proyecto si este se hubiera contratado en el mercado
+bajo condiciones laborales estándar.
 
-\subsection{Arquitectura general}
+\begin{table}[H]
+\centering
+\caption{Coste total estimado del proyecto}
+\label{tab:coste_total}
+\begin{tabular}{lr}
+\hline
+\textbf{Partida} & \textbf{Importe (€)} \\
+\hline
+Costes laborales — estudiante (500 h $\times$ 30 €/h) & 15.000 \\
+Costes laborales — director (46 h $\times$ 60 €/h)    &  2.760 \\
+Amortización de hardware                               &    135 \\
+Software y herramientas                                &      0 \\
+Infraestructura cloud (dominio incluido)               &     11 \\
+\hline
+\textbf{Total estimado}                                & \textbf{17.906 €} \\
+\hline
+\end{tabular}
+\end{table}
 
-TankGo sigue una \textbf{arquitectura de microservicios} en la que cada funcionalidad
-principal del sistema se encapsula en un servicio independiente con su propia lógica y
-despliegue. Los servicios se comunican entre sí a través de una capa de API Gateway que
-actúa como punto de entrada único para el cliente.
+% ------------------------------------------------------------
+\section{Estimación del coste en producción}
+\label{subsec:infra_prod}
+% ------------------------------------------------------------
 
-La arquitectura se organiza en cuatro niveles. El \textbf{cliente} es la aplicación React
-PWA que el usuario final consume desde el navegador o dispositivo móvil. El
-\textbf{API Gateway} (Hono) recibe todas las peticiones del cliente, gestiona la
-autenticación y las enruta hacia el microservicio correspondiente. La \textbf{capa de
-servicios} agrupa los cinco microservicios del dominio: usuarios, gasolineras,
-electrolineras, recomendación y predicción. Finalmente, la \textbf{capa de persistencia}
-centraliza el almacenamiento en PostgreSQL, accesible desde cada servicio según sus
-necesidades.
+Con el fin de contextualizar la viabilidad económica del proyecto más allá de la fase académica,
+se ofrece a continuación una estimación orientativa del coste mensual de infraestructura que
+tendría TankGo en un escenario de producción real con carga moderada.
 
-\begin{figure}[H]
-  \centering
-  %\includegraphics[width=0.85\textwidth]{figures/arquitectura.png}
-  \caption{Diagrama de arquitectura general de TankGo}
-  \label{fig:arquitectura}
-\end{figure}
+\subsection{Cloud Run — microservicios}
 
-\subsection{Diseño lógico y físico}
-Desde el punto de vista \textbf{lógico}, el sistema se estructura en torno a cinco
-entidades de dominio principales: \textit{Estación de servicio}, \textit{Precio},
-\textit{Usuario}, \textit{Favorito} y \textit{Predicción}. Las estaciones concentran la
-información geolocalizada de cada gasolinera o electrolinera; los precios registran tanto
-el valor actual como el histórico asociado a cada estación y tipo de combustible; los
-usuarios encapsulan la identidad y preferencias de cada cuenta; los favoritos modelan la
-relación entre usuario y estación; y las predicciones almacenan las estimaciones generadas
-por el modelo de machine learning para su consulta posterior.
+Google Cloud Run factura según el consumo de CPU, memoria y peticiones. Para un servicio
+desplegado en \texttt{europe-west1} con una carga de 500.000 peticiones mensuales y una
+latencia media de 300~ms por petición, el coste estimado se sitúa en torno a \textbf{5--15~€/mes}
+por servicio, según la calculadora oficial de Google Cloud \cite{gcp_run_pricing}. Con los siete
+servicios del proyecto (de los cuales algunos tienen tráfico muy bajo), el coste total de Cloud Run
+se estima en \textbf{20--50~€/mes}.
 
-Desde el punto de vista \textbf{físico}, cada microservicio se despliega como un contenedor
-Docker independiente. En producción, los servicios corren en \textbf{Google Cloud Run},
-que gestiona el escalado automático en función de la demanda. La base de datos reside en
-\textbf{Neon Tech} (PostgreSQL), y los artefactos de los modelos de machine learning se
-almacenan en \textbf{Cloud Storage}. El tráfico externo entra exclusivamente por el API
-Gateway, que es el único componente con URL pública expuesta.
+\subsection{Neon PostgreSQL}
 
-\subsection{Modelo de datos}
+Superado el plan gratuito, el plan Pro de Neon parte de \textbf{19~USD/mes} e incluye hasta
+10~GiB de almacenamiento y cómputo escalable. Para un proyecto con el volumen de datos de
+TankGo (gasolineras, historial de precios, usuarios), este plan sería suficiente en una primera
+fase de producción.
 
-El esquema de base de datos de TankGo se compone de cinco tablas principales cuyo diseño
-refleja directamente el dominio del sistema.
+\subsection{Google Gemini 2.5 Flash — asistente de voz}
 
-La tabla \texttt{gasolineras} es la entidad central del modelo. Almacena la información
-estática y los precios actuales de cada estación de servicio, identificada de forma única
-mediante el campo \texttt{ideess} (identificador oficial del Ministerio). Incluye datos de
-localización (municipio, provincia, dirección, coordenadas y geometría PostGIS), horario
-en formato estructurado (\texttt{horario\_parsed} en JSONB) y los precios actuales de cada
-tipo de combustible: Gasolina 95 E5, 98 E5, Gasóleo A, Gasóleo B, Gasóleo Premium,
-Gasolina 95 Premium y Diésel Renovable.
+El modelo Gemini 2.5 Flash, empleado en el pipeline de voz (STT, razonamiento con herramientas
+y TTS), tiene un precio de \textbf{0,30~USD por millón de tokens de entrada} y \textbf{2,50~USD por
+millón de tokens de salida} en texto \cite{gemini_pricing_2025}. El audio de entrada se factura
+a \textbf{1,00~USD por millón de tokens de audio}. Dado que cada interacción de voz consume
+un volumen de tokens muy reducido (del orden de miles), el coste unitario por consulta es
+prácticamente despreciable, estimándose en menos de \textbf{0,001~USD por interacción}.
 
-La tabla \texttt{precios\_historicos} registra la evolución temporal de los precios por
-estación. Cada registro asocia un \texttt{ideess} con una fecha y los precios de los
-distintos combustibles en ese momento, lo que permite construir series temporales para el
-análisis histórico y el entrenamiento del modelo de predicción.
+\subsection{Estimación mensual consolidada en producción}
 
-La tabla \texttt{prediction\_forecasts} almacena las estimaciones generadas por el modelo
-LightGBM. Su clave primaria es compuesta: \texttt{ideess}, \texttt{fuel},
-\texttt{forecast\_date} y \texttt{run\_date}, lo que permite distinguir predicciones para
-diferentes combustibles, horizontes temporales y ejecuciones del modelo. Cada registro
-incluye el precio predicho y los márgenes de confianza inferior y superior.
+\begin{table}[H]
+\centering
+\caption{Estimación orientativa de costes mensuales en producción}
+\label{tab:prod_cost}
+\begin{tabular}{lr}
+\hline
+\textbf{Servicio} & \textbf{Coste mensual estimado} \\
+\hline
+Google Cloud Run (7 servicios)     & 20 -- 50 € \\
+Neon PostgreSQL (plan Pro)         & $\approx$ 18 € \\
+Google Cloud Storage               & $<$ 1 € \\
+Gemini 2.5 Flash (uso moderado)    & 1 -- 5 € \\
+Dominio y DNS                      & $\approx$ 1 € \\
+\hline
+\textbf{Total mensual estimado}    & \textbf{40 -- 75 €/mes} \\
+\hline
+\end{tabular}
+\end{table}
 
-La tabla \texttt{users} gestiona las cuentas de usuario, incluyendo autenticación
-tradicional mediante \texttt{password\_hash} y autenticación federada mediante
-\texttt{google\_id} (OAuth). Almacena también las preferencias del usuario como el
-combustible favorito, el modelo de coche y el tipo de combustible del vehículo.
+Esta estimación pone de manifiesto que TankGo podría operar como servicio real con un coste
+de infraestructura inferior a \textbf{1.000~€/año}, lo que refleja la eficiencia económica de las
+arquitecturas serverless y de los modelos pay-as-you-go para proyectos de escala media.
 
-La tabla \texttt{user\_favorites} modela la relación entre usuarios y estaciones,
-permitiendo que cada usuario registre sus gasolineras favoritas. Referencia mediante
-claves foráneas tanto a \texttt{users.id} como a \texttt{gasolineras.ideess}.
+% ------------------------------------------------------------
+\section{Análisis y valoración económica}
+% ------------------------------------------------------------
 
-Las dependencias entre tablas son las siguientes: \texttt{precios\_historicos} y
-\texttt{user\_favorites} referencian \texttt{gasolineras} a través de \texttt{ideess};
-\texttt{prediction\_forecasts} referencia igualmente a \texttt{gasolineras}; y
-\texttt{user\_favorites} referencia a \texttt{users} mediante \texttt{user\_id}. El
-diagrama entidad-relación de la figura~\ref{fig:er} ilustra estas relaciones.
+Del análisis anterior se extraen las siguientes conclusiones económicas relevantes:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{imgs/entidad-relacion.png}
-  \caption{Modelo entidad-relación del sistema}
-  \label{fig:er}
-\end{figure}
+En primer lugar, el coste estimado total del proyecto asciende a \textbf{17.906~€}, cifra que refleja
+fielmente el volumen y la complejidad del trabajo técnico realizado: diseño de una arquitectura de
+microservicios con siete componentes, desarrollo fullstack, integración de modelos de aprendizaje
+automático, despliegue en Google Cloud y extensión con capacidades conversacionales basadas en
+IA generativa.
 
-\subsection{Diagramas UML}
+En segundo lugar, el coste real incurrido ha sido prácticamente nulo en lo que respecta a
+infraestructura, gracias a la selección cuidadosa de herramientas con niveles gratuitos generosos
+(Neon, GitHub, Google AI Studio, Cloud Run dentro de los umbrales de prueba). El único gasto
+efectivo ha sido el registro del dominio \texttt{tankgo.dev} por un importe de aproximadamente
+11~€. Esta decisión de diseño, lejos de ser una casualidad, es resultado de priorizar tecnologías
+cloud-native modernas cuyo modelo de negocio está específicamente orientado a facilitar el
+desarrollo y la experimentación sin coste inicial.
 
-El diagrama de casos de uso recoge las interacciones entre los actores del sistema y sus
-funcionalidades. El \textit{usuario no registrado} puede visualizar gasolineras en mapa y
-tabla, consultar el mapa de electrolineras y registrarse o iniciar sesión. El
-\textit{usuario registrado} extiende esas capacidades con acceso a la tabla de
-electrolineras, la planificación de rutas con recomendación de repostaje, el asistente
-conversacional, la predicción de precios a 7 días, la gestión de favoritos y el histórico
-de precios. El sistema interactúa además con tres actores externos: la API del Ministerio
-(MITECO) para la sincronización de precios, la Reve API para los puntos de recarga
-eléctrica, y OpenRouteService para el cálculo de rutas.
-
-\begin{figure}[H]
-  \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/casos-uso.png}
-  \caption{Diagrama de casos de uso del sistema}
-  \label{fig:casos_uso}
-\end{figure}
-
-El diagrama de secuencia de la figura~\ref{fig:secuencia_consulta} ilustra el flujo de
-consulta de gasolineras cercanas: el usuario activa la geolocalización, el frontend envía
-la petición al API Gateway, este la enruta al servicio de gasolineras, que ejecuta una
-consulta geoespacial sobre PostgreSQL mediante PostGIS y devuelve el listado de estaciones
-con sus precios actuales para su renderizado en tabla y mapa.
-
-\begin{figure}[H]
-  \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/secuencia-consulta.png}
-  \caption{Diagrama de secuencia: consulta de gasolineras cercanas}
-  \label{fig:secuencia_consulta}
-\end{figure}
-
-El segundo diagrama de secuencia, figura~\ref{fig:secuencia_ruta}, muestra el flujo de
-planificación de ruta con recomendación de repostaje. El servicio de recomendación
-coordina dos llamadas externas: a OpenRouteService para obtener el trazado de la ruta, y
-al servicio de gasolineras para recuperar las estaciones cercanas al recorrido. Con ambas
-respuestas aplica el algoritmo de ponderación por precio y desvío y devuelve las paradas
-sugeridas al usuario.
-
-\begin{figure}[H]
-  \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/secuencia-recomendacion.png}
-  \caption{Diagrama de secuencia: planificación de ruta con recomendación de repostaje}
-  \label{fig:secuencia_ruta}
-\end{figure}
-
-\section{Consideraciones sobre la Implementación}
-\subsection{Estructura del proyecto}
-\subsection{Backend}
-\subsection{Frontend}
-\subsection{Base de datos}
-\subsection{Seguridad}
-\subsection{Integraciones externas}
-\subsection{Módulo de predicción de precios}
-\subsection{Herramientas y control de versiones}
-
-\section{Plan de Pruebas}
-\subsection{Estrategia}
-\subsection{Pruebas unitarias}
-\subsection{Pruebas de integración}
-\subsection{Pruebas funcionales}
-\subsection{Resultados obtenidos}
-
-\section{Manual de Usuario}
-\subsection{Acceso al sistema}
-\subsection{Uso de la plataforma}
-\subsection{Capturas de pantalla}
-
-\section{Incidencias del Proyecto}
+Por último, la estimación de costes en producción —entre 40 y 75~€/mes— demuestra que el
+proyecto es económicamente viable como servicio real, con una estructura de costes escalable y
+predecible, característica deseable en cualquier producto software orientado a su eventual
+comercialización o despliegue a mayor escala.

@@ -1,248 +1,375 @@
-\chapter{Capítulo Tercero - Objetivos y Alcance}
+% !TEX root = ../main.tex
+% =========================================================
+%  CAPÍTULO 3 — MARCO TECNOLÓGICO
+% =========================================================
+ 
+\chapter{Capítulo tercero - Marco tecnológico}
+ 
+La elección de las tecnologías que dan soporte a TankGo no ha sido arbitraria sino que responde
+a un análisis previo de alternativas en el que se han ponderado criterios de
+rendimiento, madurez del ecosistema, compatibilidad con el modelo de despliegue
+cloud-native, coste operativo y alineación con las competencias adquiridas durante el
+grado. Este capítulo documenta dicho análisis y justifica las decisiones adoptadas,
+organizando las tecnologías según la capa arquitectónica en la que operan.
+ 
+% ---------------------------------------------------------
+\section{Capa de presentación: React y Leaflet.js}
+% ---------------------------------------------------------
+ 
+\subsection{React como framework de interfaz de usuario}
+ 
+El cliente web de TankGo está desarrollado con \textbf{React 19}\cite{react}, la biblioteca de
+interfaz de usuario de Meta. React adopta un paradigma declarativo basado en
+componentes reutilizables y un DOM virtual que minimiza las operaciones de
+renderizado sobre el árbol real, lo que resulta crítico en una aplicación como
+TankGo, donde el mapa puede contener miles de marcadores que se actualizan
+dinámicamente en función del viewport.
+ 
+Entre las alternativas evaluadas se consideraron Vue.js y Angular \cite{vuejs,angular}. Angular, aunque
+ofrece un entorno completo con \textit{dependency injection} integrada, introduce
+una curva de aprendizaje significativa y un tamaño de bundle elevado para un
+proyecto de alcance académico. Vue.js es una opción intermedia válida, pero su
+ecosistema de integración con librerías cartográficas como Leaflet es menos maduro
+que el de React, donde \texttt{react-leaflet}\cite{react_leaflet} ofrece una capa de abstracción directa sobre los componentes de ciclo de vida.
+La prevalencia de React en el mercado laboral, alcanzando el 44,7\,\% según la encuesta anual de Stack Overflow de 2025, así 
+como la familiaridad del autor con
+la biblioteca, motivaron la elección final \cite{stackoverflow_survey_2025}.
+ 
+\subsection{Leaflet.js como motor cartográfico}
+ 
+La visualización geoespacial es clave en la experiencia de usuario de TankGo.
+Para renderizar el mapa interactivo se evaluaron tres opciones principales: la API
+de Google Maps, Mapbox GL JS y Leaflet.js.
+ 
+La API de Google Maps queda descartada por su modelo de precios, que penaliza el
+uso intensivo de marcadores y limita la personalización de las capas de datos sin
+incurrir en costes adicionales \cite{logrocket_leaflet_guide}. Mapbox GL JS, si bien
+ofrece renderizado WebGL de alto rendimiento y estilos vectoriales personalizables,
+cambió su licencia de código abierto BSD a una licencia propietaria a partir de la
+versión 2 en 2020, lo que excluye su uso libre en proyectos sin garantía de
+continuidad de acceso \cite{geoapify_map_comparison}.
+ 
+Leaflet.js es una biblioteca de código abierto bajo licencia BSD-2, pesa
+aproximadamente 42\,KB en su versión minificada y ofrece un ecosistema de
+\textit{plugins} especialmente extenso \cite{logrocket_leaflet_guide}. Su
+integración nativa con teselas de OpenStreetMap elimina dependencias de
+terceros propietarios, garantizando la continuidad del servicio sin costes de
+API. El plugin \texttt{react-leaflet} \cite{react_leaflet} permite declarar capas y marcadores como
+componentes React, integrándose de forma natural con el modelo de estado de la
+aplicación. El soporte de agrupación de marcadores mediante \texttt{leaflet.markercluster}
+resulta esencial para gestionar eficientemente las más de 11.000 estaciones de
+servicio del catálogo.
+ 
+% ---------------------------------------------------------
+\section{Capa de gateway: Hono sobre Node.js}
+% ---------------------------------------------------------
+ 
+El API Gateway de TankGo está implementado con \textbf{Hono}, un framework
+web ultraligero para entornos JavaScript modernos \cite{hono}. Hono se diseñó con compatibilidad
+nativa para múltiples runtimes (Node.js, Deno, Bun, Cloudflare Workers) y ofrece
+una API de enrutamiento expresiva junto con un rendimiento medido en benchmarks
+independientes cercano a los 350.000 req/s sobre Node.js en escenarios de
+\textit{hello world} \cite{hono_benchmarks}.
+ 
+La alternativa natural habría sido Express.js, el framework más utilizado del
+ecosistema Node.js\cite{express}. Sin embargo, Express es un framework sincrónico diseñado bajo
+el modelo WSGI, mientras que Hono adopta la especificación Fetch API del estándar
+web, lo que le permite gestionar peticiones concurrentes de forma asíncrona con
+menor sobrecarga de memoria. Para un gateway cuya responsabilidad principal es
+el proxy de peticiones HTTP (operación mayoritariamente I/O-bound),la naturaleza
+asíncrona de Hono es especialmente adecuada.
+ 
+% ---------------------------------------------------------
+\section{Capa de servicios de negocio: FastAPI y Fastify}
+% ---------------------------------------------------------
+ 
+\subsection{FastAPI para servicios Python}
+ 
+Los tres servicios de negocio implementados en Python (\texttt{gasolineras-service},
+\texttt{recomendacion-service} y \texttt{prediction-service}) utilizan
+\textbf{FastAPI} como framework HTTP. FastAPI está construido sobre
+\textbf{Starlette} (capa ASGI) y \textbf{Pydantic v2} (validación de datos), lo que
+le permite ofrecer soporte nativo de programación asíncrona sin imponer restricciones
+al código de negocio síncrono.
 
-Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita
-el alcance del sistema resultante. Se definen tanto el objetivo general como los
-objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y
-viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones
-explícitas para evitar ambigüedades en la evaluación del trabajo realizado.
-
-\section{Objetivo general}
-
-Diseñar, desarrollar y desplegar una plataforma software \textit{cloud-native} que
-integre, en un único sistema, la consulta y comparación de precios de combustibles
-y puntos de recarga eléctrica en España, incorporando capacidades de análisis
-histórico, predicción de precios a corto plazo, recomendación de repostaje basada
-en rutas y asistencia conversacional, con el fin de transformar datos energéticos
-dispersos en conocimiento accesible para el usuario final.
-
-
-\section{Objetivos específicos y medibles}
-
-Los objetivos específicos desglosan el objetivo general en metas concretas,
-verificables y acotadas en el tiempo, siguiendo el criterio SMART
-(\textit{Specific, Measurable, Achievable, Relevant, Time-bound})
-\cite{doran1981there}. Se organizan en torno a los cinco ejes funcionales
-del sistema:
-
-\subsection{Ingesta y gestión de datos}
-
-\begin{itemize}
-    \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
-          con la API REST del Ministerio de Industria (MinITUR) que garantice la
-          disponibilidad de datos de precios actualizados con una frecuencia mínima
-          diaria, con persistencia histórica en base de datos relacional.
-
-    \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
-          eléctrica en el mismo modelo de datos que los combustibles convencionales,
-          permitiendo consultas unificadas sobre ambas fuentes energéticas.
-
-    \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
-          datos históricos en formato Apache Parquet hacia Google Cloud Storage,
-          como base de datos de entrenamiento reproducible para los modelos de
-          aprendizaje automático.
-\end{itemize}
-
-\subsection{Consulta y visualización geoespacial}
-
-\begin{itemize}
-    \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
-          con mapa interactivo que permita la búsqueda y filtrado de estaciones
-          por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
-          (español, inglés y euskera).
-
-    \item \textbf{OE-05.} Implementar la visualización del historial de
-          precios por estación mediante gráficos temporales interactivos.
-\end{itemize}
-
-\subsection{Predicción de precios}
-
-\begin{itemize}
-    \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
-          de precios basado en modelos de \textit{gradient boosting} (LightGBM)
-          con regresión cuantílica, incorporando el precio del crudo Brent como
-          variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
-          predicciones individualizadas por estación de servicio.
-
-    \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
-          seleccionado frente a alternativas (XGBoost, regresión lineal como
-          \textit{baseline}) mediante métricas estándar de regresión
-          (MAE, RMSE, $R^2$) \cite{s24124013}.
-\end{itemize}
-
-\subsection{Recomendación basada en rutas}
-
-\begin{itemize}
-      \item \textbf{OE-08.} Implementar un servicio de recomendación de
-          gasolineras para rutas A$\rightarrow$B que identifique candidatos
-          mediante consultas geoespaciales PostGIS (ST\_DWithin,
-          ST\_LineLocatePoint), calcule desvíos mediante la API Matrix de
-          OpenRouteService y evalúe las estaciones según una función de
-          puntuación ponderada por precio y desvío, con soporte de geometría
-          vectorial (Shapely) y distancias geodésicas (Haversine).
-      
-      \item \textbf{OE-09.} Integrar OpenRouteService como backend único de
-          enrutamiento en el entorno de producción cloud, con gestión de
-          cuotas mediante semáforo y mecanismos de resiliencia ante
-          indisponibilidad de la API externa.
-\end{itemize}
-
-\subsection{Arquitectura, despliegue y calidad}
-
-\begin{itemize}
-    \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
-          microservicios con API Gateway centralizado, donde cada servicio
-          sea independientemente desplegable y escalable, siguiendo los
-          principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
-
-    \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
-          Google Cloud Run mediante pipelines de integración y entrega continua
-          (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
-          independientes (uno por servicio).
-
-    \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
-          basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
-          para autenticación OAuth 2.0 mediante Google y gestión de perfiles
-          de usuario persistentes.
-
-    \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
-          basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
-          sobre la API REST de Google GenAI (Gemini 2.5 Flash), con capacidad
-          de \textit{tool calling} para consultar precios y estaciones cercanas
-          en tiempo real a través del API Gateway del sistema.
-\end{itemize}
-
-\section{Alcance del sistema}
-
-El alcance define los límites funcionales y técnicos del sistema desarrollado,
-estableciendo qué está incluido en la solución entregada.
-
-\subsection{Ámbito geográfico y de datos}
-
-El sistema cubre la totalidad del territorio español continental e insular,
-utilizando como fuente primaria de datos de carburantes la API pública del
-Ministerio de Industria, Turismo y Comercio (MinITUR) \cite{datosgob_carburantes},
-que publica precios de aproximadamente 11.000 estaciones de servicio activas
-en España. Los puntos de recarga eléctrica se obtienen del portal
-mapareve.es, complementando la oferta de datos de movilidad eléctrica
-disponible institucionalmente \cite{mitma_esmovilidad}.
-
-\subsection{Componentes funcionales incluidos}
-
-La plataforma entregada comprende los siguientes componentes funcionales:
-
-\begin{enumerate}
-    \item \textbf{Servicio de gasolineras:} ingesta, normalización, persistencia
-          y consulta de precios de carburantes con historial temporal.
-
-    \item \textbf{Servicio de usuarios:} registro, autenticación (tradicional
-          y OAuth Google), gestión de perfiles con preferencias de combustible
-          y vehículo, y sistema de favoritos sincronizado.
-
-    \item \textbf{Servicio de recomendación:} cálculo de rutas óptimas de
-          repostaje para trayectos A$\rightarrow$B con función de coste ponderada.
-
-    \item \textbf{Servicio de predicción:} generación de predicciones de
-          precio a corto plazo por estación, basadas en modelos LightGBM
-          entrenados sobre datos históricos.
-
-    \item \textbf{Asistente de voz:} interfaz conversacional en tiempo real
-          con acceso a las capacidades del sistema mediante \textit{tool calling}.
-
-    \item \textbf{Servidor MCP:} exposición de las herramientas del sistema
-          como servidor \textit{Model Context Protocol} para integración con
-          agentes LLM externos.
-
-    \item \textbf{API Gateway:} punto de entrada único con documentación
-          OpenAPI agregada, gestión de autenticación y bridge WebSocket.
-
-    \item \textbf{Frontend PWA:} aplicación web progresiva instalable con
-          soporte \textit{offline}, modo oscuro e internacionalización.
-\end{enumerate}
-
-\subsection{Entorno de despliegue}
-
-La plataforma se despliega íntegramente en Google Cloud Platform (GCP),
-utilizando Cloud Run como servicio de ejecución de contenedores serverless,
-Artifact Registry para el almacenamiento de imágenes Docker, Cloud Build
-para la automatización del pipeline CI/CD y Secret Manager para la
-gestión segura de credenciales en producción. La base de datos relacional
-se externaliza en Neon (PostgreSQL gestionado) y el almacenamiento de
-objetos para el pipeline de ML se realiza en Google Cloud Storage.
-
-\section{Limitaciones}
-
-Las limitaciones recogen aquellos aspectos que, estando dentro del alcance
-conceptual del proyecto, presentan restricciones técnicas o de recursos
-conocidas en la versión entregada.
-
-\begin{itemize}
-    \item \textbf{Frecuencia de actualización de precios:} La API del
-          Ministerio de Industria publica datos con una frecuencia que puede
-          variar entre actualizaciones horarias y diarias según la estación,
-          por lo que el sistema no puede garantizar precios en tiempo real
-          estricto, sino \textit{near real-time} con un desfase máximo
-          determinado por la fuente oficial.
-
-    \item \textbf{Cobertura del modelo predictivo:} El servicio de
-          predicción genera modelos únicamente para las estaciones con
-          suficiente historial de precios almacenado y para aquellas
-          marcadas como favoritas por los usuarios del sistema, priorizando
-          la relevancia sobre la cobertura total.
-
-    \item \textbf{Precisión de la recomendación por ruta:} La calidad
-          de la recomendación depende de la disponibilidad y precisión del
-          backend de enrutamiento seleccionado. El fallback a distancia
-          en línea recta, activable mediante configuración, reduce la
-          precisión del corredor geométrico calculado.
-
-    \item \textbf{Escalabilidad del asistente de voz:} El servicio de
-          voz está sujeto a los límites de cuota de la API de Gemini y al
-          rate limiting configurado (40 peticiones por minuto por IP),
-          lo que limita su uso concurrente intensivo.
-
-    \item \textbf{Disponibilidad de datos de recarga eléctrica:}
-          La información de puntos de recarga eléctrica procede de una
-          fuente de terceros (mapareve.es) cuya disponibilidad y
-          completitud no están garantizadas de forma institucional,
-          a diferencia de los datos de carburantes del Ministerio.
-\end{itemize}
-
-\section{Exclusiones}
-
-Las exclusiones delimitan explícitamente lo que queda fuera del alcance
-del presente proyecto, evitando ambigüedades en la evaluación del
-trabajo realizado.
-
-\begin{itemize}
-    \item \textbf{Aplicación móvil nativa:} El sistema se entrega como
-          PWA instalable, pero no se desarrolla una aplicación nativa para
-          iOS o Android. La PWA cubre los casos de uso de movilidad mediante
-          el navegador del dispositivo.
-
-    \item \textbf{Integración con navegadores GPS:} No se integra con
-          sistemas de navegación en tiempo real tipo Google Maps o Waze para
-          guía turn-by-turn. La recomendación de ruta se limita al cálculo
-          de la estación óptima, no a la navegación posterior.
-
-    \item \textbf{Pagos y reservas:} El sistema no contempla
-          funcionalidades de pago, reserva de surtidores ni integración
-          con sistemas de fidelización de las cadenas de gasolineras.
-
-    \item \textbf{Predicción de precios de electricidad:} El módulo
-          predictivo se centra exclusivamente en combustibles líquidos
-          (gasolina y diésel). La predicción del coste de recarga eléctrica,
-          que depende de tarifas horarias (PVPC) y contratos de operador,
-          queda fuera del alcance de esta versión.
-
-    \item \textbf{Soporte multipaís:} La plataforma está diseñada
-          y calibrada para el mercado español. La extensión a otros mercados
-          europeos requeriría adaptaciones en las fuentes de datos,
-          la normalización de formatos y la cobertura geográfica de los
-          servicios de enrutamiento.
-
-    \item \textbf{Panel de administración:} No se desarrolla una
-          interfaz de administración gráfica para la gestión de usuarios,
-          sincronizaciones o modelos ML. La administración se realiza
-          mediante endpoints protegidos por \textit{internal secret}
-          y acceso directo a la base de datos.
-\end{itemize}
+Starlette es un microframework ASGI minimalista que proporciona el servidor ASGI, enrutamiento, middleware y 
+utilidades para aplicaciones asíncronas \cite{starlette}. Pydantic permite definir modelos de datos mediante 
+anotaciones de tipo en Python; valida y parsea automáticamente las entradas y salidas, generando errores legibles 
+y esquemas JSON que FastAPI utiliza para documentar los modelos \cite{pydantic}. Gracias a esta combinación, 
+FastAPI genera automáticamente un esquema OpenAPI por cada servicio, que se expone como documentación
+interactiva (Swagger / Redoc) y facilita el consumo de la API por parte de clientes y herramientas de testing \cite{openapi}.
+ 
+La elección de FastAPI frente a Flask y Django responde a tres razones principales.
+En primer lugar, el rendimiento: los benchmarks disponibles sitúan a FastAPI ejecutado
+sobre Uvicorn en el rango de 440 req/s en endpoints con lógica de negocio real, frente
+a los aproximadamente 120 req/s de Flask en condiciones equivalentes, una diferencia
+atribuible a la arquitectura ASGI frente a WSGI \cite{afolabi_fastapi_benchmark}. En
+segundo lugar, la generación automática de documentación OpenAPI: FastAPI introspecciona
+los \textit{type hints} de Python para generar el esquema OpenAPI sin código
+adicional, lo que resulta crítico dado que el gateway agrega las especificaciones de
+todos los servicios en un único portal Swagger unificado. En tercer lugar, la
+integración con Pydantic garantiza la validación estricta de los parámetros de entrada
+antes de que alcancen la lógica de negocio, reduciendo la superficie de ataque de la
+API \cite{ijsrem_fastapi_comparison}.
+ 
+Django\cite{django} habría añadido capas de abstracción innecesarias (sistema de plantillas,
+panel de administración) que no son requeridas en servicios sin estado diseñados para
+ser consumidos exclusivamente vía API REST. Flask\cite{flask}, aunque más ligero, carece de soporte
+asíncrono nativo estable hasta su versión 3.0 y no genera documentación OpenAPI de
+forma automática \cite{afolabi_fastapi_benchmark}.
+ 
+\subsection{Fastify para el servicio de usuarios}
+ 
+El servicio de autenticación y gestión de usuarios está implementado con
+\textbf{Fastify}, el framework HTTP de alto rendimiento para Node.js. Fastify
+es especialmente adecuado para este servicio por dos motivos: su sistema de plugins
+permite integrar \texttt{@fastify/jwt} y \texttt{@fastify/cookie} con configuración
+mínima, y su esquema de validación de peticiones basado en JSON Schema rechaza
+\textit{payloads} malformados antes de que alcancen el controlador, sin necesidad de
+bibliotecas adicionales.
+ 
+La alternativa habría sido reimplementar el servicio de usuarios también en Python con
+FastAPI, manteniendo homogeneidad tecnológica. Sin embargo, las operaciones de
+autenticación (hashing con bcrypt, firma y verificación de JWT, gestión de cookies
+httpOnly) están muy bien soportadas en el ecosistema Node.js con bibliotecas
+como \texttt{bcryptjs} y \texttt{@fastify/jwt}, cuya madurez y documentación están
+consolidadas. La decisión de mantener Node.js en este servicio refleja también el
+criterio de utilizar la tecnología más idónea por capa, en lugar de imponer una
+homogeneidad tecnológica artificial que habría penalizado el desarrollo.
+ 
+% ---------------------------------------------------------
+\section{Capa de datos: PostgreSQL y Apache Parquet}
+% ---------------------------------------------------------
+ 
+\subsection{PostgreSQL como base de datos relacional}
+ 
+Todos los servicios que requieren persistencia utilizan \textbf{PostgreSQL}, el sistema
+de gestión de bases de datos relacional de código abierto más avanzado de su categoría.
+PostgreSQL ofrece soporte completo de transacciones ACID, tipos de datos geoespaciales
+a través de la extensión \textbf{PostGIS} (utilizada en el servicio de recomendación
+para operaciones como \texttt{ST\_DWithin}, \texttt{ST\_LineLocatePoint} y
+\texttt{ST\_Distance}) y un modelo de concurrencia MVCC que minimiza los bloqueos en
+lecturas simultáneas.
+ 
+ La base de datos se aloja en \textbf{Neon}\cite{neon_tech2026}, una plataforma de PostgreSQL serverless en
+ la nube que escala automáticamente a cero cuando no hay actividad, lo que resulta
+idóneo para un proyecto académico con patrones de uso variables. Neon expone la misma
+interfaz de conexión estándar de PostgreSQL, lo que permite utilizar los drivers
+nativos \texttt{psycopg2} (Python) y \texttt{pg} (Node.js) sin adaptaciones.
+ 
+\subsection{Apache Parquet para el pipeline de machine learning}
+ 
+Los datos históricos de precios de combustibles exportados para el entrenamiento de
+modelos se almacenan en formato \textbf{Apache Parquet}. Parquet es un formato de
+almacenamiento columnar de código abierto, desarrollado originalmente por Twitter y
+Cloudera, diseñado específicamente para cargas de trabajo analíticas
+\cite{databricks_parquet}.
+ 
+A diferencia de los formatos orientados a filas como CSV o JSON, Parquet agrupa los
+valores de una misma columna de forma contigua en disco. Esta organización permite
+a los motores analíticos leer únicamente las columnas necesarias para cada consulta,
+reduciendo sustancialmente el volumen de I/O y mejorando la eficiencia de la
+compresión, ya que los valores homogéneos dentro de una columna comprimen mejor que
+filas heterogéneas \cite{datacamp_parquet}. En la práctica, los ficheros Parquet
+pueden ser entre un 80 y un 90\,\% más pequeños que sus equivalentes en CSV para
+conjuntos de datos tabulares de tipo analítico \cite{bckinfo_parquet}.
+ 
+Para el pipeline de TankGo, en el que el modelo LightGBM consume únicamente
+determinadas columnas del histórico (tipo de combustible, precio, fecha, coordenadas
+y provincia), el formato columnar elimina la necesidad de deserializar filas completas,
+acelerando significativamente la fase de carga de datos de entrenamiento. Los ficheros
+Parquet se almacenan en \textbf{Google Cloud Storage} y son accesibles desde el
+\texttt{prediction-service} mediante la biblioteca \texttt{google-cloud-storage}
+de Python y \texttt{PyArrow} como motor de lectura.
+ 
+% ---------------------------------------------------------
+\section{Capa de inteligencia: LightGBM}
+% ---------------------------------------------------------
+ 
+%El módulo de predicción de precios de combustible utiliza \textbf{LightGBM},
+%una implementación de \textit{Gradient Boosting} sobre árboles de decisión desarrollada
+%por Microsoft. LightGBM introduce dos optimizaciones fundamentales respecto a
+%implementaciones clásicas como XGBoost: \textit{Gradient-based One-Side Sampling}
+%(GOSS), que descarta muestras con bajo gradiente para acelerar el entrenamiento, y
+%\textit{Exclusive Feature Bundling} (EFB), que agrupa características mutuamente
+%exclusivas para reducir la dimensionalidad efectiva \cite{tandfonline_lightgbm}.
+ 
+%La elección de LightGBM para la predicción de series temporales de precios está
+%respaldada por literatura académica reciente. Hartanto et al. demostraron que LightGBM
+%supera o iguala a XGBoost en la predicción de precios de activos financieros con
+%series temporales, obteniendo coeficientes $R^2$ superiores a 0,92 en conjuntos de
+%prueba \cite{hartanto2023lightgbm}. Los precios de los combustibles, aunque no son
+%exactamente equivalentes a los precios bursátiles, comparten la naturaleza de series
+%temporales con dependencias estacionales y correlación con variables externas —en el
+%caso de TankGo, el precio del barril de Brent obtenido mediante \texttt{yfinance}—,
+%lo que hace aplicables las mismas consideraciones metodológicas.
+ 
+%LightGBM se utiliza en modo de \textbf{regresión cuantílica}, entrenando tres modelos
+%por estación: percentil 10 (límite inferior), mediana (predicción central) y
+%percentil 90 (límite superior). Este enfoque permite expresar la incertidumbre de la
+%predicción de forma calibrada, sin asumir distribuciones normales sobre los errores.
+%Frente a modelos de series temporales clásicos como ARIMA o SARIMA, LightGBM admite
+%directamente variables exógenas adicionales (día de la semana, mes, provincia, tipo de
+%combustible) sin necesidad de transformaciones explícitas, lo que simplifica el
+%pipeline de entrenamiento \cite{joiv_lightgbm}.
+ 
+% ---------------------------------------------------------
+\section{Capa de enrutamiento geoespacial: OpenRouteService}
+% ---------------------------------------------------------
+ 
+El servicio de recomendación de gasolineras en ruta requiere calcular geometrías de
+trayecto y matrices de distancias reales entre puntos. Para ello se integra
+\textbf{OpenRouteService} (ORS), una plataforma de enrutamiento de código abierto
+desarrollada originalmente en el departamento GIScience de la Universidad de
+Heidelberg, que ofrece una API REST con soporte para múltiples perfiles de vehículo
+y la \textit{Matrix API} necesaria para el cálculo de desvíos reales desde la ruta
+principal hasta cada candidato de repostaje \cite{gisops_routing_overview}.
+ 
+La alternativa más directa era \textbf{OSRM} (\textit{Open Source Routing Machine}),
+un motor de enrutamiento implementado en C++ con tiempos de respuesta en el rango de
+los milisegundos para rutas regionales \cite{osm_wiki_routers}. Sin embargo, OSRM
+requiere un servidor propio con requisitos de RAM elevados para el grafo de la red
+viaria española, lo que es inviable en un entorno cloud serverless como Cloud Run,
+donde los contenedores no mantienen estado persistente entre peticiones. ORS, en
+cambio, expone una API REST gestionada que no requiere infraestructura adicional,
+ofreciendo las funcionalidades de \textit{directions} y \textit{matrix} necesarias
+para el algoritmo de recomendación \cite{gisops_routing_overview}.
+ 
+Adicionalmente, la API de ORS soporta la evitación de
+peajes como parámetro de la petición (incorporado en TankGo como opción
+\texttt{evitar\_peajes}), funcionalidad que OSRM no contempla en su interfaz estándar.
+ 
+%La integración técnica en \texttt{recomendacion-service} sigue el siguiente flujo:
+%(1) ORS proporciona la geometría completa de la ruta mediante la API de
+%\textit{directions}; (2) Shapely construye un corredor poligonal alrededor de esa
+%geometría filtrando las estaciones candidatas dentro del radio de desvío configurado;
+%(3) la \textit{Matrix API} de ORS calcula los desvíos reales desde la ruta hasta
+%cada candidato; (4) un algoritmo de puntuación ponderada combina precio y desvío para
+%obtener el ranking final de recomendaciones.
+ 
+% ---------------------------------------------------------
+\section{Capa de cartografía de datos: OpenStreetMap y Nominatim}
+% ---------------------------------------------------------
+ 
+Todos los datos cartográficos de base de TankGo (teselas del mapa, geocodificación
+de búsquedas y geocodificación inversa) provienen de \textbf{OpenStreetMap} (OSM),
+el proyecto colaborativo de cartografía libre que constituye la mayor base de datos
+geoespacial de código abierto del mundo. Las teselas se consumen directamente desde
+los servidores públicos de OSM a través de Leaflet.js.
+ 
+La geocodificación (conversión de nombres de lugar en coordenadas y viceversa) se
+realiza mediante \textbf{Nominatim}, el motor de búsqueda geográfica oficial de OSM.
+El API Gateway actúa como proxy de las peticiones del frontend hacia Nominatim,
+evitando que el navegador realice llamadas directas que podrían ser bloqueadas por la
+política CORS de los servidores de OSM y centralizando el control de la caché de
+respuestas.
+ 
+La alternativa comercial habría sido la API de Geocoding de Google, cuyo modelo de
+precios penaliza el número de peticiones a partir del umbral gratuito, introduciendo
+una dependencia de proveedor incompatible con los objetivos de independencia
+tecnológica del proyecto. La Geocoding API de Mapbox ofrece un modelo de precios más
+accesible pero introduce igualmente dependencia de un servicio propietario.
+ 
+% ---------------------------------------------------------
+\section{Capa de inteligencia conversacional: Gemini y Google GenAI}
+% ---------------------------------------------------------
+ 
+El asistente de voz de TankGo implementa un pipeline
+\textbf{STT $\rightarrow$ LLM con \textit{tool calling} $\rightarrow$ TTS}
+íntegramente sobre \textbf{Gemini 2.5 Flash} de Google, accedido mediante la
+biblioteca \texttt{@google/genai} y llamadas HTTP REST al endpoint
+\texttt{/v1/models/gemini-2.5-flash:generateContent}.
+ 
+La elección de un único modelo multimodal para las tres fases del pipeline —en lugar
+de combinar, por ejemplo, Whisper (STT) + GPT-4o (LLM) + un motor TTS independiente—
+simplifica significativamente la arquitectura del servicio, reduce la latencia
+acumulada entre etapas y elimina la necesidad de gestionar múltiples claves de API
+y contratos de servicio. Gemini 2.5 Flash está optimizado para latencia baja en
+tareas de diálogo, soporta audio de entrada en base64 directamente en el payload de
+ la petición, y su capacidad de \textit{tool calling} permite declarar herramientas
+ con esquema JSON que el modelo invoca autónomamente para consultar precios y
+ estaciones cercanas a través del gateway \cite{Gartner2026Trends}.
+ 
+El \textit{tool calling} del asistente expone dos herramientas al modelo:
+\texttt{get\_prices}, que consulta precios actuales de combustible por zona, y
+\texttt{get\_nearest\_stations}, que devuelve las estaciones más cercanas a
+unas coordenadas dadas. Ambas herramientas delegan en los endpoints HTTP del
+gateway, de modo que el asistente actúa como interfaz conversacional del mismo
+sistema de datos que consume el frontend web.
+ 
+% ---------------------------------------------------------
+\section{Plataforma de despliegue: Google Cloud}
+% ---------------------------------------------------------
+ 
+El despliegue en producción de TankGo utiliza tres servicios de \textbf{Google Cloud
+Platform} (GCP): \textbf{Cloud Run}, \textbf{Cloud Build} y \textbf{Cloud Storage}\cite{cloud_run2026,cloud_build2026,cloud_storage2026}.
+ 
+\textbf{Cloud Run} es una plataforma de cómputo serverless que ejecuta contenedores
+Docker sin requerir gestión de infraestructura. Su modelo de escalado automático
+—incluyendo la posibilidad de escalar a cero instancias cuando no hay tráfico—
+ elimina los costes fijos de servidores permanentes, lo que es especialmente adecuado
+ para un proyecto académico con patrones de uso irregulares \cite{cloud_run2026,Gartner2026Trends}.
+Cada microservicio de TankGo se despliega como un servicio Cloud Run independiente
+en la región \texttt{europe-west1}, garantizando aislamiento de fallos y escalado
+independiente por servicio.
+ 
+\textbf{Cloud Build} gestiona el pipeline de CI/CD mediante siete ficheros de
+configuración independientes (\texttt{cloudbuild-*.yaml}), uno por servicio. Cada
+pipeline construye la imagen Docker, la publica en \textbf{Artifact Registry} y
+despliega la nueva revisión en Cloud Run. Los secretos de producción —claves de API,
+credenciales de base de datos— se inyectan desde \textbf{Secret Manager} en tiempo
+de despliegue, nunca almacenándose en el repositorio de código.
+ 
+\textbf{Cloud Storage} actúa como almacén de objetos para los artefactos del pipeline
+de machine learning: los ficheros Parquet con el histórico de precios exportados
+diariamente por \texttt{gasolineras-service} y los modelos LightGBM serializados
+generados por \texttt{prediction-service}.
+ 
+La alternativa más directa habría sido \textbf{AWS} con Lambda o ECS. Sin embargo,
+GCP ofrece una integración nativa entre Cloud Run, Gemini y las APIs de Google (Maps,
+Geocoding, OAuth) que simplifica la configuración de identidades y permisos mediante
+IAM, reduciendo la complejidad operativa del proyecto. Adicionalmente, los créditos
+académicos del programa Google for Startups permitieron cubrir los costes de
+infraestructura durante el período de desarrollo.
+ 
+% ---------------------------------------------------------
+\section{Síntesis: justificación del stack tecnológico}
+% ---------------------------------------------------------
+ 
+La Tabla~\ref{tab:stack_tecnologico} resume las tecnologías empleadas, su capa de
+aplicación y el criterio principal que motivó su elección frente a las alternativas
+evaluadas.
+ 
+\begin{table}[H]
+\centering
+\caption{Resumen del stack tecnológico de TankGo}
+\label{tab:stack_tecnologico}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Tecnología} & \textbf{Capa} & \textbf{Alternativas evaluadas} & \textbf{Criterio de elección} \\
+\midrule
+React 19            & Frontend      & Vue.js, Angular              & Ecosistema Leaflet, adopción \\
+Leaflet.js          & Frontend      & Google Maps, Mapbox          & Licencia abierta, sin coste \\
+Hono 4.10           & Gateway       & Express.js, Fastify          & Rendimiento async, WS nativo \\
+FastAPI 0.115       & Backend Py    & Flask, Django                & ASGI, OpenAPI automático \\
+Fastify 5.7         & Backend Node  & Express.js, NestJS           & JWT/cookie ecosystem \\
+PostgreSQL / Neon   & Datos         & MySQL, MongoDB               & PostGIS, serverless, ACID \\
+Apache Parquet      & ML pipeline   & CSV, JSON, Avro              & Columnar, compresión, Python \\
+LightGBM 4.3        & ML modelo     & XGBoost, ARIMA, LSTM         & Velocidad, quantile regression \\
+ORS (OpenRouteService) & Ruteo     & OSRM, Google Directions      & API REST gestionada, Matrix  \\
+OpenStreetMap       & Cartografía   & Google Maps, Mapbox          & Datos libres, sin coste API \\
+Nominatim           & Geocodificación & Google Geocoding            & Gratuito, integrado con OSM \\
+Gemini 2.5 Flash    & IA / Voz      & GPT-4o + Whisper, Gemini Pro & Multimodal, latencia baja \\
+Google Cloud Run    & Despliegue    & AWS Lambda, Azure Container  & Escala a cero, integración GCP \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+El conjunto de tecnologías elegidas comparte un denominador común: todas son de uso
+libre, todas tienen documentación oficial exhaustiva y todas cuentan con comunidades
+activas que garantizan su mantenimiento a largo plazo. Este criterio de
+\textit{sostenibilidad tecnológica} ha primado deliberadamente sobre la mera
+novedad, asegurando que la solución desarrollada pueda ser mantenida y extendida
+con independencia de los ciclos comerciales de proveedores específicos.
+ 
