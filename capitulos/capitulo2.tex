@@ -23,8 +23,8 @@ limitaciones estructurales que justifican la propuesta de este trabajo.
 \section{Estado del arte}
 
 El estudio del estado del arte abarca tres ámbitos tecnológicos que convergen en la 
-solución propuesta: la predicción de precios energéticos mediante aprendizaje automático, 
-los sistemas de recomendación geoespacial aplicados a la movilidad y las arquitecturas 
+solución propuesta: a) la predicción de precios energéticos mediante aprendizaje automático, 
+b) los sistemas de recomendación geoespacial aplicados a la movilidad y c) las arquitecturas 
 \textit{cloud} orientadas al procesamiento de datos en tiempo real.
 
 \subsection{Predicción de precios de combustibles}
@@ -58,7 +58,7 @@ disponibilidad, tiempo de desvío y preferencias del usuario \cite{mitma_esmovil
   un corredor geométrico alrededor del trayecto planificado y la evaluación de estaciones 
   dentro de dicho corredor mediante una función de puntuación ponderada. Este enfoque, 
   adoptado en la presente plataforma, minimiza el desvío total mientras optimiza el coste 
-  energético del trayecto. La integración de servicios de enrutamiento, como OpenRouteService 
+  económico del repostaje o recarga. La integración de servicios de enrutamiento, como OpenRouteService 
   (ORS) \cite{osm_wiki_routers}a través de su API, es una práctica consolidada en aplicaciones de movilidad de código 
   abierto, ya que permite ajustar la relación entre precisión y coste operativo.
 
@@ -83,13 +83,40 @@ identificados por Gartner como prioritarios para el ciclo 2025--2026
 
 El uso de modelos de lenguaje de gran escala (LLM) como motores de interfaces 
 conversacionales en aplicaciones de dominio específico ha experimentado una adopción 
-acelerada. En este proyecto no se emplea el \textit{Model Context Protocol} (MCP); el 
+acelerada. En este proyecto no se emplea el \textit{Model Context Protocol} (MCP), el 
 sistema realiza peticiones HTTPS a la API de Gemini. Además, dispone de un conjunto 
-de herramientas internas que orientan la toma de decisiones y la orquestación de acciones 
-(por ejemplo, consultas a bases de datos o invocación de APIs del sistema) en función 
-de las peticiones de los usuarios. De este modo puede atender consultas abiertas, como 
-\enquote{¿cuál es la gasolinera más barata?}, componiendo llamadas a 
-las APIs del sistema cuando sea necesario para generar una respuesta adecuada.
+de herramientas internas y flujos de orquestación que automatizan la toma de decisiones
+y la composición de acciones en respuesta a consultas abiertas. Estas herramientas
+coordinan llamadas a las APIs del sistema, consultas geoespaciales a la base de 
+datos y la invocación de modelos de predicción cuando procede; por ejemplo, 
+para responder a consultas como \enquote{¿cuál es la gasolinera más barata?} 
+el sistema puede combinar: a) una búsqueda por proximidad mediante PostGIS 
+sobre la tabla \texttt{gasolineras}, b) la recuperación de precios actuales 
+y su histórico en \texttt{precios\_historicos}, y c) la consulta al servicio 
+de predicción (modelo LightGBM con regresión cuantílica) para estimar 
+tendencias a corto plazo.
+
+Estas capacidades se apoyan en la arquitectura descrita en el Capítulo 8: 
+un API Gateway (Hono) centraliza las peticiones, varios microservicios 
+gestionan dominios concretos (gasolineras, electrolineras, usuarios, 
+recomendación y predicción) y la capa de persistencia (PostgreSQL/Neon con PostGIS)
+permite consultas eficientes y reproducibles. El servicio de sincronización de 
+datos mantiene la frescura mediante trabajos programados (Cloud Scheduler / Cloud Run Jobs)
+que exportan snapshots en formato Parquet para el pipeline de ML, mientras que en 
+entornos locales la orquestación se realiza con Docker Compose.
+
+Adicionalmente, el sistema integra un motor de recomendación por ruta que 
+combina trazados de OpenRouteService con una función de puntuación ponderada 
+(coste, desvío y preferencias del usuario), y un asistente conversacional apoyado
+por un LLM (consultas HTTPS a la API externa) que orquesta llamadas internas para 
+componer respuestas enriquecidas. Para mejorar la disponibilidad, 
+el \textit{gasolineras-service} implementa mecanismos de fallback en memoria 
+y políticas de refresco controladas por configuración, evitando latencias 
+impredecibles en peticiones de lectura.
+
+En conjunto, estos elementos convierten consultas simples en flujos compuestos y
+reproducibles, integrando datos abiertos, capacidad predictiva y servicios 
+en la nube para ofrecer respuestas contextualizadas y accionables al usuario.
 
 \section{Soluciones existentes y limitaciones}
 
@@ -187,13 +214,14 @@ tres ejes estratégicos alineados con tendencias recientes de la industria
     precios basado en LightGBM con regresión cuantílica, seleccionado por su equilibrio 
     entre precisión, coste computacional e interpretabilidad 
     \cite{LAHMIRI2024105008, s24124013}.
-    \item \textbf{Interacción conversacional:} integración de un asistente de voz , 
+    \item \textbf{Interacción conversacional:} integración de un asistente de voz, 
     que habilita consultas en lenguaje natural sobre datos en tiempo real 
     sin modificar la arquitectura subyacente.
 \end{enumerate}
 
-Con este enfoque, el sistema evoluciona de herramienta informativa a sistema de apoyo 
-a la decisión.
+Con este enfoque, el sistema deja de ser una herramienta meramente informativa y se convierte en una plataforma web de apoyo a la decisión,
+capaz de gestionar, analizar y visualizar datos.
+
 
 \section{Justificación técnica y académica}
 

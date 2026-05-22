@@ -27,88 +27,89 @@ del sistema:
 \subsection{Ingesta y gestión de datos}
 
 \begin{itemize}
-    \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
-          con la API REST del Ministerio de Industria (MinITUR) que garantice la
-          disponibilidad de datos de precios actualizados con una frecuencia mínima
-          diaria, con persistencia histórica en base de datos relacional.
+      \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
+            con la API REST del Ministerio de Industria (MinITUR) que garantice la
+            disponibilidad de datos de precios actualizados con una frecuencia mínima
+            diaria, con persistencia histórica en base de datos relacional.
 
-    \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
-          eléctrica en el mismo modelo de datos que los combustibles convencionales,
-          permitiendo consultas unificadas sobre ambas fuentes energéticas.
+      \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
+            eléctrica en el mismo modelo de datos que los combustibles convencionales,
+            permitiendo consultas unificadas sobre ambas fuentes energéticas.
 
-    \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
-          datos históricos en formato Apache Parquet hacia Google Cloud Storage,
-          como base de datos de entrenamiento reproducible para los modelos de
-          aprendizaje automático.
+      \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
+            datos históricos en formato Apache Parquet hacia Google Cloud Storage,
+            como base de datos de entrenamiento reproducible para los modelos de
+            aprendizaje automático.
 \end{itemize}
 
 \subsection{Consulta y visualización geoespacial}
 
 \begin{itemize}
-    \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
-          con mapa interactivo que permita la búsqueda y filtrado de estaciones
-          por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
-          (español, inglés y euskera).
+      \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
+            con mapa interactivo que permita la búsqueda y filtrado de estaciones
+            por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
+            (español, inglés y euskera).
 
-    \item \textbf{OE-05.} Implementar la visualización del historial de
-          precios por estación mediante gráficos temporales interactivos.
+      \item \textbf{OE-05.} Implementar la visualización del historial de
+            precios por estación mediante gráficos temporales interactivos.
 \end{itemize}
 
 \subsection{Predicción de precios}
 
 \begin{itemize}
-    \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
-          de precios basado en modelos de \textit{gradient boosting} (LightGBM)
-          con regresión cuantílica, incorporando el precio del crudo Brent como
-          variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
-          predicciones individualizadas por estación de servicio en un periodo de 7 días.
+      \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
+            de precios basado en modelos de \textit{gradient boosting} (LightGBM)
+            con regresión cuantílica, incorporando el precio del crudo Brent como
+            variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
+            predicciones individualizadas por estación de servicio en un periodo de 7 días.
 
-    \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
-          seleccionado frente a alternativas (XGBoost, regresión lineal como
-          \textit{baseline}) mediante métricas estándar de regresión
-          (MAE, RMSE, $R^2$) \cite{s24124013}.
+      \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
+            seleccionado frente a alternativas (XGBoost, regresión lineal como
+            \textit{baseline}) mediante métricas estándar de regresión
+            (MAE, RMSE, $R^2$) \cite{s24124013}.
 \end{itemize}
 
 \subsection{Recomendación basada en rutas}
 
 \begin{itemize}
       \item \textbf{OE-08.} Implementar un servicio de recomendación de
-          gasolineras para rutas A$\rightarrow$B que identifique candidatos
-          mediante consultas geoespaciales PostGIS (ST\_DWithin,
-          ST\_LineLocatePoint), calcule desvíos mediante la API Matrix de
-          OpenRouteService y evalúe las estaciones según una función de
-          puntuación ponderada por precio y desvío, con soporte de geometría
-          vectorial (Shapely) y distancias geodésicas (Haversine).
-      
-      \item \textbf{OE-09.} Integrar OpenRouteService como backend único de
-          enrutamiento en el entorno de producción cloud, con gestión de
-          cuotas mediante semáforo y mecanismos de resiliencia ante
-          indisponibilidad de la API externa.
+            gasolineras para rutas A$\rightarrow$B que identifique las
+            estaciones óptimas dentro del corredor geográfico de la ruta,
+            evalúe las candidatas según una función de puntuación ponderada
+            que combine precio del combustible y desvío respecto al trayecto
+            original, y devuelva al usuario un ranking de recomendaciones con
+            estimación del ahorro económico frente a la opción menos favorable.
+
+      \item \textbf{OE-09.} Integrar un servicio de enrutamiento externo
+            como backend único de cálculo de rutas en el entorno de producción
+            cloud, garantizando la resiliencia del sistema ante la
+            indisponibilidad temporal de la API externa mediante mecanismos
+            de control de concurrencia y fallback configurable.
 \end{itemize}
 
 \subsection{Arquitectura, despliegue y calidad}
 
 \begin{itemize}
-    \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
-          microservicios con API Gateway centralizado, donde cada servicio
-          sea independientemente desplegable y escalable, siguiendo los
-          principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
+      \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
+            microservicios con API Gateway centralizado, donde cada servicio
+            sea independientemente desplegable y escalable, siguiendo los
+            principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
 
-    \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
-          Google Cloud Run mediante pipelines de integración y entrega continua
-          (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
-          independientes (uno por servicio).
+      \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
+            Google Cloud Run mediante pipelines de integración y entrega continua
+            (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
+            independientes (uno por servicio).
 
-    \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
-          basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
-          para autenticación OAuth 2.0 mediante Google y gestión de perfiles
-          de usuario persistentes.
+      \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
+            basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
+            para autenticación OAuth 2.0 mediante Google y gestión de perfiles
+            de usuario persistentes.
 
-    \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
-          basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
-          sobre la API REST de Google GenAI (Gemini 2.5 Flash), con capacidad
-          de \textit{tool calling} para consultar precios y estaciones cercanas
-          en tiempo real a través del API Gateway del sistema.
+      \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
+            basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
+            sobre la API REST de Google GenAI (Gemini 2.5 Flash) \cite{gemini_2_5}, con capacidad
+            de \textit{tool calling} \cite{genai_tool_calling} para consultar precios y estaciones cercanas
+            en tiempo real a través del API Gateway del sistema.
 \end{itemize}
 
 \section{Alcance del sistema}
@@ -131,39 +132,67 @@ disponible institucionalmente \cite{mitma_esmovilidad}.
 La plataforma entregada comprende los siguientes componentes funcionales:
 
 \begin{enumerate}
-    \item \textbf{Servicio de gasolineras:} ingesta, normalización, persistencia
-          y consulta de precios de carburantes con historial temporal.
+      \item \textbf{Servicio de gasolineras:} ingesta, normalización,
+            persistencia y consulta de precios de carburantes con historial
+            temporal. Ofrece búsqueda geoespacial por radio, filtrado por
+            provincia, municipio, marca y tipo de combustible, e integra
+            los puntos de recarga eléctrica en el mismo modelo de datos.
 
-    \item \textbf{Servicio de usuarios:} registro, autenticación (tradicional
-          y OAuth Google), gestión de perfiles con preferencias de combustible
-          y vehículo, y sistema de favoritos sincronizado.
+      \item \textbf{Servicio de usuarios:} registro, autenticación
+            (tradicional y OAuth Google), gestión de perfiles con
+            preferencias de combustible y vehículo, y sistema de favoritos
+            sincronizado. Emite credenciales mediante JWT almacenado en
+            \textit{httpOnly cookie} y expone endpoints internos para la
+            comunicación entre servicios.
 
-    \item \textbf{Servicio de recomendación:} cálculo de rutas óptimas de
-          repostaje para trayectos A$\rightarrow$B con función de coste ponderada.
+      \item \textbf{Servicio de recomendación:} cálculo de las gasolineras
+            óptimas para un trayecto A$\rightarrow$B definido por el usuario,
+            mediante identificación de candidatas en el corredor geográfico
+            de la ruta, cálculo de desvíos reales respecto al trayecto
+            original, evaluación mediante función de puntuación ponderada
+            por precio y desvío, y presentación de un ranking con estimación
+            del ahorro económico. Soporta configuración del tipo de
+            combustible, desvío máximo aceptable y capacidad del depósito,
+            e integra un backend de enrutamiento externo para el cálculo
+            preciso de distancias y tiempos de desvío.
 
-    \item \textbf{Servicio de predicción:} generación de predicciones de
-          precio a corto plazo por estación, basadas en modelos LightGBM
-          entrenados sobre datos históricos.
+      \item \textbf{Servicio de predicción:} generación de predicciones de
+            precio a corto plazo por estación, basadas en modelos de
+            \textit{gradient boosting} entrenados sobre series históricas
+            de precios. Incorpora el precio del crudo Brent como variable
+            exógena y cubre las estaciones con historial suficiente y
+            mayor demanda de uso.
 
-    \item \textbf{Asistente de voz:} interfaz conversacional en tiempo real
-          con acceso a las capacidades del sistema mediante \textit{tool calling}.
+      \item \textbf{Asistente de voz:} interfaz conversacional en lenguaje
+            natural que permite al usuario consultar precios y estaciones
+            cercanas mediante voz. Implementa un pipeline
+            STT$\rightarrow$LLM$\rightarrow$TTS con capacidad de
+            \textit{tool calling} para acceder en tiempo real a los datos
+            del sistema a través del API Gateway.
 
-    \item \textbf{API Gateway:} punto de entrada único con documentación
-          OpenAPI agregada, gestión de autenticación y bridge WebSocket.
+      \item \textbf{API Gateway:} punto de entrada único para el frontend,
+            que actúa como proxy reverso hacia los servicios internos,
+            agrega la documentación OpenAPI de todos ellos, gestiona la
+            autenticación mediante cookies y sirve de bridge WebSocket
+            para el asistente de voz.
 
-    \item \textbf{Frontend PWA:} aplicación web progresiva instalable con
-          soporte \textit{offline}, modo oscuro e internacionalización.
+      \item \textbf{Frontend PWA:} aplicación web progresiva instalable
+            con mapa interactivo, historial de precios, gestión de
+            favoritos, recomendación de ruta y asistente de voz integrado.
+            Ofrece soporte \textit{offline}, modo oscuro e
+            internacionalización en tres idiomas
+            \cite{web_dev_pwa,i18next}.
 \end{enumerate}
 
 \subsection{Entorno de despliegue}
 
-La plataforma se despliega íntegramente en Google Cloud Platform (GCP),
+La plataforma se despliega íntegramente en Google Cloud Platform (GCP) \cite{cloud_run2026},
 utilizando Cloud Run como servicio de ejecución de contenedores serverless,
-Artifact Registry para el almacenamiento de imágenes Docker, Cloud Build
-para la automatización del pipeline CI/CD y Secret Manager para la
+Artifact Registry \cite{artifact_registry} para el almacenamiento de imágenes Docker \cite{docker}, Cloud Build
+\cite{cloud_build2026} para la automatización del pipeline CI/CD y Secret Manager \cite{secret_manager} para la
 gestión segura de credenciales en producción. La base de datos relacional
 se externaliza en Neon (PostgreSQL gestionado) y el almacenamiento de
-objetos para el pipeline de ML se realiza en Google Cloud Storage.
+objetos para el pipeline de ML se realiza en Google Cloud Storage \cite{cloud_storage2026}.
 
 \section{Limitaciones}
 
@@ -172,35 +201,36 @@ conceptual del proyecto, presentan restricciones técnicas o de recursos
 conocidas en la versión entregada.
 
 \begin{itemize}
-    \item \textbf{Frecuencia de actualización de precios:} La API del
-          Ministerio de Industria publica datos con una frecuencia que puede
-          variar entre actualizaciones horarias y diarias según la estación,
-          por lo que el sistema no puede garantizar precios en tiempo real
-          estricto, sino \textit{near real-time} con un desfase máximo
-          determinado por la fuente oficial.
+      \item \textbf{Frecuencia de actualización de precios:} La API del
+            Ministerio de Industria publica datos con una frecuencia que puede
+            variar entre actualizaciones horarias y diarias según la estación,
+            por lo que el sistema no puede garantizar precios en tiempo real
+            estricto, sino \textit{near real-time} con un desfase máximo
+            determinado por la fuente oficial.
+      \item \textbf{Cobertura del modelo predictivo:} La generación y mantenimiento de modelos predictivos por estación es intensiva
+            en recursos computacionales (entrenamiento, almacenamiento de artefactos y ejecución de inferencia periódica) y
+            depende de la disponibilidad de series temporales suficientemente largas y de calidad. Por ello, el servicio de
+            predicción limita su cobertura a las estaciones que disponen de historial suficiente y a las marcadas como favoritas por los usuarios,
+            priorizando la relación coste/beneficio y la utilidad práctica frente a una cobertura completa que sería costosa e innecesaria para
+            estaciones con datos escasos. El diseño detallado del pipeline de entrenamiento, la política de refresco y las estimaciones de coste
+            computacional se documentan en el Capítulo 8 (Sección \ref{sec:implementacion}).
 
-    \item \textbf{Cobertura del modelo predictivo:} El servicio de
-          predicción genera modelos únicamente para las estaciones con
-          suficiente historial de precios almacenado y para aquellas
-          marcadas como favoritas por los usuarios del sistema, priorizando
-          la relevancia sobre la cobertura total.
+      \item \textbf{Precisión de la recomendación por ruta:} La calidad
+            de la recomendación depende de la disponibilidad y precisión del
+            backend de enrutamiento seleccionado. El fallback a distancia
+            en línea recta, activable mediante configuración, reduce la
+            precisión del corredor geométrico calculado.
 
-    \item \textbf{Precisión de la recomendación por ruta:} La calidad
-          de la recomendación depende de la disponibilidad y precisión del
-          backend de enrutamiento seleccionado. El fallback a distancia
-          en línea recta, activable mediante configuración, reduce la
-          precisión del corredor geométrico calculado.
+      \item \textbf{Escalabilidad del asistente de voz:} El servicio de
+            voz está sujeto a los límites de cuota de la API de Gemini y al
+            rate limiting configurado (40 peticiones por minuto por IP),
+            lo que limita su uso concurrente intensivo.
 
-    \item \textbf{Escalabilidad del asistente de voz:} El servicio de
-          voz está sujeto a los límites de cuota de la API de Gemini y al
-          rate limiting configurado (40 peticiones por minuto por IP),
-          lo que limita su uso concurrente intensivo.
-
-    \item \textbf{Disponibilidad de datos de recarga eléctrica:}
-          La información de puntos de recarga eléctrica procede de una
-          fuente de terceros (mapareve.es) cuya disponibilidad y
-          completitud no están garantizadas de forma institucional,
-          a diferencia de los datos de carburantes del Ministerio.
+      \item \textbf{Disponibilidad de datos de recarga eléctrica:}
+            La información de puntos de recarga eléctrica procede de una
+            fuente de terceros (mapareve.es) cuya disponibilidad y
+            completitud no están garantizadas de forma institucional,
+            a diferencia de los datos de carburantes del Ministerio.
 \end{itemize}
 
 \section{Exclusiones}
@@ -210,35 +240,36 @@ del presente proyecto, evitando ambigüedades en la evaluación del
 trabajo realizado.
 
 \begin{itemize}
-    \item \textbf{Aplicación móvil nativa:} El sistema se entrega como
-          PWA instalable, pero no se desarrolla una aplicación nativa para
-          iOS o Android. La PWA cubre los casos de uso de movilidad mediante
-          el navegador del dispositivo.
+      \item \textbf{Aplicación móvil nativa:} El sistema se entrega como
+            PWA instalable, pero no se desarrolla una aplicación nativa para
+            iOS o Android. La PWA cubre los casos de uso de movilidad mediante
+            el navegador del dispositivo.
 
-    \item \textbf{Integración con navegadores GPS:} No se integra con
-          sistemas de navegación en tiempo real tipo Google Maps o Waze para
-          guía turn-by-turn. La recomendación de ruta se limita al cálculo
-          de la estación óptima, no a la navegación posterior.
+      \item \textbf{Integración con navegadores GPS:} No se integra con
+            sistemas de navegación en tiempo real tipo Google Maps o Waze para
+            guía turn-by-turn. La recomendación de ruta se limita al cálculo
+            de la estación óptima, no a la navegación posterior. Sin embargo, la aplicacion
+            proporciona enlaces directos a Google Maps para la navegación hacia la estación recomendada.
 
-    \item \textbf{Pagos y reservas:} El sistema no contempla
-          funcionalidades de pago, reserva de surtidores ni integración
-          con sistemas de fidelización de las cadenas de gasolineras.
+      \item \textbf{Pagos y reservas:} El sistema no contempla
+            funcionalidades de pago, reserva de surtidores ni integración
+            con sistemas de fidelización de las cadenas de gasolineras.
 
-    \item \textbf{Predicción de precios de electricidad:} El módulo
-          predictivo se centra exclusivamente en combustibles líquidos
-          (gasolina y diésel). La predicción del coste de recarga eléctrica,
-          que depende de tarifas horarias (PVPC) y contratos de operador,
-          queda fuera del alcance de esta versión.
+      \item \textbf{Predicción de precios de electricidad:} El módulo
+            predictivo se centra exclusivamente en combustibles líquidos
+            (gasolina y diésel). La predicción del coste de recarga eléctrica,
+            que depende de tarifas horarias (PVPC) y contratos de operador,
+            queda fuera del alcance de esta versión.
 
-    \item \textbf{Soporte multipaís:} La plataforma está diseñada
-          y configurada para el mercado español. La extensión a otros mercados
-          europeos requeriría adaptaciones en las fuentes de datos,
-          la normalización de formatos y la cobertura geográfica de los
-          servicios de enrutamiento.
+      \item \textbf{Soporte multipaís:} La plataforma está diseñada
+            y configurada para el mercado español. La extensión a otros mercados
+            europeos requeriría adaptaciones en las fuentes de datos,
+            la normalización de formatos y la cobertura geográfica de los
+            servicios de enrutamiento.
 
-    \item \textbf{Panel de administración:} No se desarrolla una
-          interfaz de administración gráfica para la gestión de usuarios,
-          sincronizaciones o modelos ML. La administración se realiza
-          mediante endpoints protegidos por \textit{internal secret}
-          y acceso directo a la base de datos.
+      \item \textbf{Panel de administración:} No se desarrolla una
+            interfaz de administración gráfica para la gestión de usuarios,
+            sincronizaciones o modelos ML. La administración se realiza
+            mediante endpoints protegidos por \textit{internal secret}
+            y acceso directo a la base de datos.
 \end{itemize}
