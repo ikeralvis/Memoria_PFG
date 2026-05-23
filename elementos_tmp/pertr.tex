@@ -1,0 +1,166 @@
+% ─────────────────────────────────────────────────────────────
+%  Diagrama PERT – TankGo
+%  Preámbulo necesario:
+%    \usepackage{tikz}
+%    \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds}
+% ─────────────────────────────────────────────────────────────
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  fase1/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=teal!55!black!70, text=white, draw=teal!30!black, line width=0.8pt
+  },
+  fase2/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=green!45!black!80, text=white, draw=green!30!black, line width=0.8pt
+  },
+  infra/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=blue!55!black!70, text=white, draw=blue!30!black, line width=0.8pt
+  },
+  refin/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=orange!70!red!80, text=white, draw=orange!40!red!60, line width=0.8pt
+  },
+  docu/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=red!60!black!70, text=white, draw=red!40!black, line width=0.8pt
+  },
+  inicio/.style={
+    rectangle, rounded corners=5pt, minimum width=2.8cm, minimum height=0.9cm,
+    text width=2.6cm, align=center, font=\small\bfseries,
+    fill=violet!60!blue!80, text=white, draw=violet!40!blue!60, line width=0.8pt
+  },
+  fin/.style={
+    circle, minimum size=1.1cm, font=\small\bfseries,
+    fill=gray!60, text=white, draw=gray!40, line width=0.8pt
+  },
+  flecha/.style={-{Stealth[length=5pt]}, thick, gray!70},
+  flechap/.style={-{Stealth[length=5pt]}, thick, dashed, gray!50},
+  flechat2/.style={-{Stealth[length=5pt]}, thick, dashed, teal!60!black},
+  flechad/.style={-{Stealth[length=5pt]}, thick, dashed, red!50!black},
+  lbl/.style={font=\tiny, fill=white, inner sep=1pt}
+]
+
+% ── FASE 1 ──────────────────────────────────────────────
+
+\node[inicio]   (T1)  at (0,    0)    {\textbf{T1}\\{\footnotesize Alcance y\\arquitectura}};
+\node[fase1]    (T2)  at (3.5,  1.2)  {\textbf{T2}\\{\footnotesize Gasolineras}};
+\node[fase1]    (T3)  at (3.5,  0)    {\textbf{T3}\\{\footnotesize Usuarios}};
+\node[fase1]    (T4)  at (3.5, -1.2)  {\textbf{T4}\\{\footnotesize API Gateway}};
+\node[fase1]    (T5)  at (7,    0)    {\textbf{T5}\\{\footnotesize Frontend}};
+\node[fase1]    (T6)  at (10.5, 0)    {\textbf{T6}\\{\footnotesize Despliegue\\Render}};
+
+% Flechas Fase 1
+\draw[flecha] (T1) -- (T2);
+\draw[flecha] (T1) -- (T3);
+\draw[flecha] (T1) -- (T4);
+\draw[flecha] (T2) -- (T5);
+\draw[flecha] (T3) -- (T5);
+\draw[flecha] (T4) -- (T5);
+\draw[flecha] (T5) -- (T6);
+
+% ── FASE 2 ──────────────────────────────────────────────
+
+\node[infra]  (T7)   at (0,   -3.3)  {\textbf{T7}\\{\footnotesize Migración GCP}};
+\node[fase2]  (T8)   at (3.5, -2.6)  {\textbf{T8}\\{\footnotesize Electromovilidad}};
+\node[fase2]  (T9)   at (3.5, -3.7)  {\textbf{T9}\\{\footnotesize Recomendación}};
+\node[fase2]  (T10)  at (3.5, -4.8)  {\textbf{T10}\\{\footnotesize Predicción ML}};
+\node[fase2]  (T11)  at (3.5, -5.9)  {\textbf{T11}\\{\footnotesize Asistente}};
+\node[refin]  (T12a) at (7,   -3.7)  {\textbf{T12a}\\{\footnotesize Refin. rutado}};
+\node[refin]  (T12b) at (7,   -4.8)  {\textbf{T12b}\\{\footnotesize Refin. predicción}};
+\node[docu]   (T13)  at (7,   -5.9)  {\textbf{T13}\\{\footnotesize Documentación}};
+\node[fin]    (FIN)  at (10.5,-4.8)  {\textbf{FIN}};
+
+% T6 → T7 (entre fases, curva por la izquierda)
+\draw[flechap, bend right=25] (T6.south) to (T7.north);
+
+% T7 → módulos
+\draw[flecha] (T7) -- (T8);
+\draw[flecha] (T7) -- (T9);
+\draw[flecha] (T7) -- (T10);
+\draw[flecha] (T7) -- (T11);
+
+% T2 revisado → T10 (por margen derecho)
+\draw[flechat2]
+  (T2.east) -- ++(0.5,0) -- ++(0,-6.0) -- (T10.east)
+  node[lbl, pos=0.12, right] {\footnotesize T2\,revisado};
+
+% T9 → T12a  |  T10 → T12b
+\draw[flecha] (T9)  -- (T12a);
+\draw[flecha] (T10) -- (T12b);
+
+% T7 → T13 (paralela, baja pegada a la izquierda de los módulos)
+\draw[flechad]
+  (T7.east) -- ++(0.4,0) -- ++(0,-2.6) -- (T13.west);
+
+% Hacia FIN
+\draw[flecha] (T12a) -- (FIN);
+\draw[flecha] (T12b) -- (FIN);
+\draw[flecha] (T13.east) -- ++(0.3,0) |- (FIN);
+\draw[flechap] (T8.east)  -- ++(0.3,0) |- (FIN);
+\draw[flechap] (T11.east) -- ++(0.3,0) |- (FIN);
+
+% ── Marcos de fase con labels ENCIMA del marco ──────────
+\begin{scope}[on background layer]
+  % Marco Fase 1
+  \node[
+    rectangle, rounded corners=8pt,
+    fill=blue!4, draw=blue!25, line width=0.8pt,
+    fit=(T1)(T2)(T3)(T4)(T5)(T6),
+    inner sep=14pt
+  ] (boxF1) {};
+
+  % Marco Fase 2
+  \node[
+    rectangle, rounded corners=8pt,
+    fill=green!4, draw=green!25, line width=0.8pt,
+    fit=(T7)(T8)(T9)(T10)(T11)(T12a)(T12b)(T13)(FIN),
+    inner sep=14pt
+  ] (boxF2) {};
+\end{scope}
+
+% Labels de fase FUERA de los marcos (encima, alineados a la izquierda)
+\node[
+  font=\small\bfseries, text=blue!60!black,
+  anchor=south west
+] at (boxF1.north west) {Fase 1 — Prototipo inicial (oct–dic 2025)};
+
+\node[
+  font=\small\bfseries, text=green!50!black,
+  anchor=south west
+] at (boxF2.north west) {Fase 2 — Ampliación PFG (feb–may 2026)};
+
+% ── Separador entre fases ──
+\draw[dashed, gray!35, line width=0.5pt]
+  ([xshift=-5pt]boxF1.south west) -- ([xshift=5pt]boxF1.south east);
+
+% ── Leyenda ──────────────────────────────────────────────
+\node[
+  rectangle, rounded corners=4pt,
+  fill=gray!8, draw=gray!25, line width=0.5pt,
+  inner sep=6pt,
+  below=0.6cm of boxF2.south,
+  anchor=north
+] (legend) {
+  \begin{tikzpicture}[baseline, inner sep=0]
+    \node[inicio, minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (0,0)     {Inicio};
+    \node[fase1,  minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (2.2,0)   {Núcleo F1};
+    \node[infra,  minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (4.4,0)   {Infraestructura};
+    \node[fase2,  minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (6.6,0)   {Módulos F2};
+    \node[refin,  minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (8.8,0)   {Refinamiento};
+    \node[docu,   minimum width=1.8cm, minimum height=0.55cm, font=\footnotesize] at (11.0,0)  {Documentación};
+  \end{tikzpicture}
+};
+
+\end{tikzpicture}
+\caption{Diagrama PERT del proyecto TankGo}
+\label{fig:pert}
+\end{figure}

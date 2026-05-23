@@ -104,33 +104,11 @@ vial aplicables. El sistema de recomendacion de rutas tambien añade una depende
 % ═════════════════════════════════════════════
 
 \subsection{Alternativas exploradas y decisiones tecnológicas}
-Las decisiones tecnológicas de TankGo responden a criterios de adecuación funcional,
-rendimiento en entornos cloud y familiaridad del equipo de desarrollo. A continuación se
-justifican las elecciones más relevantes.
-
-Para el \textbf{API Gateway} se han evaluado opciones como Kong, AWS API Gateway y soluciones
-basadas en Nginx. Se ha optado por \textbf{Hono sobre Node.js} por su bajo consumo de recursos,
-su rendimiento en entornos serverless y su sintaxis próxima a Express, lo que simplificó la
-curva de aprendizaje~\cite{hono}. Hono permite implementar enrutamiento, middleware de
-autenticación y políticas CORS con un código mínimo y muy legible.
-
-Para los \textbf{microservicios de dominio} se han utilizado dos tecnologías según el
-lenguaje más adecuado para cada caso. El servicio de usuarios se implementó con
-\textbf{Fastify (Node.js)}, un framework orientado al alto rendimiento con una gestión
-eficiente del esquema de validación. Los servicios de gasolineras,
-recomendación y predicción se implementaron con \textbf{FastAPI (Python)}, elección
-motivada por la integración nativa con el ecosistema de machine learning de Python
-(scikit-learn, LightGBM, pandas) y su capacidad para generar documentación OpenAPI
-automáticamente.
-
-Para el \textbf{frontend} se ha optado por \textbf{React con TypeScript y Vite}, combinación
-que ofrece tipado estático, tiempos de compilación reducidos y un ecosistema de componentes
-amplio. La aplicación está construida como \textit{Progressive Web App} (PWA), lo que
-permite su uso en dispositivos móviles con comportamiento nativo.
-
-La \textbf{base de datos} es PostgreSQL, desplegada en Neon Cloud \cite{neon_cloud}. Se ha elegido PostgreSQL por su solidez,
-soporte de extensiones geoespaciales y compatibilidad con los ORM uilizados en ambos
-stacks tecnológicos.
+Las decisiones tecnológicas de TankGo quedan recogidas en detalle en el
+Capítulo~3 (Marco Tecnológico), donde se justifica la elección de cada
+componente del stack frente a las alternativas evaluadas. En esta sección
+se describen únicamente los aspectos de diseño arquitectónico que
+condicionan la implementación.
 
 
 \subsection{Arquitectura general}
@@ -151,8 +129,8 @@ necesidades.
 
 \begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{figures/arquitectura.png}
-  \caption{Diagrama de arquitectura general de TankGo}
+  \includegraphics[width=0.9\textwidth]{imgs/arquitectura_tankgo.png}
+  \caption{Diagrama de arquitectura general del sistema}
   \label{fig:arquitectura}
 \end{figure}
 

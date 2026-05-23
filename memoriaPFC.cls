@@ -279,3 +279,5 @@
 \usepackage{multirow}      % Para las celdas combinadas en la tabla
 \usepackage{float}         % Para [H] en figuras y tablas
 \usepackage{lscape}   % en vez de pdflscape
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds}

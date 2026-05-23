@@ -1,1 +1,112 @@
-\chapter{Capitulo Septimo}
+% !TEX root = ../main.tex
+% =========================================================
+%  CAPÍTULO 7 — METODOLOGÍA
+% =========================================================
+
+\chapter{Capítulo Séptimo - Metodología}
+Este capítulo describe el enfoque metodológico adoptado para la gestión y el desarrollo de
+TankGo. Se justifica la elección de una metodología ágil iterativa frente a enfoques clásicos
+en cascada, se describe el marco de trabajo Kanban implementado mediante Todoist, y se detalla
+el uso del control de versiones y las dinámicas de coordinación seguidas a lo largo del
+proyecto.
+
+\section{Enfoque de desarrollo: metodología ágil iterativa}
+
+El desarrollo de TankGo se ha abordado siguiendo los principios de las metodologías ágiles
+de desarrollo de software~\cite{sommerville2011}, que priorizan la entrega incremental de
+valor, la capacidad de respuesta ante cambios en los requisitos y la colaboración continua
+con los interesados del proyecto.
+
+Frente a un enfoque en cascada (\textit{waterfall}), en el que las fases de análisis, diseño,
+implementación y pruebas se realizan de forma lineal y cerrada, un modelo iterativo resulta
+adecuado en proyectos con requisitos emergentes o sujetos a
+evolución~\cite{sommerville2011}. TankGo al partir de un prototipo previo y como se ha ido
+ampliando el alcance lo largo de las dos fases, este alcance dinámico hace inviable
+un planteamiento en cascada y justifica la adopción de un enfoque iterativo e incremental.
+
+\section{Relación con Scrum y elección de Kanban}
+
+Entre las metodologías ágiles más extendidas se encuentran Scrum y Kanban. Scrum estructura
+el desarrollo en iteraciones de duración fija denominadas \textit{sprints}, con revisiones
+periódicas, \textit{daily stand-up}, revisión de sprint, retrospectiva, y roles diferenciados
+como \textit{Product Owner} y \textit{Scrum Master}~\cite{anderson2010kanban}. Este marco está
+concebido para equipos multidisciplinares y requiere una coordinación constante entre sus
+miembros para que sea efectivo.
+
+TankGo ha sido desarrollado íntegramente por un único estudiante, con supervisión
+del director del PFG y colaboración del grupo MORElab. En este contexto de
+desarrollo en solitario, las revisiones y artefactos de Scrum resultan desproporcionados y
+difíciles de aplicar. Kanban, en cambio, es un marco de gestión
+visual del trabajo orientado al flujo continuo de tareas, sin imponer una cadencia
+estricta de iteraciones~\cite{anderson2010kanban}. Su principio fundamental es limitar
+el trabajo en progreso (\textit{work in progress}, WIP) y hacer visible el estado de
+cada tarea en un tablero compartido, lo que favorece la concentración y la detección
+temprana de bloqueos. Por estas razones, Kanban se adoptó como marco de referencia
+para la gestión del proyecto.
+
+No obstante, el flujo de trabajo adoptado incorpora elementos propios del desarrollo
+iterativo que recuerdan a Scrum: para cada módulo o bloque funcional
+del sistema se han definido un conjunto de tareas concretas, se han estimado su duración, se
+priorizaron y se ejecutaron de forma ordenada hasta su integración y despliegue.
+El ciclo por bloque seguía las fases de análisis y diseño,
+implementación, pruebas, corrección y despliegue en producción, reproduciendo
+el ciclo ágil básico de forma recurrente a lo largo de ambas fases del proyecto.
+
+\section{Gestión de tareas: Todoist como tablero Kanban y agenda diaria}
+
+La herramienta utilizada para la gestión de tareas ha sido Todoist~\cite{Todoist2026},
+una aplicación de productividad personal que se ha empleado con una doble función complementaria.
+
+Por un lado, Todoist ha actuado como \textbf{tablero Kanban}: cada módulo funcional del
+sistema disponía de su propio bloque de tareas, organizadas por temática
+(por ejemplo, \textit{recomendación}, \textit{predicción}, \textit{asistente de voz}).
+Dentro de cada bloque se listaban las tareas necesarias (análisis de alternativas,
+desarrollo, despliegue en la nube, pruebas, corrección y despliegue definitivo),
+a las que se asignaba una prioridad y una estimación de duración. A medida que avanzaba el
+trabajo, cada tarea pasaba por los estados \textit{pendiente}, \textit{en progreso}
+y \textit{completada}, reproduciendo el flujo de columnas propio de un tablero
+Kanban (\textit{backlog} $\rightarrow$ \textit{to do} $\rightarrow$ \textit{in progress} $\rightarrow$ \textit{done}).
+
+Por otro lado, Todoist funcionaba también como \textbf{agenda diaria}: al comienzo de
+cada sesión de trabajo se seleccionaban y priorizaban las tareas a abordar ese día,
+añadiendo micro-tareas o recordatorios puntales que complementaban la planificación a
+nivel de módulo. Esta doble dimensión, tablero de proyecto y planificador diario, ha resultado
+útil para compaginar el desarrollo del PFG con otras obligaciones académicas,
+permitiendo retomar el trabajo con claridad independientemente del tiempo transcurrido
+entre sesiones.
+
+\section{Control de versiones}
+
+El código fuente del proyecto se ha gestionado mediante Git~\cite{git_scm2026,github2026}, con un 
+repositorio alojado en GitHub organizado como monorepo. Todo el desarrollo se ha
+realizado sobre una única rama principal (\texttt{main}), sin emplear ramas de características
+ni flujos de trabajo basados en \textit{pull requests}, decisión coherente con el contexto
+de desarrollo en solitario, donde la sobrecarga de un modelo de ramas más elaborado no
+aporta beneficio real.
+
+Los \textit{commits} se han realizado de forma frecuente, tras la finalización de
+cada tarea o subtarea significativa, lo que permite reconstruir la evolución del
+sistema y revertir cambios de forma controlada si fuera necesario. La integración
+del repositorio con los pipelines de Cloud Build~\cite{cloud_build2026} cierra el
+ciclo de control de versiones: cada \textit{push} a \texttt{main} desencadena
+automáticamente la construcción, publicación y despliegue del microservicio correspondiente
+en Google Cloud Run, convirtiendo el propio flujo de control de versiones en el disparador
+del proceso de entrega continua.
+
+\section{Coordinación y seguimiento}
+
+La supervisión académica y técnica del proyecto se ha organizado en torno a dos canales
+de comunicación periódica.
+
+Con el director del PFG se han mantenido reuniones de seguimiento a lo largo de la Fase
+2 del proyecto, con una frecuencia aproximada de una reunión cada semana o cada dos semanas, complementadas
+con comunicación por correo electrónico para la resolución de dudas puntuales y
+la revisión de entregables parciales.
+
+Con el grupo de investigación DEUSTEK/MORElab~\cite{MORElab2026}, a través del proyecto
+NextEdge, se ha mantenido una reunión semanal de carácter técnico los viernes, con una
+duración aproximada de una hora. Estas sesiones han servido como punto de revisión del
+avance del módulo de recomendación, como canal de orientación sobre requisitos y casos
+de uso reales, y como motor de algunas de las replanificaciones descritas en el Capítulo 5.
+La implicación activa de MORElab ha dotado al proyecto de una dimensión de validación externa
+que refuerza su orientación aplicada.

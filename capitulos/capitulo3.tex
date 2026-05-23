@@ -9,7 +9,7 @@ La elección de las tecnologías que dan soporte a TankGo responde a un análisi
 de alternativas en el que se han ponderado criterios de rendimiento, madurez del
 ecosistema, compatibilidad con el modelo de despliegue \textit{cloud-native}, coste
 operativo y alineación con las competencias adquiridas durante el grado. Este capítulo
-presenta las tecnologías seleccionadas organizadas por capa arquitectónica; la
+presenta las tecnologías seleccionadas organizadas por capa arquitectónica, la
 justificación técnica detallada de cada decisión se recoge en el Capítulo~8.
 
 % ---------------------------------------------------------
@@ -71,7 +71,7 @@ especialmente adecuado para la gestión de identidad y autenticación.
 
 Todos los servicios con necesidades de persistencia utilizan \textbf{PostgreSQL},
 alojado en \textbf{Neon} \cite{neon_tech2026}, plataforma de PostgreSQL serverless que
-escala a cero en inactividad. La extensión \textbf{PostGIS} habilita las consultas
+escala a cero en inactividad. La extensión \textbf{PostGIS} \cite{postgis} habilita las consultas
 geoespaciales (\texttt{ST\_DWithin}, \texttt{ST\_LineLocatePoint},
 \texttt{ST\_Distance}) requeridas por el servicio de recomendación.
 
@@ -123,7 +123,7 @@ modelos de precios variables.
 
 El asistente de voz implementa un pipeline \textbf{STT $\rightarrow$ LLM con
 \textit{tool calling} $\rightarrow$ TTS} sobre \textbf{Gemini 2.5 Flash}
-\cite{gemini_2_5}, accedido mediante llamadas HTTP REST con la biblioteca
+\cite{gemini_2_5}, accedido mediante llamadas API REST con la biblioteca
 \texttt{@google/genai}. El uso de un único modelo multimodal simplifica la
 arquitectura, reduce la latencia acumulada entre etapas y elimina la gestión de
 múltiples claves de API \cite{Gartner2026Trends}. El \textit{tool calling}

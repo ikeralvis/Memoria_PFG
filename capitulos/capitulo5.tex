@@ -1,6 +1,11 @@
+% !TEX root = ../main.tex
+% =========================================================
+%  CAPÍTULO 5 — PLANIFICACIÓN DEL PROYECTO
+% =========================================================
+
 \chapter{Capítulo Quinto - Planificación del Proyecto}
 
-Este capítulo describe cómo se organizó y gestionó el desarrollo de TankGo a lo largo de sus
+Este capítulo describe cómo se ha organizado y gestionado el desarrollo de TankGo a lo largo de sus
 dos fases. Se detalla la descomposición del trabajo en tareas, la
 estimación de tiempos, el cronograma seguido, los hitos alcanzados y las replanificaciones
 que surgieron durante el proceso.
@@ -14,49 +19,49 @@ el proyecto en bloques funcionales que reflejan la evolución real del desarroll
 dos grandes fases, cada una subdividida en paquetes de trabajo.
 
 \begin{description}
-  \item \textbf{Fase 1 - Prototipo inicial (octubre-diciembre 2025)}
-  \begin{enumerate}
-    \item \textbf{Definición del alcance y arquitectura inicial.}
-      Estudio de fuentes de datos disponibles, definición de objetivos del sistema y diseño
-      de la arquitectura de microservicios.
-    \item \textbf{Módulo de gasolineras.}
-      Integración con la API del Ministerio para obtener datos de precios en tiempo real,
-      diseño del modelo de datos y desarrollo del microservicio correspondiente.
-    \item \textbf{Módulo de usuarios.}
-      Implementación del sistema de autenticación, gestión de perfiles y preferencias.
-    \item \textbf{API Gateway.}
-      Configuración del gateway como punto de entrada unificado para los distintos
-      microservicios.
-    \item \textbf{Interfaz de usuario (frontend).}
-      Diseño UX/UI y desarrollo de la aplicación web para consulta y comparación de precios.
-    \item \textbf{Primer despliegue (Render PaaS).}
-      Puesta en producción del sistema en la plataforma Render como validación del
-      funcionamiento integral.
-  \end{enumerate}
+  \item \textbf{Fase 1 - Prototipo inicial (octubre--diciembre 2025)}
+        \begin{enumerate}
+          \item \textbf{Definición del alcance y arquitectura inicial.}
+                Estudio de fuentes de datos disponibles, definición de objetivos del sistema y diseño
+                de la arquitectura de microservicios.
+          \item \textbf{Módulo de gasolineras.}
+                Integración con la API del Ministerio para obtener datos de precios en tiempo real,
+                diseño del modelo de datos y desarrollo del microservicio correspondiente.
+          \item \textbf{Módulo de usuarios.}
+                Implementación del sistema de autenticación, gestión de perfiles y preferencias.
+          \item \textbf{API Gateway.}
+                Configuración del gateway como punto de entrada unificado para los distintos
+                microservicios.
+          \item \textbf{Interfaz de usuario (frontend).}
+                Diseño UX/UI y desarrollo de la aplicación web para consulta y comparación de precios.
+          \item \textbf{Primer despliegue (Render PaaS).}
+                Puesta en producción del sistema en la plataforma Render como validación del
+                funcionamiento integral.
+        \end{enumerate}
 
-  \item \textbf{Fase 2 - Ampliación como PFG (enero-mayo 2026)}
-  \begin{enumerate}
-    \setcounter{enumi}{6}
-    \item \textbf{Migración y mejora del despliegue a GCP.}
-      Reconfiguración de la infraestructura en Google Cloud Platform, incluyendo Cloud Run,
-      Cloud Storage, asi como mantener la base de datos de Neon Tech.
-    \item \textbf{Módulo de electromovilidad.}
-      Integración de puntos de recarga de vehículos eléctricos como extensión del dominio
-      de datos del sistema.
-    \item \textbf{Sistema de recomendación de rutas.}
-      Desarrollo del módulo de rutado que sugiere paradas de repostaje óptimas en función
-      de la ruta del usuario.
-    \item \textbf{Módulo de predicción de precios (ML).}
-      Entrenamiento y despliegue del modelo LightGBM para la estimación de precios futuros
-      de carburante.
-    \item \textbf{Asistente conversacional.}
-      Implementación del agente de voz para la interacción en lenguaje natural
-      con el sistema.
-    \item \textbf{Mejora y refinamiento del sistema de rutado.}
-      Optimización de los algoritmos de recomendación y validación con casos de uso reales.
-    \item \textbf{Documentación y memoria del PFG.}
-      Redacción de la memoria técnica, preparación de la presentación y revisión final.
-  \end{enumerate}
+  \item \textbf{Fase 2 - Ampliación como PFG (febrero--mayo 2026)}
+        \begin{enumerate}
+          \setcounter{enumi}{6}
+          \item \textbf{Migración y mejora del despliegue a GCP.}
+                Reconfiguración de la infraestructura en Google Cloud Platform, incluyendo Cloud Run
+                y Cloud Storage, manteniendo la base de datos en Neon Tech.
+          \item \textbf{Módulo de electromovilidad.}
+                Integración de puntos de recarga de vehículos eléctricos como extensión del dominio
+                de datos del sistema.
+          \item \textbf{Sistema de recomendación de rutas.}
+                Desarrollo del módulo de rutado que sugiere paradas de repostaje óptimas en función
+                de la ruta del usuario.
+          \item \textbf{Módulo de predicción de precios (ML).}
+                Entrenamiento y despliegue del modelo LightGBM para la estimación de precios futuros
+                de carburante.
+          \item \textbf{Asistente conversacional.}
+                Implementación del agente de voz para la interacción en lenguaje natural
+                con el sistema.
+          \item \textbf{Mejora y refinamiento del sistema de rutado.}
+                Optimización de los algoritmos de recomendación y validación con casos de uso reales.
+          \item \textbf{Documentación y memoria del PFG.}
+                Redacción de la memoria técnica, preparación de la presentación y revisión final.
+        \end{enumerate}
 
 \end{description}
 
@@ -64,10 +69,11 @@ dos grandes fases, cada una subdividida en paquetes de trabajo.
 \section{Estimación de tiempos}
 % ─────────────────────────────────────────────
 
-La estimación de tiempos se realizó de forma incremental: la Fase~1 contó con una dedicación
-intensiva propia de una asignatura de proyecto, mientras que la Fase~2 se desarrolló a un
+La estimación de tiempos se ha realizado de forma incremental: la Fase~1 ha contado con una dedicación
+propia de una asignatura de proyecto, mientras que la Fase~2 se ha desarrollado a un
 ritmo de entre 10 y 15 horas semanales, compatibilizando el trabajo con otras actividades
-académicas y la colaboración con el grupo de investigación DEUSTEK/MORElab \cite{MORElab2026} de la Facultad de Ingenieria de la Universidad de Deusto.
+académicas y la colaboración con el grupo de investigación DEUSTEK/MORElab \cite{MORElab2026}
+de la Facultad de Ingeniería de la Universidad de Deusto.
 
 La tabla siguiente recoge la estimación de horas por paquete de trabajo:
 
@@ -77,37 +83,37 @@ La tabla siguiente recoge la estimación de horas por paquete de trabajo:
   \label{tab:estimacion_horas}
   \begin{tabular}{llr}
     \toprule
-    \textbf{Fase} & \textbf{Paquete de trabajo} & \textbf{Horas estimadas} \\
+    \textbf{Fase}                               & \textbf{Paquete de trabajo}           & \textbf{Horas estimadas} \\
     \midrule
     \multirow{6}{*}{Fase 1}
-      & Definición del alcance y arquitectura     & 15 \\
-      & Módulo de gasolineras                     & 30 \\
-      & Módulo de usuarios                        & 20 \\
-      & API Gateway                               & 15 \\
-      & Frontend                                  & 45 \\
-      & Despliegue en Render                      & 10 \\
+                                                & Definición del alcance y arquitectura & 15                       \\
+                                                & Módulo de gasolineras                 & 25                       \\
+                                                & Módulo de usuarios                    & 20                       \\
+                                                & API Gateway                           & 15                       \\
+                                                & Frontend                              & 40                       \\
+                                                & Despliegue en Render                  & 10                       \\
     \midrule
     \multirow{7}{*}{Fase 2}
-      & Migración a GCP                           & 25 \\
-      & Módulo de electromovilidad                & 10 \\
-      & Sistema de recomendación de rutas         & 50 \\
-      & Módulo de predicción (ML)                 & 40 \\
-      & Asistente conversacional                  & 35 \\
-      & Refinamiento del rutado                   & 25 \\
-      & Refinamiento del la interfaz              & 15 \\
-      & Correcciones y mejoras                    & 25 \\
-      & Documentación y memoria                   & 40 \\
+                                                & Migración a GCP                       & 25                       \\
+                                                & Módulo de electromovilidad            & 10                       \\
+                                                & Sistema de recomendación de rutas     & 50                       \\
+                                                & Módulo de predicción (ML)             & 40                       \\
+                                                & Asistente conversacional              & 35                       \\
+                                                & Refinamiento del rutado               & 25                       \\
+                                                & Refinamiento de la interfaz           & 15                       \\
+                                                & Correcciones y mejoras                & 20                       \\
+                                                & Documentación y memoria               & 55                       \\
     \midrule
-    \multicolumn{2}{l}{\textbf{Total estimado}}   & \textbf{400} \\
+    \multicolumn{2}{l}{\textbf{Total estimado}} & \textbf{400}                                                     \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Las estimaciones recogidas en la tabla constituyen una aproximación retrospectiva al esfuerzo 
-real invertido, elaborada a partir del registro de tareas y del seguimiento del tablero Kanban. 
-La naturaleza incremental del proyecto hace que la estimación prospectiva de horas presente 
-mayor incertidumbre que en proyectos con alcance cerrado desde el inicio; por ello, las cifras 
-reflejan el tiempo efectivamente dedicado con mayor fidelidad que una planificación previa 
+Las estimaciones recogidas en la tabla constituyen una aproximación del esfuerzo
+real invertido, elaborada a partir del registro de tareas y del seguimiento del tablero Kanban.
+La naturaleza incremental del proyecto hace que la estimación prospectiva de horas presente
+mayor incertidumbre que en proyectos con alcance cerrado desde el inicio, por eso, las cifras
+reflejan el tiempo efectivamente dedicado con mayor fidelidad que una planificación previa
 al desarrollo.
 
 
@@ -118,6 +124,7 @@ al desarrollo.
 El cronograma del proyecto abarca el período comprendido entre octubre de 2025 y mayo de 2026.
 La figura~\ref{fig:gantt} representa el diagrama de Gantt con las principales tareas del
 proyecto distribuidas en el tiempo.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{imgs/gantt.png}
@@ -129,32 +136,32 @@ proyecto distribuidas en el tiempo.
 \section{Hitos del proyecto}
 % ─────────────────────────────────────────────
 
-A lo largo del proyecto se definieron tres hitos principales que marcaron el cierre de etapas
-significativas y sirvieron como puntos de validación con el director:
+A lo largo del proyecto se han definido tres hitos principales que han marcado el cierre de etapas
+importantes y han servido como puntos de validación con el director:
 
 \begin{description}
   \item[M1 - Prototipo funcional (diciembre 2025).] Finalización de la primera versión
-    operativa del sistema, con los módulos de gasolineras, usuarios, gateway y frontend
-    integrados y desplegados en Render. Este hito cerró la fase correspondiente a la
-    asignatura de proyecto y sentó las bases del PFG.
+        operativa del sistema, con los módulos de gasolineras, usuarios, gateway y frontend
+        integrados y desplegados en Render. Este hito cerró la fase correspondiente a la
+        asignatura de proyecto y sentó las bases del PFG.
 
   \item[M2 - Sistema completo en GCP (mayo 2026).] Finalización de todos los módulos
-    avanzados: migración a Google Cloud Platform, sistema de recomendación de rutas, módulo
-    de predicción de precios con LightGBM y asistente conversacional. Este hito supuso la
-    validación funcional del sistema en su versión completa.
+        avanzados: migración a Google Cloud Platform, sistema de recomendación de rutas, módulo
+        de predicción de precios con LightGBM y asistente conversacional. Este hito ha supuesto la
+        validación funcional del sistema en su versión completa.
 
   \item[M3 - Entrega del PFG (junio 2026).] Cierre del proyecto con la entrega de la memoria
-    técnica y la presentación ante el tribunal. Este hito incluye la revisión final de la
-    documentación y la preparación de la defensa.
+        técnica y la presentación ante el tribunal. Este hito incluye la revisión final de la
+        documentación y la preparación de la defensa.
 \end{description}
 
 % ─────────────────────────────────────────────
 \section{Encadenamiento de actividades}
 % ─────────────────────────────────────────────
 
-El encadenamiento de actividades refleja las dependencias lógicas entre los distintos paquetes
+El encadenamiento de actividades refleja las dependencias entre los distintos paquetes
 de trabajo, es decir, qué tareas deben completarse antes de que otras puedan comenzar. Dado que
-el proyecto siguió un enfoque incremental, muchas dependencias son secuenciales dentro de cada
+el proyecto ha seguido un enfoque incremental, muchas dependencias son secuenciales dentro de cada
 módulo, aunque algunas tareas de la segunda fase podían abordarse en paralelo una vez
 estabilizado el núcleo del sistema.
 
@@ -164,10 +171,10 @@ fuentes de datos a integrar. A partir de ella, el \textbf{módulo de gasolineras
 \textbf{módulo de usuarios} pueden desarrollarse en paralelo, ya que ambos son funcionalmente
 independientes. El primero es el componente central de la plataforma y su finalización es
 prerequisito para el desarrollo del frontend, que consume los datos que expone. El
-\textbf{API Gateway}, por su parte, se desarrolló de forma incremental conforme se añadían
+\textbf{API Gateway}, por su parte, se ha desarrollado de forma incremental conforme se añadían
 nuevos microservicios, requiriendo que al menos uno de ellos estuviera operativo para poder
-configurar el enrutamiento. El \textbf{frontend} no puede estabilizarse hasta que tanto el
-gateway como los módulos principales expongan contratos de API consolidados. El
+configurar el enrutamiento. El \textbf{frontend} no puede configurarse hasta que tanto el
+gateway como los módulos principales expongan endpoints para ser consumidos. El
 \textbf{despliegue en Render} cierra la Fase~1 y requiere que todos los componentes anteriores
 estén integrados y probados.
 
@@ -176,13 +183,20 @@ avanzado, ya que la nueva infraestructura proporciona los servicios de cómputo,
 y orquestación sobre los que se apoya el resto del sistema. Una vez completada, el
 \textbf{módulo de electromovilidad} y el \textbf{agente conversacional} pueden desarrollarse
 en paralelo, al tratarse de extensiones independientes. El \textbf{sistema de recomendación
-de rutas} depende de que los datos de gasolineras y puntos de recarga estén disponibles y
+  de rutas} depende de que los datos de gasolineras estén disponibles y
 correctamente modelados, mientras que el \textbf{módulo de predicción} (LightGBM) requiere
 además disponer de series históricas de precios almacenadas en GCP. El
 \textbf{refinamiento del rutado} se inicia una vez que el sistema de recomendación está
 operativo y se han identificado sus limitaciones mediante pruebas. Finalmente, la
 \textbf{documentación y memoria} se elabora en paralelo con el desarrollo técnico de la
-Fase~2, aunque con una intensidad creciente hacia el cierre del proyecto.
+Fase~2, aunque con una intensidad mayor hacia el cierre del proyecto.
+ 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{imgs/pert.png}
+  \caption{Diagrama PERT de las actividades del proyecto}
+  \label{fig:pert}
+\end{figure}
 
 % ─────────────────────────────────────────────
 \section{Plan de recursos humanos}
@@ -196,33 +210,33 @@ consultivo con el grupo de investigación DEUSTEK/MORElab \cite{MORElab2026} de 
 El \textbf{alumno} ha asumido la responsabilidad íntegra del diseño, implementación, pruebas y
 documentación del sistema, así como las tareas propias de gestión del proyecto: planificación
 de tareas, seguimiento del tablero Kanban y coordinación con los agentes externos. La
-dedicación fue de aproximadamente 10--15 horas semanales durante la Fase~2. 
+dedicación ha sido de aproximadamente 10--15 horas semanales durante la Fase~2.
 
 El \textbf{director del PFG} ha ejercido la supervisión técnica y académica del proyecto mediante
 reuniones periódicas de seguimiento, orientación en las decisiones de diseño y revisión de los
-entregables, con una dedicación estimada de 1--2 horas semanales a lo largo de todo el
-proyecto.
+entregables, con una dedicación estimada de 1--2 horas semanales a lo largo del proyecto.
 
-Adicionalmente, el proyecto ha contado con la colaboración del grupo de investigación
-\textbf{DEUSTEK/MORElab}\cite{MORElab2026}, a través del proyecto \textit{NextEdge}, de la Universidad de Deusto, dirigido por el Dr.\ Diego López-de-Ipiña y
-  la Dra. Oihane Gómez Carmona. El grupo mostró un interés activo en la solución y ha promovido
-  el desarrollo del módulo de recomendación: han proporcionado orientación sobre requisitos y realizaron
-  consultas periódicas. Su implicación ha orientado decisiones de
-  diseño y ha motivado la incorporación del módulo de electromovilidad y del sistema de predicción
-  de precios, ampliando así la funcionalidad y el alcance de TankGo.
+Ademas, el proyecto ha contado con la colaboración del grupo de investigación
+\textbf{DEUSTEK/MORElab}\cite{MORElab2026}, a través del proyecto \textit{NextEdge}, de la
+Universidad de Deusto, dirigido por el Dr.\ Diego López-de-Ipiña y la Dra. Oihane Gómez
+Carmona. El grupo mostró un interés activo en la solución y ha promovido el desarrollo del
+módulo de recomendación: proporcionaron orientación sobre requisitos y realizaron consultas
+periódicas. Su implicación ha orientado decisiones de diseño y motivado la incorporación del
+módulo de electromovilidad, agente conversacional y del sistema de rutado, ampliando así la
+funcionalidad y el alcance de TankGo.
 
 % ─────────────────────────────────────────────
 \section{Replanificaciones realizadas}
 % ─────────────────────────────────────────────
 
 A lo largo del proyecto se han producido varias replanificaciones que modificaron el alcance
-inicial. Estas desviaciones no respondieron a fallos de planificación,
+inicial. Estas desviaciones no se debieron a fallos de planificación,
 sino a la naturaleza exploratoria del proyecto y a oportunidades de colaboración que surgieron
 durante el desarrollo.
 
 \textbf{Ampliación del dominio de datos.} El sistema ha sido concebido inicialmente como una
 plataforma de consulta de precios de gasolineras en tiempo real. A raíz de la colaboración
-con NextEdge y de la identificación de casos de uso más completos, el alcance se amplió para
+con el grupo DEUSTEK/MORElab \cite{MORElab2026} y de la identificación de casos de uso más completos, el alcance se amplió para
 incluir puntos de recarga de vehículos eléctricos. Este cambio implicó la creación de un nuevo
 módulo y la revisión del modelo de datos para acomodar entidades heterogéneas.
 
@@ -240,7 +254,7 @@ actuales en interfaces conversacionales para aplicaciones de información geoloc
 \textbf{Cambio de plataforma de despliegue.} El primer despliegue se realizó en Render como
 solución de validación rápida. La migración posterior a Google Cloud Platform supuso un
 esfuerzo de reconfiguración no previsto inicialmente, pero proporcionó una infraestructura más
-robusta, escalable y alineada con los objetivos de cloud-native del proyecto.
+robusta, escalable y alineada con los objetivos cloud-native del proyecto.
 
 En conjunto, estas replanificaciones han resultado en un incremento del alcance respecto al
 prototipo inicial, sin comprometer los objetivos académicos ni los plazos de entrega del PFG.
