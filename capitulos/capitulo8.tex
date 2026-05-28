@@ -76,7 +76,7 @@ asistente conversacional no deben ser muy elevados, requisito crítico para gara
 la seguridad vial en uso móvil.
 
 \textbf{Escalabilidad (RNF-03):} La arquitectura de microservicios y el despliegue en
-Cloud Run permiten escalar cada componente de forma independiente según la demanda, sin
+la nube permiten escalar cada componente de forma independiente según la demanda, sin
 afectar al resto del sistema.
 
 \textbf{Usabilidad (RNF-04):} El frontend está diseñado con criterio \textit{mobile-first}
@@ -144,12 +144,10 @@ usuarios encapsulan la identidad y preferencias de cada cuenta; los favoritos mo
 relación entre usuario y estación; y las predicciones almacenan las estimaciones generadas
 por el modelo de machine learning para su consulta posterior.
 
-Desde el punto de vista \textbf{físico}, cada microservicio se despliega como un contenedor
-Docker independiente. En producción, los servicios corren en \textbf{Google Cloud Run},
-que gestiona el escalado automático en función de la demanda. La base de datos reside en
-\textbf{Neon Tech} (PostgreSQL), y los artefactos de los modelos de machine learning se
-almacenan en \textbf{Cloud Storage}. El tráfico externo entra exclusivamente por el API
-Gateway, que es el único componente con URL pública expuesta.
+Desde el punto de vista \textbf{físico}, cada microservicio se ejecuta de forma
+independiente. La orquestación, contenedores y detalles operativos (plataforma de
+ejecución, imágenes, pipelines y gestión de secretos) se describen en la sección
+\textit{Despliegue en GCP y pipeline CI/CD}.
 
 \subsection{Modelo de datos}
 
@@ -272,7 +270,7 @@ entorno local y los siete ficheros \texttt{cloudbuild-*.yaml} para el despliegue
 producción.
 
 La orquestación local se basa en \textbf{Docker Compose}~\cite{docker_compose}, con
-dependencias de arranque declaradas explícitamente, los servicios de dominio esperan a que
+dependencias de arranque declaradas explícitamente, los servicios esperan a que
 la base de datos esté accesible, el gateway espera a que los servicios de dominio superen
 sus \textit{health checks}, el frontend arranca únicamente cuando el gateway está
 disponible. Los servicios opcionales de IA y predicción se activan mediante perfiles Docker
@@ -291,22 +289,18 @@ día~\cite{datosgob_carburantes}.
 
 \subsubsection*{Ciclo de sincronización}
 
-El servicio implementa tres mecanismos de sincronización complementarios. En primer lugar,
-al arrancar, si la variable \texttt{AUTO\_ENSURE\_FRESH\_ON\_STARTUP} está activa, el
-servicio comprueba la antigüedad de los datos almacenados y lanza una sincronización
-condicional si supera el umbral configurado. En segundo lugar, en producción un
-\textbf{Cloud Scheduler} de Google Cloud Platform \cite{cloud_scheduler2026,gcp_products2026}
-dispara diariamente un Cloud Run Job \cite{cloud_run2026} que invoca el endpoint interno 
-\texttt{POST /gasolineras/daily-sync-export}, este endpoint
-sincroniza los datos desde la API del Ministerio de Industria y, a continuación, exporta
-un snapshot en formato Parquet a Google Cloud Storage \cite{cloud_storage2026} para el pipeline de machine learning.
-En tercer lugar, si una petición de lectura detecta que los datos superan el umbral de
-antigüedad (\texttt{AUTO\_SYNC\_ON\_READ=true}), el servicio puede desencadenar una
-sincronización en segundo plano, aunque en producción esta opción se mantiene desactivada
-para evitar latencia impredecible.
+El servicio mantiene la frescura de los datos mediante tres mecanismos complementarios:
+- Comprobación al arranque: si \texttt{AUTO\_ENSURE\_FRESH\_ON\_STARTUP} está activa, se
+  valida la antigüedad local y se lanza una sincronización condicional.
+- Job programado: un \textbf{Cloud Scheduler} ejecuta diariamente un Cloud Run Job que
+  sincroniza desde la API del Ministerio y exporta un snapshot Parquet a Google Cloud
+  Storage para el pipeline de ML.
+- Sincronización bajo demanda: si una lectura detecta datos obsoletos y
+  \texttt{AUTO\_SYNC\_ON\_READ=true}, se puede desencadenar una sincronización en
+  segundo plano (en producción esta opción suele estar desactivada para evitar latencia).
 
-La combinación de estos mecanismos garantiza que los datos nunca superen 24 horas de
-antigüedad en producción sin necesidad de un sistema de colas externo.
+Estos tres mecanismos combinados mantienen los datos con menos de 24 horas de antigüedad
+en producción sin depender de un sistema de colas externo.
 
 \subsubsection*{Almacenamiento y consultas geoespaciales}
 
@@ -319,9 +313,7 @@ cálculo de la distancia haversine en capa de aplicación para el filtrado inici
 reservándolo únicamente para el refinamiento de resultados.
 
 El histórico de precios se registra en la tabla \texttt{precios\_historicos}, donde cada
-fila representa una instantánea de los precios de una estación en una fecha concreta. Este
-diseño permite construir series temporales por estación y combustible, que son la entrada
-del modelo de predicción.
+fila representa una instantánea de los precios de una estación en una fecha concreta.
 
 \subsubsection*{Fallback en memoria}
 
@@ -360,11 +352,10 @@ Este mecanismo impide que el token sea accesible desde JavaScript del navegador,
 ataques XSS~\cite{owasp_xss}.
 
 Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
-\texttt{id\_token} de Google, lo verifica y llama al endpoint interno
-\texttt{POST /api/usuarios/google/internal} con cabecera \texttt{X-Internal-Secret}, de
-forma que este endpoint nunca queda expuesto al exterior. El servicio realiza un
-\textit{upsert} del usuario (crea la cuenta si no existe, o la actualiza si ya existe por
-email) y devuelve el JWT al gateway para su encapsulación en cookie.
+\texttt{id\_token} de Google, lo verifica y llama a un endpoint interno protegido
+(véase la sección \textbf{Seguridad transversal}) para realizar el \textit{upsert} del
+usuario. A continuación el servicio devuelve el JWT al gateway para su encapsulación
+en cookie.
 
 Las contraseñas se almacenan únicamente como hash generado con \textbf{bcrypt}~\cite{bcrypt}
 con 12 rondas de sal, lo que hace computacionalmente inviable su recuperación por fuerza
@@ -461,7 +452,7 @@ En producción el servicio opera en modo API (\texttt{RUN\_HTTP\_API=true}): no 
 pipeline de entrenamiento, sino que expone el endpoint
 \texttt{GET /api/prediction/station/\{ideess\}} que lee directamente de la tabla
 \texttt{prediction\_forecasts}. El entrenamiento y la escritura en base de datos son
-responsabilidad exclusiva del Cloud Run Job periódico, separando claramente los roles de
+responsabilidad exclusiva del Cloud Run Job periódico, separando los roles de
 escritura y lectura.
 
 % ─────────────────────────────────────────────
@@ -631,6 +622,7 @@ productor de modelos) y el servicio de predicción en modo API (lector de result
 Además de los mecanismos de autenticación descritos en la sección anterior, el sistema
 implementa un conjunto de controles de seguridad aplicados de forma transversal.
 
+
 La comunicación entre el gateway y los microservicios internos está protegida por la
 cabecera \texttt{X-Internal-Secret}: los endpoints de administración (sincronización
 forzada, export, consulta de favoritos globales) rechazan con \texttt{403 Forbidden}
@@ -639,18 +631,19 @@ Este mecanismo evita que dichos endpoints sean accesibles desde el exterior incl
 un servicio queda expuesto inadvertidamente.
 
 La validación de datos de entrada se realiza en capa de aplicación con
-\textbf{Pydantic v2}~\cite{pydantic} en los servicios Python y con los esquemas de
+	extbf{Pydantic v2}~\cite{pydantic} en los servicios Python y con los esquemas de
 validación de Fastify en los servicios Node.js. Los parámetros de consulta con potencial
 de abuso (radio de búsqueda, límite de resultados) tienen cotas máximas declaradas
 explícitamente. Las consultas a PostgreSQL utilizan siempre parámetros preparados, sin
 concatenación de cadenas, eliminando el vector de inyección SQL~\cite{owasp_sqli}.
 
-El servicio de usuarios aplica \textbf{Helmet.js}~\cite{helmetjs} para establecer
-cabeceras HTTP de seguridad (\texttt{X-Frame-Options}, \texttt{Content-Security-Policy},
-\texttt{X-Content-Type-Options}). En producción, Cloud Run gestiona HTTPS
-automáticamente, de forma que todo el tráfico externo está cifrado en tránsito. Los
-secretos de producción (claves de API, cadenas de conexión, JWT secret) nunca residen en
-el repositorio y se inyectan en tiempo de ejecución desde Secret Manager.
+Además, la política de seguridad transversal incluye comprobaciones y controles operativos
+que se aplican a todos los servicios: verificación de que los endpoints internos requieran
+la cabecera \texttt{X-Internal-Secret}, activación de cabeceras de seguridad mediante
+	extbf{Helmet.js} en los servicios Node.js, saneamiento de logs para evitar el registro
+de información sensible y aplicación coherente de límites de tasa y reglas de perímetro
+(Cloudflare / reglas del gateway). Estas comprobaciones reducen la superficie de ataque
+y facilitan la auditoría de seguridad.
 \section{Plan de Pruebas}
 \subsection{Estrategia}
 \subsection{Pruebas unitarias}
@@ -658,9 +651,427 @@ el repositorio y se inyectan en tiempo de ejecución desde Secret Manager.
 \subsection{Pruebas funcionales}
 \subsection{Resultados obtenidos}
 
+% ═════════════════════════════════════════════
 \section{Manual de Usuario}
-\subsection{Acceso al sistema}
-\subsection{Uso de la plataforma}
-\subsection{Capturas de pantalla}
+\label{sec:manual_usuario}
+% ═════════════════════════════════════════════
 
+Este apartado describe cómo acceder y utilizar la plataforma TankGo desde la perspectiva
+del usuario final. La aplicación está disponible públicamente en su dominio web y no
+requiere instalación previa: puede usarse directamente desde el navegador en cualquier
+dispositivo. Se describen los flujos principales según el perfil de acceso, diferenciando
+entre el usuario no registrado y el usuario registrado.
+
+% ─────────────────────────────────────────────
+\subsection{Acceso a la plataforma}
+\label{subsec:manual_acceso}
+% ─────────────────────────────────────────────
+
+TankGo es una aplicación web accesible desde cualquier navegador moderno, tanto en
+escritorio como en dispositivo móvil. No requiere instalación: basta con acceder a la URL
+pública de la plataforma para comenzar a utilizarla.
+
+\subsubsection*{Acceso desde navegador}
+
+El acceso básico no requiere registro. Al abrir la URL de la plataforma, el usuario accede
+a pagina de bienvenida. Dispone arriba de un menu de navegación para poder acceder al resto de paginas. 
+
+Para utilizar lasfuncionalidades avanzadas (predicción de precios, recomendación de ruta, asistente
+conversacional y gestión de favoritos) es necesario iniciar sesión.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Pantalla de inicio / landing con mapa visible y botón de login en la barra superior.
+  % Válida tanto en escritorio como en móvil. Nombrar el archivo: manual_landing.png
+  \includegraphics[width=0.85\textwidth]{imgs/manual_landing.png}
+  \caption{Vista principal de TankGo al acceder desde el navegador}
+  \label{fig:manual_landing}
+\end{figure}
+
+\subsubsection*{Instalación como aplicación (PWA)}
+
+TankGo implementa el estándar de \textit{Progressive Web App} (PWA), lo que permite
+instalarla en el dispositivo como si fuera una aplicación nativa. En dispositivos Android
+y en escritorio con Chrome o Edge, el navegador muestra automáticamente un aviso de
+instalación o la opción aparece en el menú del navegador. En iOS (Safari), la instalación
+se realiza mediante la opción \textit{Añadir a pantalla de inicio} del menú de compartir.
+Una vez instalada, la aplicación se abre en modo \textit{standalone}, sin la barra de
+navegación del navegador.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Pantalla de instalación PWA en móvil (Android preferiblemente).
+  % El aviso emergente de "Añadir a pantalla de inicio" o el icono en barra de Chrome.
+  % Nombrar el archivo: manual_pwa_install.png
+  %\includegraphics[width=0.45\textwidth]{imgs/manual_pwa_install.png}
+  \caption{Opción de instalación de TankGo como PWA en dispositivo móvil}
+  \label{fig:manual_pwa}
+\end{figure}
+
+\subsubsection*{Permisos de ubicación}
+
+Algunas funcionalidades de TankGo requieren acceso a la ubicación del dispositivo para
+mostrar las gasolineras cercanas al usuario. Al acceder por primera vez, el navegador
+solicita permiso de geolocalización. Se recomienda conceder este permiso para aprovechar
+las funciones de búsqueda por proximidad. Si el permiso
+se deniega, la aplicación sigue siendo funcional pero será necesario introducir manualmente
+la ubicación de referencia en las búsquedas.
+
+% ─────────────────────────────────────────────
+\subsection{Usuario no registrado}
+\label{subsec:manual_anonimo}
+% ─────────────────────────────────────────────
+
+El usuario no registrado tiene acceso a las funciones de consulta pública de la plataforma
+sin necesidad de crear una cuenta.
+
+\subsubsection*{Consulta de gasolineras tabla o mapa}
+
+La vista principal muestra una lista de gasolineras ordenadas por proximidad a la ubicación del usuario,
+con información básica de cada estación (nombre, dirección, horario y precio del combustible).
+Ademas de la lista se complementa con un mapa interactivo con las gasolineras cercanas a la ubicación
+del usuario. Los marcadores pueden agruparse a niveles de zoom bajos mediante
+\textit{clustering} para evitar la saturación visual. Haciendo clic sobre un marcador o
+sobre una fila de la tabla lateral se accede al detalle de la estación: dirección, horario,
+tipos de combustible disponibles y precios actuales.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Vista del mapa con gasolineras marcadas y panel lateral con tabla de resultados.
+  \includegraphics[width=0.85\textwidth]{imgs/manual_mapa_gasolineras.png}
+  \caption{Vista del mapa de gasolineras con tabla de resultados}
+  \label{fig:manual_mapa}
+\end{figure}
+
+El usuario puede filtrar las gasolineras por tipo de combustible (Gasolina 95, Gasolina 98,
+Gasóleo A, entre otros) y ordenar los resultados por precio o por distancia. Al seleccionar
+una estación, el panel de detalle muestra los precios actualizados de todos los combustibles
+disponibles en esa estación, junto con su horario de apertura.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Panel de detalle de una gasolinera concreta (precios, horario, nombre).
+  \includegraphics[width=0.75\textwidth]{imgs/manual_detalle_gasolinera.png}
+  \caption{Panel de detalle de una estación de servicio}
+  \label{fig:manual_detalle}
+\end{figure}
+
+
+
+\subsubsection*{Consulta del mapa de electrolineras}
+
+Desde la navegación principal, el usuario puede acceder al mapa de puntos de recarga
+eléctrica. La vista muestra las electrolineras disponibles con su ubicación georreferenciada.
+Esta funcionalidad es especialmente útil para usuarios de vehículos eléctricos que necesitan
+planificar paradas de recarga en ruta.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Mapa con marcadores de electrolineras visibles.
+  \includegraphics[width=0.85\textwidth]{imgs/manual_mapa_electrolineras.png}
+  \caption{Mapa de puntos de recarga eléctrica}
+  \label{fig:manual_electrolineras}
+\end{figure}
+
+\subsubsection*{Registro e inicio de sesión}
+
+Para acceder a las funcionalidades avanzadas, el usuario puede registrarse mediante su
+cuenta de Google. El proceso de autenticación se realiza a través del flujo estándar de
+Google OAuth: al hacer clic en \textit{Iniciar sesión con Google}, el usuario es redirigido
+a la pantalla de autenticación de Google y, tras autorizarlo, regresa automáticamente a la
+plataforma con su sesión activa.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Pantalla o modal de login con el botón "Iniciar sesión con Google".
+  % Nombrar: manual_login.png
+  \includegraphics[width=0.65\textwidth]{imgs/manual_login.png}
+  \caption{Pantalla de inicio de sesión mediante Google OAuth}
+  \label{fig:manual_login}
+\end{figure}
+
+% ─────────────────────────────────────────────
+\subsection{Usuario registrado}
+\label{subsec:manual_registrado}
+% ─────────────────────────────────────────────
+
+Una vez autenticado, el usuario accede a todas las funcionalidades de la plataforma.
+A continuación se describen los flujos principales disponibles para el usuario registrado.
+
+\subsubsection*{Gestión de favoritos e histórico de precios}
+
+El usuario registrado puede marcar cualquier gasolinera como favorita pulsando el icono
+correspondiente en el panel de detalle de la estación. Las estaciones favoritas se
+muestran de forma destacada y son accesibles desde la sección de favoritos del perfil.
+
+Desde el detalle de una estación favorita, el usuario puede consultar el histórico de
+precios: un gráfico que muestra la evolución del precio de cada combustible a lo largo
+del tiempo, lo que permite identificar tendencias y patrones de variación de precios en
+esa estación concreta.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Gráfico de histórico de precios de una estación favorita.
+  % Mostrar la línea de evolución temporal del precio. Nombrar: manual_historico.png
+  %\includegraphics[width=0.85\textwidth]{imgs/manual_historico.png}
+  \caption{Histórico de precios de una estación de servicio favorita}
+  \label{fig:manual_historico}
+\end{figure}
+
+\subsubsection*{Predicción de precios a 7 días}
+
+Para las estaciones marcadas como favoritas, TankGo ofrece una predicción del precio de
+combustible para los próximos 7 días, generada por el modelo de machine learning basado
+en LightGBM. La predicción se presenta como una gráfica con el precio estimado diario y
+los márgenes de confianza (percentiles 5 y 95), de forma que el usuario puede anticipar
+si el precio tenderá a subir o bajar en los próximos días.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Gráfica de predicción a 7 días con la banda de confianza visible.
+  % Nombrar: manual_prediccion.png
+  %\includegraphics[width=0.85\textwidth]{imgs/manual_prediccion.png}
+  \caption{Predicción de precios a 7 días para una estación favorita}
+  \label{fig:manual_prediccion}
+\end{figure}
+
+\subsubsection*{Recomendación de ruta con paradas de repostaje}
+
+La funcionalidad de rutado permite al usuario introducir un origen y un destino para
+obtener una ruta optimizada con sugerencias de dónde repostar a lo largo del trayecto.
+El sistema pondera el precio del combustible y el desvío necesario para llegar a cada
+estación candidata, devolviendo las paradas recomendadas ordenadas por eficiencia
+económica. El usuario puede configurar el tipo de combustible de su vehículo en las
+preferencias del perfil para que las recomendaciones sean coherentes con su vehículo.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Vista de rutado con origen/destino introducidos y paradas recomendadas visibles en mapa.
+  % Nombrar: manual_ruta.png
+  %\includegraphics[width=0.85\textwidth]{imgs/manual_ruta.png}
+  \caption{Recomendación de paradas de repostaje en ruta}
+  \label{fig:manual_ruta}
+\end{figure}
+
+\subsubsection*{Asistente conversacional de voz}
+
+El asistente de voz permite realizar consultas en lenguaje natural sobre gasolineras y
+precios. El usuario accede al asistente desde el icono del micrófono en la interfaz
+principal. Puede formular preguntas como \textit{«¿Cuál es la gasolinera más barata
+cerca de mí?»}, tanto por voz
+como por texto. El asistente procesa la consulta, obtiene los datos en tiempo real de la
+plataforma y devuelve la respuesta en audio.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Interfaz del asistente de voz con el micrófono activo o con una respuesta visible.
+  % Idealmente en móvil para reflejar el caso de uso principal. Nombrar: manual_voz.png
+  %\includegraphics[width=0.55\textwidth]{imgs/manual_voz.png}
+  \caption{Asistente conversacional de voz en TankGo}
+  \label{fig:manual_voz}
+\end{figure}
+
+\subsubsection*{Gestión del perfil de usuario}
+
+Desde la sección de perfil, el usuario registrado puede configurar sus preferencias
+personales: tipo de combustible habitual y modelo de vehículo. Estos datos se utilizan
+por el sistema de recomendación de ruta y por el asistente conversacional para
+personalizar las respuestas.
+
+\begin{figure}[H]
+  \centering
+  % CAPTURA: Pantalla de perfil de usuario con campos de preferencias visibles.
+  % Nombrar: manual_perfil.png
+  \includegraphics[width=0.75\textwidth]{imgs/manual_perfil.png}
+  \caption{Gestión del perfil y preferencias del usuario}
+  \label{fig:manual_perfil}
+\end{figure}
+
+% ═════════════════════════════════════════════
 \section{Incidencias del Proyecto}
+\label{sec:incidencias}
+% ═════════════════════════════════════════════
+
+Esta sección documenta los problemas técnicos más relevantes encontrados a lo largo del
+desarrollo de TankGo, las causas identificadas y las soluciones adoptadas. Lejos de ser
+una lista de fallos, las incidencias recogidas aquí reflejan el proceso de toma de
+decisiones técnicas ante situaciones no previstas en la planificación inicial y constituyen
+parte del aprendizaje más valioso del proyecto.
+
+% ─────────────────────────────────────────────
+\subsection{Integración con servicios externos y APIs de terceros}
+\label{subsec:inc_externos}
+% ─────────────────────────────────────────────
+
+\subsubsection*{Renderizado del mapa con todas las gasolineras activo}
+
+Inicialmente el frontend pintaba en el mapa todas las gasolineras del
+catálogo nacional simultáneamente al cargar la vista, lo que generaba un retraso notable
+en la respuesta del navegador y una experiencia visualmente saturada con más de 11\,000
+marcadores activos. El problema no solo era de red, sino de rendering en el hilo principal
+del navegador.
+
+La solución que se ha abordado son dos enfoques. En el backend, las consultas de gasolineras se
+limitaron geoespacialmente mediante PostGIS~\cite{postgis}, devolviendo las
+estaciones dentro del radio de búsqueda del usuario en lugar del catálogo completo. En el
+frontend, se ha integrado \textbf{Leaflet MarkerCluster}~\cite{leaflet_markercluster} para
+agrupar los marcadores en función del nivel de zoom, de modo que a escalas reducidas el
+mapa muestra agregados en lugar de marcadores individuales. Esta combinación redujo el
+tiempo de renderizado inicial a valores aceptables y ha mejorado la
+usabilidad en dispositivos móviles.
+
+\subsubsection*{Algoritmo de recomendación: estaciones cercanas y cálculo de desvíos}
+
+El servicio de recomendación de ruta ha presentado varias dificultades durante su
+implementación. El primer problema ha sido la definición de \textit{cercanía} a una ruta: una
+búsqueda por radio desde el punto de origen no tiene sentido para rutas largas, ya que
+excluye las estaciones ubicadas a lo largo del trayecto. Se ha adoptado un enfoque basado en
+un corredor geométrico alrededor de la polilínea de la ruta, implementado con
+\textbf{PostGIS}~\cite{postgis} (\texttt{ST\_DWithin} sobre la geometría de la ruta) y
+refinado con la librería \textbf{Shapely} para el cálculo de buffers vectoriales.
+
+El segundo problema ha sido el cálculo del tiempo de desvío real para cada estación candidata.
+Las primeras versiones calculaban el desvío como la distancia haversine al punto más
+cercano de la ruta, pero este valor no correlaciona bien con el tiempo de desvío en
+carretera, que depende de la red viaria real. La solución ha sido utilizar la
+\textbf{Matrix API de OpenRouteService}~\cite{gisops_routing_overview} para obtener
+tiempos de desvío reales, refinando posteriormente los resultados mediante llamadas
+individuales a la Directions API para los candidatos con mejor puntuación.
+
+Adicionalmente, la evasión de peajes solicitada como parámetro de la ruta no siempre
+producía buenos resultados, 
+debido a que la API de Matrix de OpenRouteService no tiene en cuenta esta variable 
+en el cálculo de tiempos de desvío, 
+lo que llevaba a recomendar estaciones que técnicamente cumplían el criterio 
+de cercanía pero que implicaban ir por carreteras de pago. Sin embargo, la llamada para 
+marcar el recorrido si que permite evitar peajes. 
+Esta limitación quedó documentada como restricción conocida del sistema
+(véase la sección~\ref{sec:alcance}).
+
+% ─────────────────────────────────────────────
+\subsection{Infraestructura y despliegue en Google Cloud Platform}
+\label{subsec:inc_gcp}
+% ─────────────────────────────────────────────
+
+\subsubsection*{Configuración de variables de entorno y Secret Manager}
+
+Una de las primeras incidencias en el despliegue fue la gestión de variables de entorno
+en Cloud Run. Inicialmente se ha intentado configurar algunas variables directamente en los
+ficheros \texttt{cloudbuild.yaml}, lo que presentaba dos problemas: los valores quedaban
+expuestos en los logs de compilación de Cloud Build, y cualquier cambio de valor requería
+una nueva ejecución del pipeline.
+
+La solución fue migrar todos los secretos a \textbf{Secret Manager}~\cite{secret_manager}
+y referenciarlos en los ficheros de despliegue mediante la sintaxis
+\texttt{secretKeyRef}, de forma que Cloud Run los inyecta en tiempo de ejecución sin que
+el valor nunca aparezca en el código ni en los logs. La distinción entre variables de
+configuración no sensibles (inyectadas directamente como \texttt{env} en el
+\texttt{cloudbuild.yaml}) y secretos (gestionados por Secret Manager) quedó establecida
+como convención del proyecto.
+
+\subsubsection*{Conflicto de DNS entre Cloudflare y GCP}
+
+El proyecto utiliza Cloudflare como proveedor de DNS para el dominio público de TankGo.
+Durante la configuración inicial surgió un conflicto entre la gestión de certificados TLS
+de Cloud Run (que espera verificar la propiedad del dominio mediante registros DNS
+específicos) y el modo \textit{proxy} activo de Cloudflare, que oculta las IPs reales
+del servidor y puede interferir con el proceso de validación de dominio de Google.
+
+La resolución ha requerido desactivar temporalmente el modo proxy de Cloudflare durante la
+verificación de dominio en Cloud Run, para posteriormente reactivarlo una vez completada
+la validación. 
+
+\subsubsection*{Problemas de conexión SSL con Neon Tech}
+
+La base de datos PostgreSQL en \textbf{Neon Tech}~\cite{neon_tech2026} requiere conexión
+cifrada SSL obligatoria. Durante las primeras pruebas de despliegue en Cloud Run, algunos
+microservicios fallaban al establecer la conexión con errores relacionados con la
+verificación del certificado TLS. El problema tenía dos causas: la cadena de conexión no
+incluía el parámetro \texttt{sslmode=require} de forma explícita, y la imagen base de
+algunos servicios no incluía los certificados raíz de CA necesarios para verificar el
+certificado del servidor Neon.
+
+La solución ha consistido en estandarizar la cadena de conexión en todos los servicios para
+incluir \texttt{?sslmode=require} y asegurarse de que las imágenes Docker incluyeran el
+paquete \texttt{ca-certificates}, disponible en todas las distribuciones base utilizadas.
+
+% ─────────────────────────────────────────────
+\subsection{Seguridad: ataques detectados y medidas adoptadas}
+\label{subsec:inc_seguridad}
+% ─────────────────────────────────────────────
+
+\subsubsection*{Intentos de explotación detectados en producción}
+
+Poco después de publicar el sistema en producción con dominio público, el análisis de logs
+de Cloud Run ha revelado un volumen de peticiones automatizadas intentando acceder
+a rutas no existentes en el proyecto, pero características de vulnerabilidades conocidas en
+otras plataformas: rutas como \texttt{/wp-admin}, \texttt{/phpMyAdmin},
+\texttt{/.env} o \texttt{/admin/config.php}. Este tipo de escaneo automatizado
+es habitual en cualquier servidor público expuesto a internet y no representa una amenaza
+directa para TankGo, cuya API no implementa ninguno de esos patrones, pero confirmó la
+necesidad de reforzar la configuración de seguridad perimetral.
+
+Como respuesta, se han configurado reglas en \textbf{Cloudflare} para bloquear peticiones
+dirigidas a patrones de rutas asociados a exploits conocidos de WordPress, PHP y paneles
+de administración genéricos, así como para limitar la tasa de peticiones desde IPs que
+generaran un número anómalo de errores \texttt{404} en un intervalo corto. Además, se
+incorporaron reglas a nivel DNS y de firewall específicas para mitigar vectores dirigidos
+a componentes PHP (por ejemplo, detección de rutas y extensiones típicas), reduciendo la
+superficie de ataque sobre ese tipo de recursos. Se añadió también un análisis de
+cabeceras y patrones de petición HTTP/1.1 para identificar clientes automatizados; ante
+peticiones con comportamiento sospechoso el perímetro puede responder con un reto de
+verificación (challenge), por ejemplo comprobaciones JavaScript o CAPTCHA, antes de
+permitir el acceso, lo que ayuda a filtrar bots y ahorrar peticiones fraudulentas.
+Las reglas de \textit{rate limiting} del gateway se revisaron y ajustaron para garantizar que los
+endpoints de mayor exposición (autenticación, consulta de precios) tuviesen límites
+apropiados.
+
+% ─────────────────────────────────────────────
+\subsection{Asistente conversacional: transporte y control del dominio}
+\label{subsec:inc_voice}
+% ─────────────────────────────────────────────
+
+\subsubsection*{Abandono del transporte WebSocket en favor de HTTP}
+
+El diseño inicial del asistente de voz contemplaba una conexión \textbf{WebSocket}
+persistente entre el cliente y el servicio, con el objetivo de permitir streaming de
+audio en tiempo real y reducir la latencia percibida. Durante el desarrollo se implementó
+el endpoint \texttt{/ws/voice} y se probó su funcionamiento en entorno local, donde se
+comportaba correctamente.
+
+Sin embargo, al desplegar el servicio en \textbf{Cloud Run}, surgieron problemas de
+estabilidad que impedían establecer la conexión WebSocket de forma consistente. La causa
+raíz está relacionada con el comportamiento de Cloud Run ante conexiones de larga
+duración: la infraestructura serverless no garantiza la persistencia de conexiones
+WebSocket bajo condiciones de escalado o reasignación de instancias, y los timeouts de
+la plataforma interferían con el ciclo de vida esperado de la conexión.
+
+Ante esta situación, se ha tomado la decisión de migrar el transporte del cliente al endpoint
+HTTP \texttt{POST /voice/dialog}, que encapsula el ciclo completo STT\,$\rightarrow$\,LLM\,$\rightarrow$\,TTS
+en una única petición request-response. Esta decisión sacrifica el streaming de audio
+parcial pero ofrece un comportamiento completamente predecible en todos los entornos de
+despliegue y elimina la complejidad de gestión del estado de conexión en el cliente.
+El endpoint WebSocket se mantiene implementado en el servidor pero no se utiliza en
+producción.
+
+\subsubsection*{Diseño de guardarraíles para el control del dominio}
+
+Durante las pruebas del asistente se ha detectado que el modelo de lenguaje, sin restricciones
+explícitas, tendía a responder consultas fuera del dominio de TankGo (preguntas generales,
+conversación casual, solicitudes de información no relacionada con combustible o
+gasolineras). Esto no era deseable en un asistente diseñado para uso en conducción, donde
+las respuestas deben ser breves, directas y estrictamente relacionadas con la tarea.
+
+Se ha diseñado un sistema de guardarraíles en dos niveles. El primer nivel es un
+\textbf{comprobador de alcance} previo al LLM que evalúa la presencia de términos del
+dominio en la transcripción; si no se detecta ninguno, el servicio devuelve directamente
+una respuesta predefinida sin consumir tokens del modelo. El segundo nivel actúa mediante
+el \textbf{system prompt}: las instrucciones del sistema definen explícitamente el papel
+del asistente, los temas permitidos, el formato de respuesta esperado y la obligación de
+utilizar las funciones declaradas (\textit{tool calling}) para cualquier consulta de datos
+en lugar de generar respuestas basadas en conocimiento interno del modelo.
+
+La combinación de ambos niveles ha reducido de forma efectiva las respuestas fuera de dominio,
+aunque la calibración del comprobador de alcance requirió varias iteraciones para encontrar
+un equilibrio entre el rechazo de consultas legítimas con vocabulario informal y la
+permisividad excesiva ante consultas claramente fuera de ámbito.
