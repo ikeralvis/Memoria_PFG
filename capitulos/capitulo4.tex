@@ -29,7 +29,7 @@ del sistema:
 \begin{itemize}
       \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
             con la API REST del Ministerio de Industria (MinITUR) que garantice la
-            disponibilidad de datos de precios actualizados con una frecuencia mínima
+            disponibilidad de datos de precios de combustible fósiles atualizados con una frecuencia mínima
             diaria, con persistencia histórica en base de datos relacional.
 
       \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
@@ -58,13 +58,12 @@ del sistema:
 
 \begin{itemize}
       \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
-            de precios basado en modelos de \textit{gradient boosting} (LightGBM)
-            con regresión cuantílica, incorporando el precio del crudo Brent como
+            de precios, incorporando el precio del crudo Brent como
             variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
             predicciones individualizadas por estación de servicio en un periodo de 7 días.
 
       \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
-            seleccionado frente a alternativas (XGBoost, regresión lineal como
+            de predicción seleccionado frente a a otras alternativas (XGBoost, regresión lineal como
             \textit{baseline}) mediante métricas estándar de regresión
             (MAE, RMSE, $R^2$) \cite{s24124013}.
 \end{itemize}
@@ -113,6 +112,7 @@ del sistema:
 \end{itemize}
 
 \section{Alcance del sistema}
+\label{sec:alcance}
 
 El alcance define los límites funcionales y técnicos del sistema desarrollado,
 estableciendo qué está incluido en la solución entregada.
@@ -129,7 +129,7 @@ disponible institucionalmente \cite{mitma_esmovilidad}.
 
 \subsection{Componentes funcionales incluidos}
 
-La plataforma entregada comprende los siguientes componentes funcionales:
+La plataforma especificada comprende los siguientes componentes funcionales:
 
 \begin{enumerate}
       \item \textbf{Servicio de gasolineras:} ingesta, normalización,
@@ -259,7 +259,7 @@ trabajo realizado.
             predictivo se centra exclusivamente en combustibles líquidos
             (gasolina y diésel). La predicción del coste de recarga eléctrica,
             que depende de tarifas horarias (PVPC) y contratos de operador,
-            queda fuera del alcance de esta versión.
+            queda fuera del alcance de este Proyecto de Fin de Grado.
 
       \item \textbf{Soporte multipaís:} La plataforma está diseñada
             y configurada para el mercado español. La extensión a otros mercados

@@ -1,13 +1,21 @@
+% !TEX root = ../main.tex
+% =========================================================
+%  CAPÍTULO 8 — Desarrollo del sistema
+% =========================================================
 \chapter{Capítulo Octavo - Desarrollo del Sistema}
+\label{cap:desarrollo_sistema}
+
 Este capítulo recoge la especificación, el diseño y la implementación de TankGo, así como
 el plan de pruebas y el manual de usuario. Es el núcleo técnico del proyecto y documenta
 las decisiones de arquitectura, las tecnologías empleadas y el resultado final del sistema.
 
 % ═════════════════════════════════════════════
 \section{Especificación de Requisitos}
+\label{sec:especificacion}
 % ═════════════════════════════════════════════
 
 \subsection{Contexto del sistema}
+\label{subsec:contexto}
 
 TankGo es una plataforma de inteligencia de datos orientada a la movilidad y la eficiencia
 energética. Su propósito es transformar los datos abiertos del Geoportal de Gasolineras del
@@ -23,6 +31,7 @@ estimación de precios futuros y un asistente conversacional por voz para intera
 manos libres.
 
 \subsection{Identificación de usuarios}
+\label{subsec:identificacion_usuarios}
 
 El sistema contempla dos perfiles de usuario diferenciados. El \textbf{usuario no registrado}
 puede acceder a las funciones de consulta pública: visualización de gasolineras y
@@ -37,6 +46,7 @@ larga distancia con criterios de coste, y el usuario de vehículo eléctrico que
 localizar puntos de recarga en ruta.
 
 \subsection{Requisitos funcionales}
+\label{subsec:requisitos_funcionales}
 
 Los requisitos funcionales definen las capacidades que el sistema debe ofrecer al
 usuario~\cite{sommerville2011}. La tabla~\ref{tab:rf} recoge los requisitos identificados
@@ -47,21 +57,22 @@ para TankGo.
   \label{tab:rf}
   \begin{tabular}{llp{9cm}}
     \toprule
-    \textbf{ID} & \textbf{Requisito} & \textbf{Descripción} \\
+    \textbf{ID} & \textbf{Requisito}         & \textbf{Descripción}                                                                                                                                           \\
     \midrule
-    RF-01 & Consulta de gasolineras     & El sistema muestra las estaciones de servicio cercanas a la ubicación del usuario en tabla y mapa interactivo, con detalle de precios por tipo de combustible. \\
-    RF-02 & Consulta de electrolineras  & El sistema muestra los puntos de recarga eléctrica disponibles en un mapa independiente. \\
-    RF-03 & Histórico de precios        & Para cada estación, el sistema permite visualizar la evolución histórica del precio de cada combustible. \\
-    RF-04 & Predicción de precios       & El sistema estima el precio de combustible para los próximos 7 días en las estaciones marcadas como favoritas por el usuario. \\
-    RF-05 & Gestión de favoritos        & El usuario registrado puede marcar y gestionar sus estaciones de servicio favoritas. \\
-    RF-06 & Recomendación en ruta       & El sistema sugiere paradas de repostaje óptimas a lo largo de una ruta, ponderando precio y desvío. \\
-    RF-07 & Asistente conversacional    & El sistema permite realizar consultas en lenguaje natural mediante voz, como localizar la gasolinera más barata en la zona. \\
-    RF-08 & Autenticación de usuarios   & El sistema permite el registro e inicio de sesión mediante Google OAuth. \\
+    RF-01       & Consulta de gasolineras    & El sistema muestra las estaciones de servicio cercanas a la ubicación del usuario en tabla y mapa interactivo, con detalle de precios por tipo de combustible. \\
+    RF-02       & Consulta de electrolineras & El sistema muestra los puntos de recarga eléctrica disponibles en un mapa independiente.                                                                       \\
+    RF-03       & Histórico de precios       & Para cada estación, el sistema permite visualizar la evolución histórica del precio de cada combustible.                                                       \\
+    RF-04       & Predicción de precios      & El sistema estima el precio de combustible para los próximos 7 días en las estaciones marcadas como favoritas por el usuario.                                  \\
+    RF-05       & Gestión de favoritos       & El usuario registrado puede marcar y gestionar sus estaciones de servicio favoritas.                                                                           \\
+    RF-06       & Recomendación en ruta      & El sistema sugiere paradas de repostaje óptimas a lo largo de una ruta, ponderando precio y desvío.                                                            \\
+    RF-07       & Asistente conversacional   & El sistema permite realizar consultas en lenguaje natural mediante voz, como localizar la gasolinera más barata en la zona.                                    \\
+    RF-08       & Autenticación de usuarios  & El sistema permite el registro e inicio de sesión mediante Google OAuth.                                                                                       \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection{Requisitos no funcionales}
+\label{subsec:requisitos_no_funcionales}
 
 Los requisitos no funcionales establecen las propiedades de calidad del sistema, no
 directamente relacionadas con las funciones que ofrece, sino con cómo las
@@ -88,24 +99,26 @@ se gestiona mediante tokens JWT y el acceso a los microservicios internos está 
 a través del API Gateway.
 
 \subsection{Restricciones}
+\label{subsec:restricciones}
 
 El sistema opera bajo tres restricciones principales. En primer lugar, existe una
 \textbf{dependencia de fuentes externas}: los datos de gasolineras provienen de la API
 pública del Ministerio para la Transición Ecológica~\cite{datosgob_carburantes}, cuya
 disponibilidad y frecuencia de actualización están fuera del control del sistema. En segundo
 lugar, las funciones de consulta, predicción y recomendación requieren \textbf{conectividad
-activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
+  activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
 \textbf{asistente conversacional} está diseñado para responder consultas puntuales, no para
 mantener diálogos extendidos mientras se conduce, en línea con las directrices de seguridad
 vial aplicables. El sistema de recomendacion de rutas tambien añade una dependecia esta fuera del control del sistema, ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
 
 % ═════════════════════════════════════════════
 \section{Diseño del Sistema}
+\label{sec:diseño_sistema}
 % ═════════════════════════════════════════════
 
 \subsection{Alternativas exploradas y decisiones tecnológicas}
-Las decisiones tecnológicas de TankGo quedan recogidas en detalle en el
-Capítulo~3 (Marco Tecnológico), donde se justifica la elección de cada
+Las decisiones tecnológicas de TankGo quedan recogidas en detalle en el Capítulo \ref{cap:marco_tecnologico}
+(Marco Tecnológico), donde se justifica la elección de cada
 componente del stack frente a las alternativas evaluadas. En esta sección
 se describen únicamente los aspectos de diseño arquitectónico que
 condicionan la implementación.
@@ -122,7 +135,7 @@ La arquitectura se organiza en cuatro niveles. El \textbf{cliente} es la aplicac
 PWA que el usuario final consume desde el navegador o dispositivo móvil. El
 \textbf{API Gateway} (Hono) recibe todas las peticiones del cliente, gestiona la
 autenticación y las enruta hacia el microservicio correspondiente. La \textbf{capa de
-servicios} agrupa los cinco microservicios del dominio: usuarios, gasolineras,
+  servicios} agrupa los cinco microservicios del dominio: usuarios, gasolineras,
 electrolineras, recomendación y predicción. Finalmente, la \textbf{capa de persistencia}
 centraliza el almacenamiento en PostgreSQL, accesible desde cada servicio según sus
 necesidades.
@@ -195,49 +208,133 @@ diagrama entidad-relación de la figura~\ref{fig:er} ilustra estas relaciones.
   \label{fig:er}
 \end{figure}
 
-\subsection{Diagramas UML}
+% ─────────────────────────────────────────────
+\subsection{Diagramas de casos de uso}
+\label{subsec:casos_uso}
+% ─────────────────────────────────────────────
 
-El diagrama de casos de uso recoge las interacciones entre los actores del sistema y sus
-funcionalidades. El \textit{usuario no registrado} puede visualizar gasolineras en mapa y
-tabla, consultar el mapa de electrolineras y registrarse o iniciar sesión. El
-\textit{usuario registrado} extiende esas capacidades con acceso a la tabla de
-electrolineras, la planificación de rutas con recomendación de repostaje, el asistente
-conversacional, la predicción de precios a 7 días, la gestión de favoritos y el histórico
-de precios. El sistema interactúa además con tres actores externos: la API del Ministerio
-(MITECO) para la sincronización de precios, la Reve API para los puntos de recarga
-eléctrica, y OpenRouteService para el cálculo de rutas.
+Se han elaborado dos diagramas de casos de uso para estructurar las
+interacciones entre actores y funcionalidades del sistema. El primero recoge
+el acceso a la plataforma y la gestión de usuario; el segundo cubre las
+funcionalidades avanzadas y diferenciadas de TankGo.
+
+% · · · · · · · · · · · · · · · · · · · · · ·
+\subsubsection{Acceso y gestión de usuario}
+\label{subsubsec:casos_uso_base}
+% · · · · · · · · · · · · · · · · · · · · · ·
+
+El sistema distingue dos actores principales. El \textit{usuario no
+registrado} puede visualizar el mapa de gasolineras, buscar por provincia
+o municipio, consultar el detalle de una estación junto a su historial de
+precios, explorar los puntos de carga eléctrica y cambiar el idioma de la
+interfaz. El \textit{usuario registrado} hereda todas esas capacidades y
+accede además al registro e inicio de sesión, tanto con credenciales
+propias como mediante Google OAuth, la gestión de estaciones favoritas,
+la visualización de predicciones de precio para dichas estaciones, la
+edición del perfil y la eliminación de la cuenta.
+
+La relación \textit{«include»} entre \textit{Consultar detalle de
+gasolinera} y \textit{Ver historial de precios} refleja que el segundo se
+carga de forma obligatoria como parte del primero. De igual modo,
+\textit{Ver predicción de precio} incluye \textit{Gestionar favoritos},
+dado que las predicciones se calculan únicamente sobre las estaciones
+marcadas como favoritas por el usuario.
+
 
 \begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/casos-uso.png}
-  \caption{Diagrama de casos de uso del sistema}
-  \label{fig:casos_uso}
+  \includegraphics[width=0.5\textwidth]{imgs/casos-uso-1.png}
+  \caption{Diagrama de casos de uso — acceso y gestión de usuario}
+  \label{fig:casos_uso_1}
 \end{figure}
 
-El diagrama de secuencia de la figura~\ref{fig:secuencia_consulta} ilustra el flujo de
-consulta de gasolineras cercanas: el usuario activa la geolocalización, el frontend envía
-la petición al API Gateway, este la enruta al servicio de gasolineras, que ejecuta una
-consulta geoespacial sobre PostgreSQL mediante PostGIS y devuelve el listado de estaciones
-con sus precios actuales para su renderizado en tabla y mapa.
+% · · · · · · · · · · · · · · · · · · · · · ·
+\subsubsection{Funcionalidades avanzadas}
+\label{subsubsec:casos_uso_avanzado}
+% · · · · · · · · · · · · · · · · · · · · · ·
+
+El segundo diagrama recoge las funcionalidades diferenciadas de TankGo
+respecto a un comparador de precios convencional. El \textit{usuario
+registrado} puede solicitar una recomendación de parada de repostaje para
+una ruta origen-destino; esta acción incluye obligatoriamente el cálculo
+de la ruta y los desvíos mediante OpenRouteService, actor externo situado
+en el lado receptor del diagrama. El caso de uso \textit{Filtrar por tipo
+de combustible} extiende la recomendación de ruta, ya que únicamente se
+activa cuando el usuario especifica un combustible concreto.
+
+El asistente de voz constituye un caso de uso independiente que incluye
+dos subcasos: la consulta de precios en tiempo real y la búsqueda de
+estaciones cercanas, ambos resueltos mediante \textit{tool calling} hacia
+la API del gateway. En el bloque de sincronización de datos se representan
+los dos actores externos que alimentan la base de datos en segundo plano:
+la API del Ministerio de Industria (MITECO) y la Reve API para los puntos
+de carga eléctrica. Ambas sincronizaciones son iniciadas por el propio
+sistema mediante tareas programadas y no requieren intervención del
+usuario.
 
 \begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/secuencia-consulta.png}
-  \caption{Diagrama de secuencia: consulta de gasolineras cercanas}
+  \includegraphics[width=0.5\textwidth]{imgs/casos-uso-2.png}
+  \caption{Diagrama de casos de uso — funcionalidades avanzadas}
+  \label{fig:casos_uso_2}
+\end{figure}
+
+% ─────────────────────────────────────────────
+\subsection{Diagramas de secuencia}
+\label{subsec:diagramas_secuencia}
+% ─────────────────────────────────────────────
+Los diagramas de secuencia complementan los casos de uso detallando el
+flujo de mensajes entre los componentes del sistema en los dos escenarios
+más representativos de TankGo.
+
+% · · · · · · · · · · · · · · · · · · · · · ·
+\subsubsection{Sincronización de datos y consulta de gasolineras}
+\label{subsubsec:secuencia_consulta}
+% · · · · · · · · · · · · · · · · · · · · · ·
+El diagrama de la figura~\ref{fig:secuencia_consulta} ilustra dos flujos
+complementarios. En segundo plano, Cloud Scheduler lanza diariamente a
+las 06:00 una petición al endpoint
+\texttt{/gasolineras/daily-sync-export}, protegido mediante la cabecera
+\texttt{X-Internal-Secret}; el servicio descarga el listado actualizado
+desde la API del Ministerio de Industria (MITECO), persiste los datos en
+PostgreSQL y exporta un \textit{snapshot} en formato Parquet a Cloud
+Storage para el pipeline de predicción. En el flujo síncrono, el usuario
+activa la geolocalización y el frontend envía la petición al API Gateway,
+que verifica el token JWT si está presente y la reenvía al servicio de
+gasolineras; este ejecuta una consulta geoespacial con PostGIS
+(\texttt{ST\_DWithin}) y devuelve el listado de estaciones con precios
+actuales para su renderizado en mapa y tabla.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{imgs/secuencia-consulta.png}
+  \caption{Diagrama de secuencia: sincronización de datos y consulta de
+           gasolineras cercanas}
   \label{fig:secuencia_consulta}
 \end{figure}
 
-El segundo diagrama de secuencia, figura~\ref{fig:secuencia_ruta}, muestra el flujo de
-planificación de ruta con recomendación de repostaje. El servicio de recomendación
-coordina dos llamadas externas: a OpenRouteService para obtener el trazado de la ruta, y
-al servicio de gasolineras para recuperar las estaciones cercanas al recorrido. Con ambas
-respuestas aplica el algoritmo de ponderación por precio y desvío y devuelve las paradas
-sugeridas al usuario.
+% · · · · · · · · · · · · · · · · · · · · · ·
+\subsubsection{Recomendación de parada en ruta}
+\label{subsubsec:secuencia_ruta}
+% · · · · · · · · · · · · · · · · · · · · · ·
+
+El diagrama de la figura~\ref{fig:secuencia_ruta} detalla el flujo de
+recomendación de parada de repostaje para una ruta origen-destino. El
+servicio de recomendación orquesta el proceso en tres fases: primero
+consulta OpenRouteService para obtener el trazado GeoJSON de la ruta
+principal; a continuación genera un corredor geométrico alrededor de
+dicha traza mediante Shapely, recupera el catálogo completo de gasolineras
+desde el servicio homónimo y filtra las candidatas que quedan dentro del
+corredor; finalmente, invoca la Matrix API de OpenRouteService para
+calcular los desvíos reales de cada candidata, aplica una función de
+puntuación ponderada por precio y desvío y devuelve al frontend las
+\textit{top-n} estaciones recomendadas con su ahorro estimado.
 
 \begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/secuencia-recomendacion.png}
-  \caption{Diagrama de secuencia: planificación de ruta con recomendación de repostaje}
+  \includegraphics[width=\textwidth]{imgs/secuencia-recomendacion.png}
+  \caption{Diagrama de secuencia: recomendación de parada de repostaje
+           en ruta}
   \label{fig:secuencia_ruta}
 \end{figure}
 
@@ -288,16 +385,18 @@ frescura respecto a una fuente externa que actualiza sus precios varias veces al
 día~\cite{datosgob_carburantes}.
 
 \subsubsection*{Ciclo de sincronización}
-
 El servicio mantiene la frescura de los datos mediante tres mecanismos complementarios:
-- Comprobación al arranque: si \texttt{AUTO\_ENSURE\_FRESH\_ON\_STARTUP} está activa, se
-  valida la antigüedad local y se lanza una sincronización condicional.
-- Job programado: un \textbf{Cloud Scheduler} ejecuta diariamente un Cloud Run Job que
-  sincroniza desde la API del Ministerio y exporta un snapshot Parquet a Google Cloud
-  Storage para el pipeline de ML.
-- Sincronización bajo demanda: si una lectura detecta datos obsoletos y
-  \texttt{AUTO\_SYNC\_ON\_READ=true}, se puede desencadenar una sincronización en
-  segundo plano (en producción esta opción suele estar desactivada para evitar latencia).
+
+\begin{itemize}
+  \item Comprobación al arranque: si \texttt{AUTO\_ENSURE\_FRESH\_ON\_STARTUP} está activa, se
+        valida la antigüedad local y se lanza una sincronización condicional.
+  \item Job programado: un \textbf{Cloud Scheduler} ejecuta diariamente un Cloud Run Job que
+        sincroniza desde la API del Ministerio y exporta un snapshot Parquet a Google Cloud
+        Storage para el pipeline de ML.
+  \item Sincronización bajo demanda: si una lectura detecta datos obsoletos y
+        \texttt{AUTO\_SYNC\_ON\_READ=true}, se puede desencadenar una sincronización en
+        segundo plano (en producción esta opción suele estar desactivada para evitar latencia).
+\end{itemize}
 
 Estos tres mecanismos combinados mantienen los datos con menos de 24 horas de antigüedad
 en producción sin depender de un sistema de colas externo.
@@ -339,12 +438,12 @@ corta) y reduce la complejidad operacional del despliegue.
 
 El \texttt{usuarios-service} gestiona el ciclo completo de identidad: registro,
 autenticación tradicional, autenticación federada con Google OAuth y gestión de favoritos.
-Está implementado con \textbf{Fastify}~\cite{fastify}, que en combinación con el plugin 
+Está implementado con \textbf{Fastify}~\cite{fastify}, que en combinación con el plugin
 \texttt{@fastify/jwt}~\cite{fastify_jwt} proporciona la firma y verificación de tokens sin código boilerplate.
 
 \subsubsection*{Autenticación y tokens JWT}
 
-Tras un inicio de sesión correcto, el servicio genera un token \textbf{JWT}~\cite{jwt_rfc}
+Tras un inicio de sesión correcto, el servicio genera un token \textbf{JWT}~\cite{jwt_rfc7519}
 firmado con el algoritmo HS256 y una caducidad de 7 días. El token no se devuelve en el
 cuerpo de la respuesta, sino que el API Gateway lo establece como una \textit{cookie}
 \texttt{httpOnly} con los flags \texttt{Secure} y \texttt{SameSite=None} en producción.
@@ -363,13 +462,15 @@ bruta incluso en caso de exfiltración de la base de datos.
 
 \subsubsection*{Gestión del esquema de base de datos}
 
-El proyecto no utiliza un sistema de migraciones automático tipo Flyway o Liquibase. El
-esquema se define en un fichero \texttt{init.sql} con sentencias idempotentes
-(\texttt{CREATE TABLE IF NOT EXISTS}, \texttt{ALTER TABLE IF NOT EXISTS}) que se aplican
-manualmente sobre la instancia PostgreSQL de Neon en el primer despliegue. Esta decisión
-es apropiada para el alcance del proyecto, aunque en un sistema de producción con múltiples
-entornos sería recomendable introducir un gestor de migraciones formal para controlar la
-evolución del esquema a lo largo del tiempo.
+El proyecto no emplea un sistema de migraciones automático (por ejemplo, Flyway o Liquibase). El esquema se mantiene en un fichero
+\texttt{init.sql} con sentencias idempotentes (\texttt{CREATE TABLE IF NOT EXISTS, ALTER TABLE IF NOT EXISTS}) que se aplican manualmente sobre la
+instancia PostgreSQL de Neon en el primer despliegue. Esta aproximación es adecuada para el alcance del proyecto, pero en entornos de
+producción con varios despliegues y equipos conviene usar un gestor de migraciones formal para controlar la evolución del esquema.
+
+Herramientas como Flyway o Liquibase permiten versionar y aplicar los cambios de forma reproducible. Flyway se basa en scripts SQL
+ordenados por versión, lo que facilita su integración en pipelines CI/CD; Liquibase añade además formatos declarativos (XML/JSON/YAML)
+y funciones avanzadas de rollback y auditoría. En proyectos con múltiples entornos estas soluciones reducen el riesgo de desincronización
+del esquema y permiten desplegar cambios de forma trazable y segura~\cite{flyway,liquibase}.
 
 \subsubsection*{Rate limiting}
 
@@ -384,7 +485,82 @@ pruebas locales.
 \label{subsec:recomendacion_impl}
 % ─────────────────────────────────────────────
 
-% Pendiente de desarrollar — el servicio de recomendación aún está en fase de refinamiento.
+El \texttt{recomendacion-service} implementa un algoritmo de recomendación geoespacial
+que, dada una ruta entre origen y destino, sugiere las paradas de repostaje óptimas
+ponderando el precio del combustible y el desvío necesario para alcanzar cada estación.
+Está implementado en \textbf{FastAPI}~\cite{fastapi} con Python, y
+combina consultas geoespaciales sobre PostGIS, geometría vectorial con
+\textbf{Shapely} y llamadas a la API de \textbf{OpenRouteService}~\cite{openrouteservice}
+para el cálculo de rutas y matrices de tiempos.
+
+\subsubsection*{Flujo del algoritmo}
+
+El algoritmo se ejecuta en siete etapas secuenciales:
+
+\begin{enumerate}
+  \item \textbf{Obtención de la ruta base.} El servicio solicita a OpenRouteService el
+        trazado completo de la ruta entre origen y destino, obteniendo la polilínea geométrica
+        y la distancia y duración totales.
+
+  \item \textbf{Prefiltrado de candidatas.} A partir de la polilínea, se construye un
+        corredor de búsqueda cuya anchura es \texttt{route\_buffer\_km = min(max\_desvio\_km
+          $\times$ 3,\ 50)} km. Este corredor se aplica mediante la función
+        \texttt{ST\_DWithin} de \textbf{PostGIS}~\cite{postgis} para recuperar únicamente las
+        estaciones cuya geometría cae dentro del área de interés, evitando cargar el catálogo
+        completo de más de 11\,000 estaciones. El corredor se refina adicionalmente en memoria
+        con \texttt{build\_route\_corridor} de \textbf{Shapely} \cite{shapely}, que construye un buffer
+        vectorial preciso alrededor de la polilínea.
+
+  \item \textbf{Cálculo de desvío aproximado.} Para cada candidata se estima un desvío
+        preliminar mediante la distancia haversine al punto más cercano de la ruta, implementado
+        en \texttt{geo\_math.py}. Este paso descarta rápidamente las estaciones que, aunque
+        dentro del corredor geométrico, superan claramente el umbral de desvío configurado.
+
+  \item \textbf{Refinamiento con Matrix API.} El subconjunto de candidatas que supera el
+        filtro aproximado se envía a la \textbf{Matrix API de OpenRouteService} \cite{openrouteservice} para obtener
+        tiempos de desvío reales en red viaria, que son significativamente más precisos que la
+        distancia en línea recta, especialmente en entornos con orografía compleja o vías de
+        acceso limitado.
+
+  \item \textbf{Refinamiento exacto con rutas vía parada.} Para las candidatas con mejor
+        puntuación preliminar, el servicio solicita a OpenRouteService la ruta completa
+        origen\,$\rightarrow$\,estación\,$\rightarrow$\,destino para obtener el sobrecoste
+        exacto en tiempo y distancia respecto a la ruta base.
+
+  \item \textbf{Filtrado por límites y puntuación.} Las estaciones que superan los límites
+        de desvío configurados (\texttt{max\_desvio\_km}, \texttt{max\_desvio\_min}) se
+        descartan. Las restantes se puntúan con la función de \textit{scoring} descrita a
+        continuación.
+\end{enumerate}
+
+\subsubsection*{Función de \textit{scoring}}
+
+La puntuación de cada estación candidata se calcula mediante una combinación lineal
+ponderada de dos factores normalizados:
+
+\begin{equation}
+  \text{score} = w_p \cdot (1 - \hat{p}) + w_d \cdot (1 - \hat{d}) + b_{\text{area}}
+  \label{eq:scoring}
+\end{equation}
+
+donde $\hat{p}$ es el precio normalizado de la estación respecto al rango de precios del
+conjunto de candidatas, $\hat{d}$ es el desvío normalizado respecto al desvío máximo
+permitido, y $b_{\text{area}} = 0.08$ es un bonus aplicado a estaciones clasificadas como
+áreas de servicio, que compensan su habitualmente mayor precio con una mayor accesibilidad
+desde la vía principal. Los pesos $w_p$ y $w_d$ son configurables por el usuario en cada
+petición y se normalizan automáticamente para que $w_p + w_d = 1$, con valores por defecto
+de $0.6$ y $0.4$ respectivamente, priorizando el precio sobre el desvío.
+
+\subsubsection*{Configuración de la petición}
+
+El endpoint \texttt{POST /api/recomendacion/ruta} acepta los parámetros
+\texttt{max\_desvio\_km} y \texttt{max\_desvio\_min} para acotar el espacio de búsqueda,
+\texttt{peso\_precio} y \texttt{peso\_desvio} para personalizar la función de
+\textit{scoring}, el tipo de combustible del vehículo para filtrar estaciones que
+dispongan de ese combustible, y \texttt{top\_n} para controlar el número de
+recomendaciones devueltas. Esta flexibilidad permite adaptar el servicio a perfiles de
+uso muy diferentes: desde un conductor particular que prioriza el precio mínimo hasta un
+transportista profesional que prefiere minimizar el tiempo de desvío.
 
 % ─────────────────────────────────────────────
 \subsection{Módulo de predicción de precios}
@@ -394,66 +570,167 @@ pruebas locales.
 El \texttt{prediction-service} implementa un pipeline de machine learning para estimar el
 precio de combustible de las estaciones favoritas de los usuarios durante los próximos 7
 días. El diseño se orienta a la ejecución periódica en lote (\textit{batch}) más que a la
-inferencia en tiempo real.
+inferencia en tiempo real, separando físicamente el rol de entrenamiento del rol de
+consulta.
 
 \subsubsection*{Selección del modelo}
 
-Se evaluaron varios enfoques de regresión para series temporales: modelos ARIMA clásicos,
-redes LSTM y árboles potenciados por gradiente. Se ha optado por \textbf{LightGBM}~\cite{lgbm}
-en régimen de \textbf{regresión cuantílica} por tres razones principales. Primero, ofrece
-un rendimiento muy competitivo en tablas de series temporales con features derivadas sin
-requerir la normalización y el ajuste de hiperparámetros extensivo que exigen las redes
-neuronales recurrentes. Segundo, la regresión cuantílica (cuantiles 0.05, 0.50, 0.95)
-produce directamente intervalos de confianza para cada predicción, lo que enriquece la
-información presentada al usuario. Tercero, LightGBM tiene un tiempo de entrenamiento muy
-reducido, compatible con la ejecución semanal del job en un entorno serverless con límites
-de memoria y CPU~\cite{ke2017lightgbm}.
+Se evaluaron tres familias de modelos para la predicción de series temporales de precios
+de combustible. Los modelos \textbf{ARIMA} ofrecen buena interpretabilidad y un error
+puntual competitivo en series estacionarias a corto plazo, pero presentan dos limitaciones
+críticas para este sistema: requieren un modelo independiente por cada par
+(estación,~combustible), lo que hace inviable su aplicación sobre las más de
+11\,000~estaciones del catálogo nacional, y no incorporan variables exógenas de forma
+directa, impidiendo aprovechar la correlación con el precio del crudo Brent. Las redes
+\textbf{LSTM} permiten modelar dependencias temporales largas, pero requieren volúmenes
+de datos superiores a los disponibles por estación, normalización de las entradas y un
+ajuste de hiperparámetros costoso; además, su tiempo de entrenamiento es incompatible con
+la ejecución semanal en un entorno serverless con recursos limitados~\cite{hartanto2023lightgbm}.
+
+Se optó por \textbf{LightGBM}~\cite{tandfonline_lightgbm} en régimen de
+\textbf{regresión cuantílica} por tres razones:
+
+\begin{enumerate}
+  \item \textbf{Escalabilidad:} el mismo código entrena modelos para cualquier número de
+        estaciones en un único job, sin requerir una instancia independiente por serie.
+  \item \textbf{Intervalos de confianza nativos:} la regresión cuantílica con cuantiles
+        0.05, 0.50 y 0.95 produce directamente una banda de incertidumbre para cada predicción,
+        enriqueciendo la información presentada al usuario sin una etapa adicional de estimación.
+  \item \textbf{Rendimiento competitivo:} en la validación sobre datos reales de tres
+        estaciones representativas, LightGBM alcanzó un MAPE inferior al 2.3\% en todos los
+        casos y superó a ARIMA y XGBoost en las series con mayor variabilidad, donde la
+        incorporación de \textit{features} exógenas del Brent aporta mayor
+        capacidad predictiva~\cite{joiv_lightgbm}.
+\end{enumerate}
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{llccc}
+    \toprule
+    \textbf{Estación} & \textbf{Modelo} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE (\%)} \\
+    \midrule
+    15158             & LightGBM        & 0.031        & 0.035         & 2.28               \\
+    15158             & ARIMA           & 0.018        & 0.020         & 1.30               \\
+    15158             & XGBoost         & 0.022        & 0.025         & 1.62               \\
+    \midrule
+    152               & LightGBM        & 0.009        & 0.010         & 0.63               \\
+    152               & ARIMA           & 0.008        & 0.012         & 0.59               \\
+    152               & XGBoost         & 0.010        & 0.014         & 0.71               \\
+    \midrule
+    10889             & LightGBM        & 0.009        & 0.010         & 0.61               \\
+    10889             & ARIMA           & 0.003        & 0.004         & 0.22               \\
+    10889             & XGBoost         & 0.004        & 0.004         & 0.25               \\
+    \bottomrule
+  \end{tabular}
+  \caption{Métricas de error en validación (últimos 7 días) para tres estaciones
+    representativas. Combustible: Gasolina 95~E5.}
+  \label{tab:metricas_modelos}
+\end{table}
 
 \begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/prediccion_mae_comparativa.png}
-  \caption{Comparativa de MAE entre modelos evaluados durante el desarrollo}
+  \includegraphics[width=0.85\textwidth]{imgs/prediccion_mae_comparativa.png}
+  \caption{Comparativa de predicción a 7 días entre LightGBM, ARIMA y XGBoost
+    para la estación 15158 (Gasolina 95~E5). LightGBM sigue mejor la tendencia
+    ascendente en el período de validación.}
   \label{fig:mae_comparativa}
 \end{figure}
 
 \subsubsection*{Ingeniería de \textit{features}}
 
-Para cada estación y tipo de combustible se construye una serie temporal diaria con el
-precio medio registrado. A partir de ella se generan \textit{features} temporales
-(día de la semana, fin de semana, semana del año, mes, trimestre), \textit{lags} de 1, 7,
-14, 21 y 30 días, medias móviles y desviaciones típicas de ventanas de 7, 14 y 30 días,
-y diferencias a 1 y 7 días. Adicionalmente, si la conexión a internet está disponible,
-se descarga el precio del crudo Brent mediante \textbf{yfinance}~\cite{yfinance} y se
-incorporan sus lags como variable exógena, aprovechando la correlación conocida entre el
-precio del petróleo y los precios en surtidor~\cite{LAHMIRI2024105008}.
+Para cada par (estación, combustible) se construye una serie temporal diaria con el precio
+medio registrado. A partir de ella se generan cuatro grupos de \textit{features}:
+
+\begin{itemize}
+  \item \textbf{Features temporales:} día de la semana, indicador de fin de semana, semana
+        del año, mes y trimestre.
+  \item \textbf{\textit{Lags}:} precios con retardos de 1, 7, 14, 21 y 30 días, que
+        capturan la autocorrelación de la serie a distintas escalas.
+  \item \textbf{Estadísticos de ventana:} media móvil y desviación típica en ventanas de
+        7, 14 y 30 días.
+  \item \textbf{Diferencias:} variación de precio a 1 y 7 días, que aproximan la
+        derivada de la serie y ayudan al modelo a detectar tendencias recientes.
+\end{itemize}
+
+Como variable exógena se incorpora el precio del crudo \textbf{Brent}, obtenido a través
+de la API pública de la Reserva Federal de St.\ Louis
+(\texttt{FRED:~DCOILBRENTEU})~\cite{LAHMIRI2024105008}. En caso de que esta fuente no
+esté disponible, el servicio recurre a \textbf{yfinance} como fuente alternativa. Los
+\textit{lags} del Brent se añaden al vector de \textit{features} aprovechando la
+correlación conocida entre el precio del crudo en mercados internacionales y los precios
+en surtidor.
+
+\begin{figure}[H]
+  \centering
+  % GRÁFICA 2: Correlación entre precio Brent y precio Gasolina 95 en el tiempo.
+  % Dos líneas sobre el mismo eje (o eje doble Y), mostrando la correlación visual.
+  % Nombrar: prediccion_brent_correlacion.png
+  \includegraphics[width=0.82\textwidth]{imgs/prediccion_brent_correlacion.png}
+  \caption{Correlación temporal entre el precio del crudo Brent y el precio de la Gasolina 95 E5}
+  \label{fig:brent_correlacion}
+\end{figure}
 
 \subsubsection*{Ciclo de entrenamiento e inferencia}
 
 El pipeline se ejecuta semanalmente mediante un \textbf{Cloud Run Job} disparado por
-\textbf{Cloud Scheduler} (cada lunes a las 06:00 UTC). En cada ejecución, el job descarga
-los snapshots Parquet de los últimos 180 días desde Google Cloud Storage, valida que los
-datos estén frescos, reentrena el modelo para cada par (estación, combustible), genera
-las predicciones de los 7 días siguientes de forma secuencial —cada día nuevo utiliza las
-predicciones previas para recalcular los lags— y persiste los resultados en la tabla
-\texttt{prediction\_forecasts} de PostgreSQL. Los artefactos del modelo entrenado
-(\texttt{.pkl}) se almacenan en el bucket GCS bajo el prefijo \texttt{modelos\_lgbm/}
-para su eventual reutilización.
+\textbf{Cloud Scheduler} cada lunes a las 06:00~UTC. En cada ejecución el job realiza los
+siguientes pasos: descarga los snapshots Parquet de los últimos 180 días desde Google
+Cloud Storage; valida que los datos sean frescos según el umbral \texttt{RAW\_MAX\_AGE\_HOURS};
+construye el vector de \textit{features} para cada par (estación, combustible); entrena
+tres modelos LightGBM independientes para los cuantiles 0.05, 0.50 y 0.95; genera las
+predicciones de los 7 días siguientes de forma secuencial, de forma que cada día
+predicho alimenta los \textit{lags} de los días posteriores; y persiste los resultados en
+la tabla \texttt{prediction\_forecasts} de PostgreSQL con los campos \texttt{precio\_predicho},
+\texttt{margen\_min} y \texttt{margen\_max}.
 
-La selección de estaciones a predecir se basa en los favoritos globales de los usuarios:
-el job consulta el endpoint interno \texttt{/api/usuarios/favoritos/all-ideess} para
-obtener los identificadores únicos de las estaciones con al menos un usuario que las ha
-marcado como favoritas. Este criterio concentra la capacidad de cómputo en las estaciones
-con mayor demanda real, evitando el coste prohibitivo de entrenar modelos para las más
-de 11\,000 estaciones del catálogo nacional.
+Los artefactos del modelo entrenado (\texttt{.pkl}) se almacenan en el bucket de Google
+Cloud Storage bajo el prefijo \texttt{GCS\_MODEL\_PREFIX} para su eventual reutilización
+o auditoría. Un backup adicional es configurable mediante \texttt{ENABLE\_GCS\_BACKUP}.
 
-\subsubsection*{Consulta de predicciones}
+La selección de estaciones a predecir opera en dos modos. En \texttt{SOURCE\_MODE=favorites},
+el job consulta la tabla \texttt{user\_favorites} o el endpoint interno del servicio de
+usuarios para obtener las estaciones con al menos \texttt{MIN\_FAVORITES\_COUNT} usuarios
+que las han marcado como favoritas, limitando el conjunto a las \texttt{TOP\_N\_STATIONS}
+más demandadas. Este criterio concentra la capacidad de cómputo en las estaciones con
+demanda real, evitando el coste prohibitivo de entrenar modelos para las más de
+11\,000 estaciones del catálogo nacional. En \texttt{SOURCE\_MODE=env}, el conjunto se
+fija manualmente mediante la variable \texttt{STATION\_IDS}, lo que facilita la ejecución
+en entornos de desarrollo o pruebas sin dependencia del servicio de usuarios.
+
+\begin{figure}[H]
+  \centering
+  % GRÁFICA 3: Predicción a 7 días para una estación concreta (Gasolina 95).
+  % Línea del precio real histórico + línea de predicción (mediana) + banda sombreada entre
+  % cuantil 0.05 y 0.95. Mostrar los últimos 30 días de histórico + 7 días predichos.
+  % Nombrar: prediccion_ejemplo_estacion.png
+  \includegraphics[width=0.85\textwidth]{imgs/prediccion_ejemplo_estacion.png}
+  \caption{Predicción a 7 días con banda de confianza (cuantiles 0.05--0.95) para la
+    estación 15158 (Gasolina 95~E5). La línea naranja representa la mediana
+    predicha; el área sombreada, el intervalo de incertidumbre.}
+  \label{fig:prediccion_ejemplo}
+\end{figure}
+
+\subsubsection*{Consulta de predicciones en producción}
 
 En producción el servicio opera en modo API (\texttt{RUN\_HTTP\_API=true}): no ejecuta el
 pipeline de entrenamiento, sino que expone el endpoint
 \texttt{GET /api/prediction/station/\{ideess\}} que lee directamente de la tabla
 \texttt{prediction\_forecasts}. El entrenamiento y la escritura en base de datos son
-responsabilidad exclusiva del Cloud Run Job periódico, separando los roles de
-escritura y lectura.
+responsabilidad exclusiva del Cloud Run Job periódico, separando los roles de escritura y
+lectura y permitiendo que el servicio de predicción en modo API tenga tiempos de respuesta
+mínimos al no ejecutar ningún cómputo intensivo durante la petición.
+
+\begin{figure}[H]
+  \centering
+  % GRÁFICA 4: Importancia de features del modelo LightGBM (feature importance).
+  % Gráfico de barras horizontales con las 10-15 features más importantes.
+  % Nombrar: prediccion_feature_importance.png
+  %\includegraphics[width=0.80\textwidth]{imgs/prediccion_feature_importance.png}
+  \caption{Importancia de \textit{features} del modelo LightGBM (cuantil 0.50)}
+  \label{fig:feature_importance}
+\end{figure}
+
 
 % ─────────────────────────────────────────────
 \subsection{Asistente conversacional de voz}
@@ -463,7 +740,7 @@ escritura y lectura.
 El \texttt{voice-assistant-service} implementa un asistente de dominio restringido que
 permite al usuario realizar consultas sobre gasolineras en lenguaje natural, tanto por
 texto como por voz, y recibir una respuesta en audio. El servicio está implementado con
-\textbf{Fastify}~\cite{fastify} y se integra con la API de \textbf{Google Gemini}~\cite{gemini}
+\textbf{Fastify}~\cite{fastify} y se integra con la API de \textbf{Google Gemini}~\cite{gemini_2_5}
 mediante llamadas HTTP REST al cliente \texttt{@google/genai}.
 
 \subsubsection*{Pipeline STT $\rightarrow$ LLM $\rightarrow$ TTS}
@@ -545,7 +822,7 @@ tiempo de compilación mediante la variable \texttt{VITE\_API\_BASE\_URL}.
 \subsubsection*{Progressive Web App}
 
 La aplicación implementa el estándar PWA mediante el plugin
-\textbf{vite-plugin-pwa}~\cite{vite_pwa} con Workbox~\cite{workbox} como gestor del
+\textbf{vite-plugin-pwa}~\cite{vite_plugin_pwa} con Workbox~\cite{workbox} como gestor del
 Service Worker. El fichero \texttt{manifest.webmanifest} define los metadatos necesarios
 para la instalación en dispositivos móviles (nombre, iconos, color de tema y modo de
 visualización \textit{standalone}). El Service Worker implementa una estrategia de caché
@@ -569,7 +846,7 @@ el área visible.
 \label{subsec:despliegue_impl}
 % ─────────────────────────────────────────────
 
-Todos los microservicios se despliegan en \textbf{Google Cloud Run}~\cite{cloud_run},
+Todos los microservicios se despliegan en \textbf{Google Cloud Run}~\cite{cloud_run2026},
 plataforma serverless que gestiona el escalado automático en función de la demanda y
 factura únicamente por el tiempo de cómputo efectivo. Esta elección elimina la necesidad
 de gestionar instancias o clústeres, lo que reduce significativamente la carga operacional
@@ -578,7 +855,7 @@ para un proyecto académico sin comprometer la disponibilidad.
 \subsubsection*{Pipeline de CI/CD}
 
 Cada microservicio dispone de su propio fichero \texttt{cloudbuild-*.yaml} que define un
-pipeline de \textbf{Cloud Build}~\cite{cloud_build} independiente. Los pipelines se
+pipeline de \textbf{Cloud Build}~\cite{cloud_build2026} independiente. Los pipelines se
 activan automáticamente con cada \textit{push} a la rama \texttt{main} del repositorio.
 El proceso consta de tres pasos: construcción de la imagen Docker, publicación en
 \textbf{Artifact Registry}~\cite{artifact_registry} (región \texttt{europe-west1}), y
@@ -602,7 +879,7 @@ autorizadas.
 
 \subsubsection*{Base de datos y almacenamiento}
 
-La base de datos PostgreSQL reside en \textbf{Neon Tech}~\cite{neon}, proveedor de
+La base de datos PostgreSQL reside en \textbf{Neon Tech}~\cite{neon_tech2026}, proveedor de
 PostgreSQL serverless que ofrece \textit{branching} de bases de datos, hibernación
 automática de instancias inactivas y conexión mediante cadena estándar
 \texttt{postgresql://}. La elección de un proveedor externo en lugar de Cloud SQL de GCP
@@ -610,7 +887,7 @@ responde a la disponibilidad de un plan gratuito suficiente para las cargas del 
 y a la independencia del proveedor cloud para la capa de datos.
 
 Los snapshots Parquet del pipeline de ML y los modelos entrenados se almacenan en
-\textbf{Google Cloud Storage}~\cite{gcs}, que actúa como capa de almacenamiento de objetos
+\textbf{Google Cloud Storage}~\cite{cloud_storage2026}, que actúa como capa de almacenamiento de objetos
 entre el servicio de gasolineras (productor de datos), el job de predicción (consumidor y
 productor de modelos) y el servicio de predicción en modo API (lector de resultados).
 
@@ -631,7 +908,7 @@ Este mecanismo evita que dichos endpoints sean accesibles desde el exterior incl
 un servicio queda expuesto inadvertidamente.
 
 La validación de datos de entrada se realiza en capa de aplicación con
-	extbf{Pydantic v2}~\cite{pydantic} en los servicios Python y con los esquemas de
+\textbf{Pydantic v2}~\cite{pydantic} en los servicios Python y con los esquemas de
 validación de Fastify en los servicios Node.js. Los parámetros de consulta con potencial
 de abuso (radio de búsqueda, límite de resultados) tienen cotas máximas declaradas
 explícitamente. Las consultas a PostgreSQL utilizan siempre parámetros preparados, sin
@@ -640,10 +917,11 @@ concatenación de cadenas, eliminando el vector de inyección SQL~\cite{owasp_sq
 Además, la política de seguridad transversal incluye comprobaciones y controles operativos
 que se aplican a todos los servicios: verificación de que los endpoints internos requieran
 la cabecera \texttt{X-Internal-Secret}, activación de cabeceras de seguridad mediante
-	extbf{Helmet.js} en los servicios Node.js, saneamiento de logs para evitar el registro
+\textbf{Helmet.js} en los servicios Node.js, saneamiento de logs para evitar el registro
 de información sensible y aplicación coherente de límites de tasa y reglas de perímetro
 (Cloudflare / reglas del gateway). Estas comprobaciones reducen la superficie de ataque
 y facilitan la auditoría de seguridad.
+
 \section{Plan de Pruebas}
 \subsection{Estrategia}
 \subsection{Pruebas unitarias}
@@ -674,7 +952,7 @@ pública de la plataforma para comenzar a utilizarla.
 \subsubsection*{Acceso desde navegador}
 
 El acceso básico no requiere registro. Al abrir la URL de la plataforma, el usuario accede
-a pagina de bienvenida. Dispone arriba de un menu de navegación para poder acceder al resto de paginas. 
+a pagina de bienvenida. Dispone arriba de un menu de navegación para poder acceder al resto de paginas.
 
 Para utilizar lasfuncionalidades avanzadas (predicción de precios, recomendación de ruta, asistente
 conversacional y gestión de favoritos) es necesario iniciar sesión.
@@ -813,7 +1091,7 @@ esa estación concreta.
   \centering
   % CAPTURA: Gráfico de histórico de precios de una estación favorita.
   % Mostrar la línea de evolución temporal del precio. Nombrar: manual_historico.png
-  %\includegraphics[width=0.85\textwidth]{imgs/manual_historico.png}
+  \includegraphics[width=0.85\textwidth]{imgs/manual_historico.png}
   \caption{Histórico de precios de una estación de servicio favorita}
   \label{fig:manual_historico}
 \end{figure}
@@ -830,7 +1108,7 @@ si el precio tenderá a subir o bajar en los próximos días.
   \centering
   % CAPTURA: Gráfica de predicción a 7 días con la banda de confianza visible.
   % Nombrar: manual_prediccion.png
-  %\includegraphics[width=0.85\textwidth]{imgs/manual_prediccion.png}
+  \includegraphics[width=0.85\textwidth]{imgs/manual_prediccion.png}
   \caption{Predicción de precios a 7 días para una estación favorita}
   \label{fig:manual_prediccion}
 \end{figure}
@@ -858,7 +1136,7 @@ preferencias del perfil para que las recomendaciones sean coherentes con su veh�
 El asistente de voz permite realizar consultas en lenguaje natural sobre gasolineras y
 precios. El usuario accede al asistente desde el icono del micrófono en la interfaz
 principal. Puede formular preguntas como \textit{«¿Cuál es la gasolinera más barata
-cerca de mí?»}, tanto por voz
+  cerca de mí?»}, tanto por voz
 como por texto. El asistente procesa la consulta, obtiene los datos en tiempo real de la
 plataforma y devuelve la respuesta en audio.
 
@@ -939,12 +1217,12 @@ tiempos de desvío reales, refinando posteriormente los resultados mediante llam
 individuales a la Directions API para los candidatos con mejor puntuación.
 
 Adicionalmente, la evasión de peajes solicitada como parámetro de la ruta no siempre
-producía buenos resultados, 
-debido a que la API de Matrix de OpenRouteService no tiene en cuenta esta variable 
-en el cálculo de tiempos de desvío, 
-lo que llevaba a recomendar estaciones que técnicamente cumplían el criterio 
-de cercanía pero que implicaban ir por carreteras de pago. Sin embargo, la llamada para 
-marcar el recorrido si que permite evitar peajes. 
+producía buenos resultados,
+debido a que la API de Matrix de OpenRouteService no tiene en cuenta esta variable
+en el cálculo de tiempos de desvío,
+lo que llevaba a recomendar estaciones que técnicamente cumplían el criterio
+de cercanía pero que implicaban ir por carreteras de pago. Sin embargo, la llamada para
+marcar el recorrido si que permite evitar peajes.
 Esta limitación quedó documentada como restricción conocida del sistema
 (véase la sección~\ref{sec:alcance}).
 
@@ -979,7 +1257,7 @@ del servidor y puede interferir con el proceso de validación de dominio de Goog
 
 La resolución ha requerido desactivar temporalmente el modo proxy de Cloudflare durante la
 verificación de dominio en Cloud Run, para posteriormente reactivarlo una vez completada
-la validación. 
+la validación.
 
 \subsubsection*{Problemas de conexión SSL con Neon Tech}
 

@@ -4,6 +4,7 @@
 % =========================================================
 
 \chapter{Capítulo tercero - Marco tecnológico}
+\label{cap:marco_tecnologico}
 
 La elección de las tecnologías que dan soporte a TankGo responde a un análisis previo
 de alternativas en el que se han ponderado criterios de rendimiento, madurez del
@@ -13,10 +14,48 @@ presenta las tecnologías seleccionadas organizadas por capa arquitectónica, la
 justificación técnica detallada de cada decisión se recoge en el Capítulo~8.
 
 % ---------------------------------------------------------
+\section{Patrón de diseño: Microservicios}
+% ---------------------------------------------------------
+
+TankGo adopta el patrón de microservicios descrito en la colección de patrones de
+microservices.io \cite{microservices_io}. El diseño propone descomponer la aplicación en
+servicios autónomos que implementan contextos acotados (bounded contexts). Sus ventajas
+relevantes para arquitecturas web modernas son:
+
+\begin{itemize}
+    \item Independencia de despliegue: permite desplegar y actualizar servicios sin afectar al
+    conjunto, acelerando ciclos de entrega y reduciendo el riesgo de regresiones.
+    \item Escalado selectivo: posibilita escalar únicamente los servicios con mayor demanda,
+    optimizando costes en entornos cloud-native.
+    \item Aislamiento y resiliencia: fallos locales se contienen, facilitando estrategias de
+    degradación progresiva y recuperación.
+    \item Heterogeneidad tecnológica: favorece el poliglotismo (usar FastAPI para ML, Fastify
+    para autenticación, etc.) y la adopción de la mejor herramienta por caso de uso.
+    \item Encaje natural con CI/CD y plataformas serverless: microservicios se integran bien con
+    pipelines por servicio y despliegues en Cloud Run / contenedores gestionados.
+\end{itemize}
+
+El patrón de microservicios encuentra su expresión más eficiente en plataformas
+\textbf{serverless}, paradigma de computación en la nube en el que el proveedor
+gestiona automáticamente el aprovisionamiento, el escalado y la disponibilidad
+de la infraestructura. El desarrollador despliega unidades de cómputo
+(funciones o contenedores) sin administrar servidores, y el sistema escala a
+cero instancias cuando no hay demanda, eliminando costes de infraestructura
+ociosa~\cite{nist2011}. En TankGo, cada microservicio se despliega como un
+contenedor independiente en \textbf{Google Cloud Run}, plataforma serverless que
+combina la portabilidad de los contenedores Docker con el modelo de facturación
+por uso efectivo de Cloud Run~\cite{cloud_run2026}.
+
+En el Capítulo~8 se documentan con más detalle los contratos entre servicios, los
+endpoints HTTP internos, las estrategias de autenticación y autorización, y las
+decisiones operativas (observabilidad, tracing y despliegue). En este capítulo se
+expone la justificación conceptual y su impacto en la arquitectura general de TankGo.
+
+% ---------------------------------------------------------
 \section{Capa de presentación: React y Leaflet.js}
 % ---------------------------------------------------------
 
-El cliente web está desarrollado con \textbf{React 19} \cite{react}, biblioteca de
+El cliente web está desarrollado con \textbf{React 19} (licencia MIT) \cite{react}, biblioteca de
 interfaz de usuario de Meta basada en componentes reutilizables y DOM virtual. Frente
 a Vue.js y Angular \cite{vuejs, angular}, React ofrece el ecosistema cartográfico más
 maduro a través de \texttt{react-leaflet} \cite{react_leaflet} y cuenta con la mayor
@@ -41,65 +80,121 @@ La internacionalización en castellano, euskera e inglés se implementa mediante
 \section{Capa de gateway: Hono sobre Node.js}
 % ---------------------------------------------------------
 
-El API Gateway utiliza \textbf{Hono} \cite{hono}, framework web ultraligero con
+El API Gateway utiliza \textbf{Hono} (licencia MIT) \cite{hono}, framework web ultraligero con
 compatibilidad nativa para múltiples runtimes y un rendimiento cercano a 350.000~req/s
 en benchmarks independientes \cite{hono_benchmarks}. Frente a Express.js
 \cite{express}, Hono adopta la especificación Fetch API del estándar web, lo que le
 confiere un modelo de concurrencia asíncrono más adecuado para un gateway cuya carga
 es mayoritariamente I/O-bound.
 
+
 % ---------------------------------------------------------
 \section{Capa de servicios de negocio: FastAPI y Fastify}
 % ---------------------------------------------------------
 
 Los servicios Python (\texttt{gasolineras-service}, \texttt{recomendacion-service} y
-\texttt{prediction-service}) utilizan \textbf{FastAPI} \cite{afolabi_fastapi_benchmark,
-ijsrem_fastapi_comparison}, construido sobre Starlette \cite{starlette} y Pydantic v2
-\cite{pydantic}. Su arquitectura ASGI ofrece un rendimiento superior a Flask
-\cite{flask} y Django \cite{django} en escenarios de API REST, y genera documentación
-OpenAPI de forma automática \cite{openapi}, lo que facilita la agregación de
-especificaciones en el gateway.
+\texttt{prediction-service}) utilizan \textbf{FastAPI} (licencia MIT)
+\cite{afolabi_fastapi_benchmark, ijsrem_fastapi_comparison}, construido sobre
+Starlette \cite{starlette} y Pydantic v2 \cite{pydantic}. Su arquitectura ASGI
+ofrece un rendimiento superior a Flask \cite{flask} y Django \cite{django} en
+escenarios de API REST.
 
-El servicio de usuarios está implementado con \textbf{Fastify}, cuyo ecosistema de
-plugins para JWT y cookies \textit{httpOnly} (\texttt{@fastify/jwt},
-\texttt{@fastify/cookie}) y su validación basada en JSON Schema lo hacen
-especialmente adecuado para la gestión de identidad y autenticación.
+FastAPI genera automáticamente especificaciones \textbf{OpenAPI 3.0}
+\cite{openapi}, el estándar de la industria para describir servicios RESTful de
+forma legible tanto por humanos como por máquinas. Una especificación OpenAPI
+define los endpoints disponibles, los esquemas de entrada y salida, los códigos
+de respuesta y los mecanismos de autenticación, lo que permite generar
+documentación interactiva (Swagger UI) y clientes tipados sin esfuerzo adicional.
+En TankGo, el API Gateway agrega las especificaciones de todos los microservicios
+en un único documento OpenAPI unificado, accesible en \texttt{/docs}.
+
+El servicio de usuarios está implementado con \textbf{Fastify} (licencia MIT) \cite{fastify}, cuyo
+ecosistema de plugins (\texttt{@fastify/jwt}, \texttt{@fastify/cookie}) \cite{fastify_jwt, fastify_cookie} y su
+validación basada en JSON Schema lo hacen especialmente adecuado para la gestión
+de identidad y autenticación. Fastify soporta además comunicación mediante
+\textbf{WebSocket} a través del plugin \texttt{@fastify/websocket} \cite{fastify_websocket}, protocolo
+bidireccional de baja latencia definido en el RFC~6455~\cite{rfc6455_websocket}
+que posibilita flujos de datos en tiempo real sin el coste de \textit{polling}
+repetitivo. En TankGo el \texttt{voice-assistant-service} implementa un endpoint
+WebSocket (\texttt{/ws/voice}) para \textit{streaming} de audio; las
+consideraciones sobre su comportamiento en el entorno de despliegue se recogen
+en el Capítulo~8.
+
+% ---------------------------------------------------------
+\section{Gestión de identidad: JWT y Google OAuth}
+% ---------------------------------------------------------
+
+Para la emisión y verificación de tokens de acceso se emplea el estándar
+\textbf{JSON Web Token} (JWT) \cite{jwt_rfc7519}, definido en el RFC~7519. Un JWT
+es un token compacto y autocontenible que transporta declaraciones (\textit{claims})
+sobre el sujeto autenticado, firmado mediante el algoritmo HS256 (JWS). Su
+estructura se compone de tres partes codificadas en Base64URL: encabezado
+(\textit{header}), cuerpo (\textit{payload}) y firma, separadas por puntos. Entre
+sus ventajas para arquitecturas de microservicios destacan la portabilidad entre
+servicios sin necesidad de consultar un almacén de sesiones centralizado y la
+compatibilidad con autenticación federada.
+
+En TankGo los tokens se emiten con una caducidad de 7 días y se transmiten
+exclusivamente mediante \textit{cookies} \texttt{httpOnly} con los atributos
+\texttt{Secure} y \texttt{SameSite=None} en producción, lo que impide su acceso
+desde JavaScript del navegador y mitiga ataques XSS~\cite{owasp_xss}. La
+autenticación federada se implementa mediante \textbf{Google OAuth 2.0}: el API
+Gateway verifica el \texttt{id\_token} de Google y lo canjea por un JWT interno,
+de forma que el servicio de usuarios nunca queda expuesto directamente al
+exterior. Los detalles de implementación se recogen en el Capítulo~8.
 
 % ---------------------------------------------------------
 \section{Capa de datos: PostgreSQL y Apache Parquet}
 % ---------------------------------------------------------
 
-Todos los servicios con necesidades de persistencia utilizan \textbf{PostgreSQL},
+Todos los servicios con necesidades de persistencia utilizan \textbf{PostgreSQL} (PostgreSQL License),
 alojado en \textbf{Neon} \cite{neon_tech2026}, plataforma de PostgreSQL serverless que
 escala a cero en inactividad. La extensión \textbf{PostGIS} \cite{postgis} habilita las consultas
 geoespaciales (\texttt{ST\_DWithin}, \texttt{ST\_LineLocatePoint},
 \texttt{ST\_Distance}) requeridas por el servicio de recomendación.
 
 Los datos históricos exportados para el entrenamiento de modelos se almacenan en
-\textbf{Apache Parquet} \cite{databricks_parquet}, formato columnar que reduce el
+\textbf{Apache Parquet} (licencia Apache-2.0) \cite{databricks_parquet}, formato columnar que reduce el
 volumen de I/O al leer únicamente las columnas necesarias y produce ficheros entre un
 80 y un 90\,\% más pequeños que sus equivalentes CSV \cite{datacamp_parquet,
-bckinfo_parquet}. Los ficheros se almacenan en Google Cloud Storage y se leen desde
-\texttt{prediction-service} mediante PyArrow.
+bckinfo_parquet}. Los ficheros se almacenan en Google Cloud Storage \cite{cloud_storage2026} y se leen desde
+\texttt{prediction-service} mediante PyArrow \cite{pyarrow}. PyArrow es la
+implementación en Python de la especificación Apache Arrow que facilita la lectura
+y escritura eficiente de ficheros Parquet y el intercambio columnar en memoria,
+reduciendo copias y acelerando operaciones de I/O en pipelines de datos.
 
 % ---------------------------------------------------------
 \section{Capa de inteligencia: LightGBM}
 % ---------------------------------------------------------
 
-El módulo de predicción utiliza \textbf{LightGBM} en modo de regresión cuantílica
-(percentiles 0{,}05, 0{,}50 y 0{,}95). Los modelos de \textit{gradient boosting}
-ofrecen un rendimiento superior a ARIMA y LSTM en series temporales con datos
-tabulares y variables exógenas \cite{LAHMIRI2024105008}, y producen directamente
-intervalos de confianza sin asumir distribuciones sobre los errores \cite{s24124013}.
-Su bajo coste de entrenamiento es compatible con la ejecución semanal del
-\textit{job} en un entorno serverless con límites de memoria y CPU.
+El módulo de predicción utiliza \textbf{LightGBM} (licencia MIT) \cite{lightgbm}
+en modo de regresión cuantílica (percentiles 0{,}05, 0{,}50 y 0{,}95). Para
+contextualizar esta elección conviene describir brevemente los enfoques
+alternativos evaluados. Los modelos \textbf{ARIMA} (\textit{AutoRegressive
+Integrated Moving Average}) son métodos clásicos de series temporales univariantes
+que modelan la autocorrelación y la tendencia mediante diferenciación, pero
+asumen linealidad y requieren estacionariedad, lo que limita su capacidad para
+capturar relaciones no lineales entre variables exógenas como el precio del
+crudo~\cite{LAHMIRI2024105008}. Las redes \textbf{LSTM} (\textit{Long Short-Term
+Memory}) son redes neuronales recurrentes diseñadas para aprender dependencias
+a largo plazo en secuencias temporales~\cite{8945584}; su rendimiento es
+competitivo pero exigen normalización cuidadosa, ajuste extensivo de
+hiperparámetros y tiempos de entrenamiento elevados, incompatibles con la
+ejecución semanal en un entorno serverless con recursos limitados.
+
+Los modelos de \textit{gradient boosting} como LightGBM ofrecen un rendimiento
+superior en tablas de series temporales con \textit{features} derivadas y variables
+exógenas~\cite{LAHMIRI2024105008}, y producen directamente intervalos de confianza
+sin asumir distribuciones sobre los errores mediante regresión
+cuantílica~\cite{s24124013}. Su bajo coste de entrenamiento es compatible con la
+ejecución semanal del \textit{job} en Cloud Run.
 
 % ---------------------------------------------------------
 \section{Capa de enrutamiento geoespacial: OpenRouteService}
 % ---------------------------------------------------------
 
 Para el cálculo de trayectos y matrices de distancias se integra
-\textbf{OpenRouteService} (ORS) \cite{gisops_routing_overview}, plataforma de
+\textbf{OpenRouteService} (ORS) (código abierto; licencias principales GPLv3/LGPL-3.0 según componente) \cite{gisops_routing_overview}, plataforma de
 enrutamiento de código abierto con API REST gestionada. OSRM \cite{osm_wiki_routers},
 aunque más rápido en tiempo de respuesta, requiere un servidor propio con requisitos
 de RAM elevados para el grafo viario español, lo que resulta inviable en Cloud Run.
@@ -111,18 +206,34 @@ capacidad de evitar peajes como parámetro nativo.
 \section{Capa de cartografía: OpenStreetMap y Nominatim}
 % ---------------------------------------------------------
 
-Las teselas del mapa y la geocodificación se obtienen de \textbf{OpenStreetMap} y su
-motor de búsqueda \textbf{Nominatim}. El API Gateway actúa como proxy hacia Nominatim,
-centralizando la caché y evitando bloqueos CORS. La API de Geocoding de Google y la de
-Mapbox quedan descartadas por introducir dependencia de servicios propietarios con
-modelos de precios variables.
+El \textbf{geocoding} es el proceso que convierte una dirección, topónimo o consulta
+textual en coordenadas geográficas (latitud y longitud), permitiendo localizar cualquier
+recurso sobre un mapa. La operación inversa, denominada \textbf{reverse geocoding},
+transforma unas coordenadas en una dirección o descripción legible, lo que resulta
+necesario para mostrar al usuario la ubicación de una estación en términos comprensibles.
+
+Las teselas cartográficas y ambas operaciones de geocoding se obtienen de
+\textbf{OpenStreetMap} (OSM) \cite{openstreetmap}, proyecto colaborativo de datos
+geográficos abiertos publicado bajo la licencia \textit{Open Database License}
+(ODbL)~\cite{odbl}, que permite el uso, distribución y modificación de los datos
+siempre que los trabajos derivados mantengan la misma licencia. El motor de búsqueda
+y geocodificación oficial de OSM es \textbf{Nominatim}, distribuido bajo licencia
+GPL-2.0, que expone una API REST para resolver consultas textuales y coordenadas
+sobre la base de datos OSM sin coste de licencia, con la única restricción de
+respetar los límites de uso del servicio público.
+
+En TankGo, el API Gateway actúa como proxy hacia Nominatim: centraliza las llamadas de
+geocoding y reverse geocoding, aplica caché local para reducir la latencia y evita los
+bloqueos CORS que afectarían a las llamadas directas desde el navegador. La API de
+Geocoding de Google y la de Mapbox quedan descartadas por su dependencia de servicios
+propietarios con modelos de precios variables.
 
 % ---------------------------------------------------------
 \section{Capa de inteligencia conversacional: Gemini y Google GenAI}
 % ---------------------------------------------------------
 
 El asistente de voz implementa un pipeline \textbf{STT $\rightarrow$ LLM con
-\textit{tool calling} $\rightarrow$ TTS} sobre \textbf{Gemini 2.5 Flash}
+\textit{tool calling} $\rightarrow$ TTS} sobre \textbf{Gemini 2.5 Flash} (servicio propietario de Google)
 \cite{gemini_2_5}, accedido mediante llamadas API REST con la biblioteca
 \texttt{@google/genai}. El uso de un único modelo multimodal simplifica la
 arquitectura, reduce la latencia acumulada entre etapas y elimina la gestión de
@@ -135,14 +246,26 @@ HTTP del gateway.
 \section{Plataforma de despliegue: Google Cloud}
 % ---------------------------------------------------------
 
-El despliegue en producción utiliza \textbf{Cloud Run} \cite{cloud_run2026} como
+El despliegue en producción utiliza \textbf{Cloud Run} (servicio propietario de Google) \cite{cloud_run2026} como
 plataforma serverless de ejecución de contenedores, \textbf{Cloud Build}
 \cite{cloud_build2026} para los pipelines CI/CD (siete ficheros
 \texttt{cloudbuild-*.yaml}, uno por servicio), \textbf{Cloud Storage}
 \cite{cloud_storage2026} para los artefactos del pipeline de ML y
 \textbf{Secret Manager} para la inyección de credenciales en tiempo de despliegue.
-Frente a AWS, GCP ofrece integración nativa con Gemini y las APIs de Google,
-simplificando la gestión de identidades mediante IAM \cite{Gartner2026Trends}.
+
+Frente a AWS y Azure, GCP ofrece integración nativa con Gemini y las APIs de
+Google. La gestión de identidades se realiza mediante \textbf{Cloud IAM}
+(\textit{Identity and Access Management})~\cite{gcp_products2026}, servicio que
+controla qué entidades (usuarios, cuentas de servicio) pueden realizar qué
+acciones sobre qué recursos. En TankGo, cada microservicio se ejecuta bajo una
+cuenta de servicio con permisos mínimos (\textit{least privilege}): el servicio
+de predicción tiene acceso de lectura y escritura sobre el bucket de Cloud
+Storage, pero no sobre Secret Manager ni Cloud Run. El modelo de costes de GCP
+para los servicios utilizados sigue un esquema de pago por uso: Cloud Run factura
+por tiempo de CPU y memoria consumidos durante la ejecución efectiva de
+peticiones, Cloud Storage por volumen almacenado y operaciones de lectura/escritura,
+y Cloud Build por minutos de compilación, con niveles gratuitos mensuales que
+cubren la totalidad de la carga del proyecto en su estado actual~\cite{gcp_products2026}.
 
 % ---------------------------------------------------------
 \section{Síntesis: justificación del stack tecnológico}
@@ -157,29 +280,30 @@ evaluadas.
     \caption{Resumen del stack tecnológico de TankGo}
     \label{tab:stack_tecnologico}
     \small
-    \begin{tabular}{llll}
+    \begin{tabular}{lllll}
         \toprule
-        \textbf{Tecnología}    & \textbf{Capa}       & \textbf{Alternativas evaluadas}  & \textbf{Criterio de elección}   \\
+        \textbf{Tecnología}    & \textbf{Capa}       & \textbf{Alternativas evaluadas}  & \textbf{Criterio de elección} & \textbf{Licencia} \\
         \midrule
-        React 19               & Frontend            & Vue.js, Angular                  & Ecosistema Leaflet, adopción    \\
-        Leaflet.js             & Frontend            & Google Maps, Mapbox              & Licencia abierta, sin coste     \\
-        Hono 4.10              & Gateway             & Express.js, Fastify              & Rendimiento async, WS nativo    \\
-        FastAPI 0.115          & Backend Python      & Flask, Django                    & ASGI, OpenAPI automático        \\
-        Fastify 5.7            & Backend Node.js     & Express.js, NestJS               & JWT/cookie ecosystem            \\
-        PostgreSQL / Neon      & Datos               & MySQL, MongoDB                   & PostGIS, serverless, ACID       \\
-        Apache Parquet         & ML pipeline         & CSV, JSON, Avro                  & Columnar, compresión, Python    \\
-        LightGBM 4.3           & ML modelo           & XGBoost, ARIMA, LSTM             & Velocidad, quantile regression  \\
-        ORS (OpenRouteService) & Ruteo               & OSRM, Google Directions          & API REST gestionada, Matrix     \\
-        OpenStreetMap          & Cartografía         & Google Maps, Mapbox              & Datos libres, sin coste API     \\
-        Nominatim              & Geocodificación     & Google Geocoding                 & Gratuito, integrado con OSM     \\
-        Gemini 2.5 Flash       & IA / Voz            & GPT-4o + Whisper, Gemini Pro     & Multimodal, latencia baja       \\
-        Google Cloud Run       & Despliegue          & AWS Lambda, Azure Container      & Escala a cero, integración GCP  \\
+        React 19               & Frontend            & Vue.js, Angular                  & Ecosistema Leaflet, adopción    & MIT \\
+        Leaflet.js             & Frontend            & Google Maps, Mapbox              & Licencia abierta, sin coste     & BSD-2-Clause \\
+        Hono 4.10              & Gateway             & Express.js, Fastify              & Rendimiento async, WS nativo    & MIT \\
+        FastAPI 0.115          & Backend Python      & Flask, Django                    & ASGI, OpenAPI automático        & MIT \\
+        Fastify 5.7            & Backend Node.js     & Express.js, NestJS               & JWT/cookie ecosystem            & MIT \\
+        PostgreSQL / Neon      & Datos               & MySQL, MongoDB                   & PostGIS, serverless, ACID       & PostgreSQL License \\
+        Apache Parquet         & ML pipeline         & CSV, JSON, Avro                  & Columnar, compresión, Python    & Apache-2.0 \\
+        LightGBM 4.3           & ML modelo           & XGBoost, ARIMA, LSTM             & Velocidad, quantile regression  & MIT \\
+        ORS (OpenRouteService) & Ruteo               & OSRM, Google Directions          & API REST gestionada, Matrix     & GPLv3 / LGPL-3.0 \\
+        OpenStreetMap          & Cartografía         & Google Maps, Mapbox              & Datos libres, sin coste API     & ODbL (datos) \\
+        Nominatim              & Geocodificación     & Google Geocoding                 & Gratuito, integrado con OSM     & GPLv3 (código); Apache-2.0 (algunos ficheros) \\
+        Gemini 2.5 Flash       & IA / Voz            & GPT-4o + Whisper, Gemini Pro     & Multimodal, latencia baja       & Servicio propietario (Google) \\
+        Google Cloud Run       & Despliegue          & AWS Lambda, Azure Container      & Escala a cero, integración GCP  & Servicio propietario (Google) \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-El conjunto de tecnologías elegidas comparte un denominador común: todas son de uso
-libre o tienen niveles gratuitos generosos, cuentan con documentación oficial
-exhaustiva y comunidades activas. Este criterio de \textit{sostenibilidad tecnológica}
-ha primado sobre la mera novedad, garantizando que la solución pueda ser mantenida y
-extendida con independencia de los ciclos comerciales de proveedores específicos.
+El conjunto de tecnologías de código abierto elegidas comparte un denominador
+común: licencias permisivas, documentación oficial exhaustiva y comunidades
+activas. Los servicios propietarios de Google (Cloud Run, Gemini) se incorporan
+por su integración nativa y sus niveles gratuitos suficientes para la carga del
+proyecto, asumiendo la dependencia de proveedor como una decisión consciente
+justificada en el Capítulo~8.

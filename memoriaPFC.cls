@@ -40,6 +40,7 @@
 \RequirePackage{color}   % Colores
 \RequirePackage{fancyvrb}        % Verbose
 \RequirePackage{amssymb}         % Símbolos matemáticos
+\RequirePackage{amsmath}         % Entornos y comandos matemáticos (\text{})
 \RequirePackage{multibib}        % Múltiples bibliografías
 \RequirePackage{listings}        % Código fuente
 \RequirePackage{pdfpages}        % Incluir PDFs
