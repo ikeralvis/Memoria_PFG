@@ -79,7 +79,7 @@ entre sesiones.
 
 El código fuente del proyecto se ha gestionado mediante Git~\cite{git_scm2026,github2026}, con un 
 repositorio alojado en GitHub organizado como monorepo. Todo el desarrollo se ha
-realizado sobre una única rama principal (\texttt{main}), sin emplear ramas de características
+realizado sobre una única rama principal (\texttt{master}), sin emplear ramas de características
 ni flujos de trabajo basados en \textit{pull requests}, decisión coherente con el contexto
 de desarrollo en solitario, donde la sobrecarga de un modelo de ramas más elaborado no
 aporta beneficio real.
@@ -88,7 +88,7 @@ Los \textit{commits} se han realizado de forma frecuente, tras la finalización 
 cada tarea o subtarea significativa, lo que permite reconstruir la evolución del
 sistema y revertir cambios de forma controlada si fuera necesario. La integración
 del repositorio con los pipelines de Cloud Build~\cite{cloud_build2026} cierra el
-ciclo de control de versiones: cada \textit{push} a \texttt{main} desencadena
+ciclo de control de versiones: cada \textit{push} a \texttt{master} desencadena
 automáticamente la construcción, publicación y despliegue del microservicio correspondiente
 en Google Cloud Run, convirtiendo el propio flujo de control de versiones en el disparador
 del proceso de entrega continua.

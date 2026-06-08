@@ -109,7 +109,7 @@ lugar, las funciones de consulta, predicción y recomendación requieren \textbf
 activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
 \textbf{asistente conversacional} está diseñado para responder consultas puntuales, no para
 mantener diálogos extendidos mientras se conduce, en línea con las directrices de seguridad
-vial aplicables. El sistema de recomendacion de rutas tambien añade una dependecia que esta fuera del control del sistema, 
+vial aplicables. El sistema de recomendación de rutas también añade una dependencia que está fuera del control del sistema, 
 ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
 
 % ═════════════════════════════════════════════
@@ -426,7 +426,7 @@ ser un servicio externo puede experimentar latencias de conexión en arranques e
 
 \subsubsection*{Integración de electrolineras}
 
-Los puntos de recarga eléctrica se obtienen de la API de Mapareve~\cite{mitma_esmovilidad}
+Los puntos de recarga eléctrica se obtienen de la API de Mapareve~\cite{reve_api}
 y están integrados directamente dentro del \texttt{gasolineras-service}, bajo el prefijo
 de rutas \texttt{/api/charging/}. Esta decisión evita la proliferación de microservicios
 para funcionalidades que comparten el mismo patrón de acceso (consulta geoespacial, caché
@@ -453,7 +453,7 @@ ataques XSS~\cite{owasp_xss}.
 
 Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
 \texttt{id\_token} de Google, lo verifica y llama a un endpoint interno protegido
-(véase la sección \textbf{Seguridad transversal} \ref{subsec:seguridad_transversal}) para realizar el \textit{upsert} del
+(véase la sección \textbf{Seguridad transversal} \ref{subsec:seguridad_impl}) para realizar el \textit{upsert} del
 usuario. A continuación el servicio devuelve el JWT al gateway para su encapsulación
 en cookie.
 
@@ -601,7 +601,7 @@ Se ha optado por \textbf{LightGBM}~\cite{tandfonline_lightgbm} en régimen de
         estaciones representativas, LightGBM alcanzó un MAPE inferior al 2.3\% en todos los
         casos y superó a ARIMA y XGBoost en las series con mayor variabilidad, donde la
         incorporación de \textit{features} exógenas del Brent aporta mayor
-        capacidad predictiva~\cite{joiv_lightgbm}.
+        capacidad predictiva~\cite{hartanto2023lightgbm}.
 \end{enumerate}
 
 \begin{table}[H]
@@ -867,7 +867,7 @@ para un proyecto académico sin comprometer la disponibilidad.
 
 Cada microservicio dispone de su propio fichero \texttt{cloudbuild-*.yaml} que define un
 pipeline de \textbf{Cloud Build}~\cite{cloud_build2026} independiente. Los pipelines se
-activan automáticamente con cada \textit{push} a la rama \texttt{main} del repositorio.
+activan automáticamente con cada \textit{push} a la rama \texttt{master} del repositorio.
 El proceso consta de tres pasos: construcción de la imagen Docker, publicación en
 \textbf{Artifact Registry}~\cite{artifact_registry} (región \texttt{europe-west1}), y
 despliegue en Cloud Run con las variables de entorno inyectadas desde
@@ -1139,7 +1139,7 @@ completos.
 \label{sec:calidad-estatica}
 
 El repositorio está integrado con SonarCloud~\cite{sonarcloud}, que analiza
-automáticamente cada push a \texttt{master} sobre las 31\,000 líneas de código del proyecto.
+automáticamente cada push a \texttt{master} sobre las 32\,000 líneas de código del proyecto.
 La Figura~\ref{fig:sonarcloud} muestra el panel de resultados del análisis más reciente.
 
 \begin{figure}[H]
@@ -1149,7 +1149,7 @@ La Figura~\ref{fig:sonarcloud} muestra el panel de resultados del análisis más
     \label{fig:sonarcloud}
 \end{figure}
 
-Los resultados muestran una \textbf{duplicación del 2,4\,\%} sobre 39\,000 líneas
+Los resultados muestran una \textbf{duplicación del 2,4\,\%} sobre 32\,000 líneas
 analizadas, esto indica que hay una alta cohesión del código sin repetición estructural.
 Los \textbf{157 issues de mantenibilidad} (rating~A) corresponden mayoritariamente a
 \textit{code smells} menores  (nombres de variables, complejidad ciclomática puntual) propios
@@ -1299,9 +1299,9 @@ pública de la plataforma para comenzar a utilizarla.
 \subsubsection*{Acceso desde navegador}
 
 El acceso básico no requiere registro. Al abrir la URL de la plataforma, el usuario accede
-a pagina de bienvenida. Dispone arriba de un menu de navegación para poder acceder al resto de paginas.
+a la página de bienvenida. Dispone tambien arriba de un menú de navegación para poder acceder al resto de paginas.
 
-Para utilizar lasfuncionalidades avanzadas (predicción de precios, recomendación de ruta, asistente
+Para utilizar las funcionalidades avanzadas (predicción de precios, recomendación de ruta, asistente
 conversacional y gestión de favoritos) es necesario iniciar sesión.
 
 \begin{figure}[H]
@@ -1354,7 +1354,7 @@ sin necesidad de crear una cuenta.
 
 La vista principal muestra una lista de gasolineras ordenadas por proximidad a la ubicación del usuario,
 con información básica de cada estación (nombre, dirección, horario y precio del combustible).
-Ademas de la lista se complementa con un mapa interactivo con las gasolineras cercanas a la ubicación
+La lista se complementa además con un mapa interactivo de las gasolineras cercanas a la ubicación
 del usuario. Los marcadores pueden agruparse a niveles de zoom bajos mediante
 \textit{clustering} para evitar la saturación visual. Haciendo clic sobre un marcador o
 sobre una fila de la tabla lateral se accede al detalle de la estación: dirección, horario,
@@ -1516,11 +1516,9 @@ personalizar las respuestas.
 \label{sec:incidencias}
 % ═════════════════════════════════════════════
 
-Esta sección documenta los problemas técnicos más relevantes encontrados a lo largo del
-desarrollo de TankGo, las causas identificadas y las soluciones adoptadas. Lejos de ser
-una lista de fallos, las incidencias recogidas aquí reflejan el proceso de toma de
-decisiones técnicas ante situaciones no previstas en la planificación inicial y constituyen
-parte del aprendizaje más valioso del proyecto.
+Esta sección analiza los problemas técnicos más relevantes surgidos durante el desarrollo de TankGo, detallando sus causas 
+y las soluciones aplicadas. Más allá de un registro de errores, este apartado documenta cómo se adaptó la arquitectura del 
+proyecto ante imprevistos técnicos y los criterios seguidos para resolverlos.
 
 % ─────────────────────────────────────────────
 \subsection{Integración con servicios externos y APIs de terceros}
