@@ -1,6 +1,159 @@
-\chapter{Capítulo Noveno - Valoración Ética, Legal y de Protección de Datos}
+% ============================================================
+%  CAPÍTULO 9: VALORACIÓN ÉTICA DEL PROYECTO
+% ============================================================
 
-\section{7.1 Protección de datos (RGPD)}
-\section{7.2 Cumplimiento normativo}
-\section{7.3 Impacto social y medioambiental}
-\section{7.4 Consideraciones éticas del sistema}
+\chapter{Capítulo Noveno: Valoración Ética del Proyecto}
+\label{ch:etica}
+
+Este capítulo recoge la valoración ética de \textit{TankGo}, identificando las cuestiones
+éticas relevantes que plantea el proyecto, analizando las opciones disponibles y justificando
+las decisiones adoptadas a lo largo del desarrollo. Se abordan cuatro dimensiones principales:
+la privacidad y el tratamiento de los datos del usuario, la transparencia e interpretabilidad
+del módulo de predicción basado en aprendizaje automático, el impacto social del sistema y
+su alineación con los Objetivos de Desarrollo Sostenible (ODS) de las Naciones Unidas
+\cite{onu_ods_goals}, y los principios de ética profesional del ingeniero aplicados
+al proceso de desarrollo.
+
+% ------------------------------------------------------------
+\section{Privacidad y tratamiento de datos personales}
+\label{sec:etica-privacidad}
+
+\subsection{Identificación de la cuestión ética}
+
+\textit{TankGo} maneja datos con implicaciones directas para la privacidad de sus usuarios.
+La plataforma procesa: (i) la ubicación geográfica del usuario, necesaria para
+mostrar estaciones próximas y calcular rutas de repostaje, (ii) las estaciones marcadas como
+favoritas, que revelan patrones de movilidad y hábitos de consumo, y (iii) las consultas
+realizadas al asistente de voz, que pueden contener información contextual sobre desplazamientos
+y preferencias.
+
+La cuestión ética principal es la tensión entre la
+\textbf{utilidad de las funcionalidades personalizadas}, que requieren cierto grado de
+persistencia o procesamiento de datos, y el \textbf{derecho a la privacidad} del usuario,
+entendido como principio deontológico irrenunciable en el diseño de sistemas de información.
+
+\subsection{Análisis de opciones}
+
+Se han considerado dos aproximaciones principales para el tratamiento de estos datos:
+
+\begin{itemize}
+    \item \textbf{Opción A — Perfilado amplio:} almacenar el historial completo de consultas,
+          ubicaciones y rutas para mejorar la personalización y las predicciones del modelo
+          de \textit{machine learning}. Esta opción maximiza la utilidad funcional, pero compromete
+          la privacidad, incrementa la superficie de ataque ante posibles vulnerabilidades y puede
+          generar desconfianza en el usuario.
+
+    \item \textbf{Opción B — Minimización de datos:} recopilar únicamente los datos
+          estrictamente necesarios para cada funcionalidad concreta. La ubicación se procesa
+          en tiempo real sin almacenamiento persistente más allá de la sesión, las predicciones
+          de precio se calculan exclusivamente para las estaciones marcadas como favoritas por
+          el usuario, de forma voluntaria y explícita.
+\end{itemize}
+
+\subsection{Decisión adoptada y justificación}
+
+Se ha optado por la \textbf{Opción B}, basada en el principio de minimización de datos
+(\textit{data minimisation}), coherente con el Reglamento General de Protección de
+Datos (RGPD) \cite{rgpd2016}. Esta decisión no se deriva de un dilema de difícil
+resolución, sino de la aplicación del principio de que \textbf{la privacidad prima por
+defecto} cuando existe incertidumbre sobre la necesidad real de un dato. Desde el
+principio de \textit{privacy by design} \cite{rgpd2016}, el sistema se ha diseñado para
+no acumular datos que no sean imprescindibles para la funcionalidad ofrecida.
+
+En la práctica, esto implica que las predicciones de LightGBM se generan y almacenan
+únicamente para estaciones favoritas, reduciendo también el coste computacional, que
+la geolocalización se solicita de forma explícita al usuario en cada sesión, y que el
+asistente de voz no registra el historial de conversaciones más allá del contexto inmediato
+de la consulta en curso.
+
+% ------------------------------------------------------------
+\section{Transparencia e interpretabilidad del modelo predictivo}
+\label{sec:etica-ia}
+
+\subsection{Identificación de la cuestión ética}
+
+\textit{TankGo} incorpora un módulo de predicción de precios de carburante basado en
+LightGBM con regresión por cuantiles. Este tipo de sistema plantea una cuestión ética
+relacionada con la \textbf{confianza del usuario en las predicciones}: si el usuario
+interpreta una predicción como un dato certero en lugar de como una estimación probabilística,
+podría tomar decisiones de repostaje basadas en información que no tiene garantía de exactitud.
+
+\subsection{Análisis de opciones}
+
+\begin{itemize}
+    \item \textbf{Opción A — Presentar las predicciones como valores exactos:} simplifica
+          la interfaz, pero induce al usuario a sobrevalorar la fiabilidad del modelo.
+
+    \item \textbf{Opción B — Comunicar explícitamente la naturaleza probabilística de las
+              predicciones:} señalizar visualmente que se trata de estimaciones sujetas a incertidumbre,
+          diferenciando los datos oficiales del MITECO \cite{datosgob_carburantes} de las
+          predicciones generadas por el modelo.
+\end{itemize}
+
+\subsection{Decisión adoptada y justificación}
+
+Se ha optado por la \textbf{Opción B}, con arreglo al principio de \textbf{autonomía
+del usuario}: para que una decisión sea autónoma, el usuario debe contar con información
+veraz sobre la naturaleza de los datos que se le presentan. La interfaz diferencia
+visualmente los precios actuales, obtenidos en tiempo real de la fuente oficial, de las
+predicciones del modelo, que se presentan con indicadores de incertidumbre derivados de
+la estimación por cuantiles. Esta práctica está alineada con las recomendaciones de la
+\textit{Trustworthy AI} propuesta por la Comisión Europea \cite{ec2019trustworthyai},
+que incluye la transparencia como uno de los siete requisitos fundamentales que todo
+sistema de IA debe satisfacer para considerarse digno de confianza.
+
+% ------------------------------------------------------------
+\section{Impacto social y alineación con los ODS}
+\label{sec:etica-ods}
+
+\textit{TankGo} nace con una vocación de utilidad social: facilitar al ciudadano
+la comparación de precios de carburante y la localización de puntos de recarga eléctrica,
+contribuyendo a una movilidad más informada y económicamente más justa.
+
+Desde la perspectiva del impacto social, se identifica un riesgo menor aunque digno de
+mención: la plataforma beneficia principalmente a usuarios con acceso a un dispositivo
+móvil o navegador web y con vehículo propio, lo que podría suponer una brecha de
+accesibilidad respecto a colectivos sin recursos tecnológicos o sin vehículo privado.
+Sin embargo, dado que el servicio se ofrece de forma gratuita y accesible sin registro
+obligatorio, se mitiga parcialmente esta asimetría.
+
+% ------------------------------------------------------------
+\section{Principios de ética profesional del ingeniero}
+\label{sec:etica-profesional}
+
+El desarrollo de \textit{TankGo} se ha guiado por tres principios fundamentales de la
+ética profesional en ingeniería:
+
+\textbf{Principio de beneficencia.} El sistema persigue un beneficio tangible para el
+usuario final: reducir la brecha informativa del mercado de los carburantes,
+permitiéndole tomar decisiones de repostaje más ventajosas. Asimismo, el fomento de
+la movilidad eléctrica contribuye al bien común en términos medioambientales.
+
+\textbf{Principio de autonomía.} La plataforma respeta y potencia la capacidad de
+decisión del usuario. No se imponen recomendaciones, sino que se provee información
+contrastada y herramientas de análisis (comparativa de precios, predicciones
+etiquetadas como tales, recomendaciones de ruta explicadas) para que el usuario
+tome sus propias decisiones de forma informada. Las funcionalidades personalizadas
+(favoritos, predicciones específicas) son siempre de carácter voluntario y activadas
+explícitamente por el usuario.
+
+\textbf{Principio de justicia.} Los datos de precios utilizados proceden de fuentes
+oficiales del Ministerio para la Transición Ecológica y el Reto Demográfico
+\cite{datosgob_carburantes}, garantizando la objetividad e imparcialidad de la
+información presentada. No se introducen mecanismos de promoción de estaciones
+concretas ni se acepta ningún tipo de patrocinio que pudiera sesgar los resultados
+mostrados al usuario.
+
+% ------------------------------------------------------------
+\section{Síntesis de la valoración ética}
+\label{sec:etica-sintesis}
+
+Las principales cuestiones éticas identificadas en \textit{TankGo} se articulan en torno
+a la privacidad de los datos de movilidad del usuario, la transparencia en la comunicación
+de las predicciones generadas por el modelo de aprendizaje automático, y el impacto social
+de una herramienta orientada a democratizar el acceso a información sobre precios energéticos.
+En todos los casos, las decisiones de diseño adoptadas priorizan la protección del usuario
+frente a la maximización funcional, la transparencia frente a la opacidad algorítmica,
+y el beneficio colectivo frente al interés particular. El proyecto contribuye
+a una movilidad más sostenible, informada y económicamente
+equitativa.

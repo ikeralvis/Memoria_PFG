@@ -116,7 +116,7 @@ de identidad y autenticación. Fastify soporta además comunicación mediante
 bidireccional de baja latencia definido en el RFC~6455~\cite{rfc6455_websocket}
 que posibilita flujos de datos en tiempo real sin el coste de \textit{polling}
 repetitivo. En TankGo el \texttt{voice-assistant-service} implementa un endpoint
-WebSocket (\texttt{/ws/voice}) para \textit{streaming} de audio; las
+WebSocket (\texttt{/ws/voice}) para \textit{streaming} de audio, las
 consideraciones sobre su comportamiento en el entorno de despliegue se recogen
 en el Capítulo~8.
 
@@ -170,31 +170,30 @@ reduciendo copias y acelerando operaciones de I/O en pipelines de datos.
 El módulo de predicción utiliza \textbf{LightGBM} (licencia MIT) \cite{lightgbm}
 en modo de regresión cuantílica (percentiles 0{,}05, 0{,}50 y 0{,}95). Para
 contextualizar esta elección conviene describir brevemente los enfoques
-alternativos evaluados. Los modelos \textbf{ARIMA} (\textit{AutoRegressive
-Integrated Moving Average}) son métodos clásicos de series temporales univariantes
-que modelan la autocorrelación y la tendencia mediante diferenciación, pero
-asumen linealidad y requieren estacionariedad, lo que limita su capacidad para
-capturar relaciones no lineales entre variables exógenas como el precio del
-crudo~\cite{LAHMIRI2024105008}. Las redes \textbf{LSTM} (\textit{Long Short-Term
-Memory}) son redes neuronales recurrentes diseñadas para aprender dependencias
-a largo plazo en secuencias temporales~\cite{8945584}; su rendimiento es
-competitivo pero exigen normalización cuidadosa, ajuste extensivo de
-hiperparámetros y tiempos de entrenamiento elevados, incompatibles con la
-ejecución semanal en un entorno serverless con recursos limitados.
+alternativos evaluados. Los modelos \textbf{ARIMA} (\textit{AutoRegressive Integrated Moving Average}) son
+métodos clásicos de series temporales univariantes que modelan la autocorrelación
+y la tendencia mediante diferenciación, pero asumen linealidad y requieren
+estacionariedad, lo que limita su capacidad para capturar relaciones no lineales
+entre variables exógenas como el precio del crudo~\cite{hyndman2018forecasting}.
+Las redes \textbf{LSTM} (\textit{Long Short-Term Memory}) son redes neuronales
+recurrentes diseñadas para aprender dependencias a largo plazo en secuencias
+temporales~\cite{8945584}, su rendimiento es competitivo pero exigen normalización
+cuidadosa, ajuste extensivo de hiperparámetros y tiempos de entrenamiento elevados,
+incompatibles con la ejecución semanal en un entorno serverless con recursos
+limitados.
 
 Los modelos de \textit{gradient boosting} como LightGBM ofrecen un rendimiento
-superior en tablas de series temporales con \textit{features} derivadas y variables
-exógenas~\cite{LAHMIRI2024105008}, y producen directamente intervalos de confianza
-sin asumir distribuciones sobre los errores mediante regresión
-cuantílica~\cite{s24124013}. Su bajo coste de entrenamiento es compatible con la
-ejecución semanal del \textit{job} en Cloud Run.
+superior en series temporales con \textit{features} derivadas y variables
+exógenas~\cite{hartanto2023lightgbm,LAHMIRI2024105008}, y producen intervalos de
+confianza sin asumir distribuciones sobre los errores mediante regresión
+cuantílica~\cite{s24124013}.
 
 % ---------------------------------------------------------
 \section{Capa de enrutamiento geoespacial: OpenRouteService}
 % ---------------------------------------------------------
 
 Para el cálculo de trayectos y matrices de distancias se integra
-\textbf{OpenRouteService} (ORS) (código abierto; licencias principales GPLv3/LGPL-3.0 según componente) \cite{gisops_routing_overview}, plataforma de
+\textbf{OpenRouteService} (ORS) (código abierto, licencias principales GPLv3/LGPL-3.0 según componente) \cite{gisops_routing_overview}, plataforma de
 enrutamiento de código abierto con API REST gestionada. OSRM \cite{osm_wiki_routers},
 aunque más rápido en tiempo de respuesta, requiere un servidor propio con requisitos
 de RAM elevados para el grafo viario español, lo que resulta inviable en Cloud Run.
@@ -280,25 +279,26 @@ evaluadas.
     \caption{Resumen del stack tecnológico de TankGo}
     \label{tab:stack_tecnologico}
     \small
-    \begin{tabular}{lllll}
+    % Definimos que ocupe exactamente el ancho del texto de la página
+    \begin{tabularx}{\textwidth}{llXXX}
         \toprule
-        \textbf{Tecnología}    & \textbf{Capa}       & \textbf{Alternativas evaluadas}  & \textbf{Criterio de elección} & \textbf{Licencia} \\
+        \textbf{Tecnología} & \textbf{Capa} & \textbf{Alternativas evaluadas} & \textbf{Criterio de elección} & \textbf{Licencia} \\
         \midrule
-        React 19               & Frontend            & Vue.js, Angular                  & Ecosistema Leaflet, adopción    & MIT \\
-        Leaflet.js             & Frontend            & Google Maps, Mapbox              & Licencia abierta, sin coste     & BSD-2-Clause \\
-        Hono 4.10              & Gateway             & Express.js, Fastify              & Rendimiento async, WS nativo    & MIT \\
-        FastAPI 0.115          & Backend Python      & Flask, Django                    & ASGI, OpenAPI automático        & MIT \\
-        Fastify 5.7            & Backend Node.js     & Express.js, NestJS               & JWT/cookie ecosystem            & MIT \\
-        PostgreSQL / Neon      & Datos               & MySQL, MongoDB                   & PostGIS, serverless, ACID       & PostgreSQL License \\
-        Apache Parquet         & ML pipeline         & CSV, JSON, Avro                  & Columnar, compresión, Python    & Apache-2.0 \\
-        LightGBM 4.3           & ML modelo           & XGBoost, ARIMA, LSTM             & Velocidad, quantile regression  & MIT \\
-        ORS (OpenRouteService) & Ruteo               & OSRM, Google Directions          & API REST gestionada, Matrix     & GPLv3 / LGPL-3.0 \\
-        OpenStreetMap          & Cartografía         & Google Maps, Mapbox              & Datos libres, sin coste API     & ODbL (datos) \\
-        Nominatim              & Geocodificación     & Google Geocoding                 & Gratuito, integrado con OSM     & GPLv3 (código); Apache-2.0 (algunos ficheros) \\
-        Gemini 2.5 Flash       & IA / Voz            & GPT-4o + Whisper, Gemini Pro     & Multimodal, latencia baja       & Servicio propietario (Google) \\
-        Google Cloud Run       & Despliegue          & AWS Lambda, Azure Container      & Escala a cero, integración GCP  & Servicio propietario (Google) \\
+        React 19 & Frontend & Vue.js, Angular & Ecosistema Leaflet, adopción & MIT \\
+        Leaflet.js & Frontend & Google Maps, Mapbox & Licencia abierta, sin coste & BSD-2-Clause \\
+        Hono 4.10 & Gateway & Express.js, Fastify & Rendimiento async, WS nativo & MIT \\
+        FastAPI 0.115 & Backend Python & Flask, Django & ASGI, OpenAPI automático & MIT \\
+        Fastify 5.7 & Backend Node.js & Express.js, NestJS & JWT/cookie ecosystem & MIT \\
+        PostgreSQL / Neon & Datos & MySQL, MongoDB & PostGIS, serverless, ACID & PostgreSQL License \\
+        Apache Parquet & ML pipeline & CSV, JSON, Avro & Columnar, compresión, Python & Apache-2.0 \\
+        LightGBM 4.3 & ML modelo & XGBoost, ARIMA, LSTM & Velocidad, quantile regression & MIT \\
+        ORS (OpenRouteService) & Ruteo & OSRM, Google Directions & API REST gestionada, Matrix & GPLv3 / LGPL-3.0 \\
+        OpenStreetMap & Cartografía & Google Maps, Mapbox & Datos libres, sin coste API & ODbL (datos) \\
+        Nominatim & Geocodificación & Google Geocoding & Gratuito, integrado con OSM & GPLv3 (código) - Apache-2.0 (algunos ficheros) \\
+        Gemini 2.5 Flash & IA / Voz & GPT-4o + Whisper, Gemini Pro & Multimodal, latencia baja & Servicio propietario (Google) \\
+        Google Cloud Run & Despliegue & AWS Lambda, Azure Container & Escala a cero, integración GCP & Servicio propietario (Google) \\
         \bottomrule
-    \end{tabular}
+    \end{tabularx}
 \end{table}
 
 El conjunto de tecnologías de código abierto elegidas comparte un denominador

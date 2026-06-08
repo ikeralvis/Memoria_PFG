@@ -106,10 +106,11 @@ El sistema opera bajo tres restricciones principales. En primer lugar, existe un
 pública del Ministerio para la Transición Ecológica~\cite{datosgob_carburantes}, cuya
 disponibilidad y frecuencia de actualización están fuera del control del sistema. En segundo
 lugar, las funciones de consulta, predicción y recomendación requieren \textbf{conectividad
-  activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
+activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
 \textbf{asistente conversacional} está diseñado para responder consultas puntuales, no para
 mantener diálogos extendidos mientras se conduce, en línea con las directrices de seguridad
-vial aplicables. El sistema de recomendacion de rutas tambien añade una dependecia esta fuera del control del sistema, ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
+vial aplicables. El sistema de recomendacion de rutas tambien añade una dependecia que esta fuera del control del sistema, 
+ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
 
 % ═════════════════════════════════════════════
 \section{Diseño del Sistema}
@@ -142,7 +143,7 @@ necesidades.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{imgs/arquitectura_tankgo.png}
+  \includegraphics[width=0.7\textwidth]{imgs/arquitectura_tankgo.png}
   \caption{Diagrama de arquitectura general del sistema}
   \label{fig:arquitectura}
 \end{figure}
@@ -151,10 +152,10 @@ necesidades.
 Desde el punto de vista \textbf{lógico}, el sistema se estructura en torno a cinco
 entidades de dominio principales: \textit{Estación de servicio}, \textit{Precio},
 \textit{Usuario}, \textit{Favorito} y \textit{Predicción}. Las estaciones concentran la
-información geolocalizada de cada gasolinera o electrolinera; los precios registran tanto
-el valor actual como el histórico asociado a cada estación y tipo de combustible; los
-usuarios encapsulan la identidad y preferencias de cada cuenta; los favoritos modelan la
-relación entre usuario y estación; y las predicciones almacenan las estimaciones generadas
+información geolocalizada de cada gasolinera o electrolinera, los precios registran tanto
+el valor actual como el histórico asociado a cada estación y tipo de combustible, los
+usuarios encapsulan la identidad y preferencias de cada cuenta, los favoritos modelan la
+relación entre usuario y estación, y las predicciones almacenan las estimaciones generadas
 por el modelo de machine learning para su consulta posterior.
 
 Desde el punto de vista \textbf{físico}, cada microservicio se ejecuta de forma
@@ -196,8 +197,8 @@ permitiendo que cada usuario registre sus gasolineras favoritas. Referencia medi
 claves foráneas tanto a \texttt{users.id} como a \texttt{gasolineras.ideess}.
 
 Las dependencias entre tablas son las siguientes: \texttt{precios\_historicos} y
-\texttt{user\_favorites} referencian \texttt{gasolineras} a través de \texttt{ideess};
-\texttt{prediction\_forecasts} referencia igualmente a \texttt{gasolineras}; y
+\texttt{user\_favorites} referencian \texttt{gasolineras} a través de \texttt{ideess},
+\texttt{prediction\_forecasts} referencia a \texttt{gasolineras} y
 \texttt{user\_favorites} referencia a \texttt{users} mediante \texttt{user\_id}. El
 diagrama entidad-relación de la figura~\ref{fig:er} ilustra estas relaciones.
 
@@ -215,7 +216,7 @@ diagrama entidad-relación de la figura~\ref{fig:er} ilustra estas relaciones.
 
 Se han elaborado dos diagramas de casos de uso para estructurar las
 interacciones entre actores y funcionalidades del sistema. El primero recoge
-el acceso a la plataforma y la gestión de usuario; el segundo cubre las
+el acceso a la plataforma y la gestión de usuario, el segundo cubre las
 funcionalidades avanzadas y diferenciadas de TankGo.
 
 % · · · · · · · · · · · · · · · · · · · · · ·
@@ -243,7 +244,7 @@ marcadas como favoritas por el usuario.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.5\textwidth]{imgs/casos-uso-1.png}
+  \includegraphics[width=0.4\textwidth]{imgs/casos-uso-1.png}
   \caption{Diagrama de casos de uso — acceso y gestión de usuario}
   \label{fig:casos_uso_1}
 \end{figure}
@@ -253,10 +254,10 @@ marcadas como favoritas por el usuario.
 \label{subsubsec:casos_uso_avanzado}
 % · · · · · · · · · · · · · · · · · · · · · ·
 
-El segundo diagrama recoge las funcionalidades diferenciadas de TankGo
+El segundo diagrama recoge las funcionalidades de TankGo
 respecto a un comparador de precios convencional. El \textit{usuario
 registrado} puede solicitar una recomendación de parada de repostaje para
-una ruta origen-destino; esta acción incluye obligatoriamente el cálculo
+una ruta origen-destino, esta acción incluye el cálculo
 de la ruta y los desvíos mediante OpenRouteService, actor externo situado
 en el lado receptor del diagrama. El caso de uso \textit{Filtrar por tipo
 de combustible} extiende la recomendación de ruta, ya que únicamente se
@@ -295,13 +296,13 @@ El diagrama de la figura~\ref{fig:secuencia_consulta} ilustra dos flujos
 complementarios. En segundo plano, Cloud Scheduler lanza diariamente a
 las 06:00 una petición al endpoint
 \texttt{/gasolineras/daily-sync-export}, protegido mediante la cabecera
-\texttt{X-Internal-Secret}; el servicio descarga el listado actualizado
+\texttt{X-Internal-Secret}, el servicio descarga el listado actualizado
 desde la API del Ministerio de Industria (MITECO), persiste los datos en
 PostgreSQL y exporta un \textit{snapshot} en formato Parquet a Cloud
 Storage para el pipeline de predicción. En el flujo síncrono, el usuario
 activa la geolocalización y el frontend envía la petición al API Gateway,
 que verifica el token JWT si está presente y la reenvía al servicio de
-gasolineras; este ejecuta una consulta geoespacial con PostGIS
+gasolineras, este ejecuta una consulta geoespacial con PostGIS
 (\texttt{ST\_DWithin}) y devuelve el listado de estaciones con precios
 actuales para su renderizado en mapa y tabla.
 
@@ -322,10 +323,10 @@ El diagrama de la figura~\ref{fig:secuencia_ruta} detalla el flujo de
 recomendación de parada de repostaje para una ruta origen-destino. El
 servicio de recomendación orquesta el proceso en tres fases: primero
 consulta OpenRouteService para obtener el trazado GeoJSON de la ruta
-principal; a continuación genera un corredor geométrico alrededor de
+principal. Luego genera un corredor geométrico alrededor de
 dicha traza mediante Shapely, recupera el catálogo completo de gasolineras
-desde el servicio homónimo y filtra las candidatas que quedan dentro del
-corredor; finalmente, invoca la Matrix API de OpenRouteService para
+desde el servicio y filtra las candidatas que quedan dentro del
+corredor. Finalmente, invoca la Matrix API de OpenRouteService para
 calcular los desvíos reales de cada candidata, aplica una función de
 puntuación ponderada por precio y desvío y devuelve al frontend las
 \textit{top-n} estaciones recomendadas con su ahorro estimado.
@@ -356,7 +357,7 @@ diseño arquitectónico.
 El repositorio sigue una estructura de monorepo, cada microservicio reside en su propio
 directorio raíz y tiene su propio \texttt{Dockerfile}, su fichero de dependencias y su
 conjunto de pruebas. Esta organización permite iterar sobre un servicio sin alterar el
-resto y facilita la asignación de un pipeline de CI/CD independiente a cada componente.
+resto y facilita la asignación de un pipeline de CI/CD independiente a cada componente \cite{newman2021building}.
 
 Los directorios principales son \texttt{gateway-hono}, \texttt{gasolineras-service},
 \texttt{usuarios-service}, \\
@@ -452,7 +453,7 @@ ataques XSS~\cite{owasp_xss}.
 
 Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
 \texttt{id\_token} de Google, lo verifica y llama a un endpoint interno protegido
-(véase la sección \textbf{Seguridad transversal}) para realizar el \textit{upsert} del
+(véase la sección \textbf{Seguridad transversal} \ref{subsec:seguridad_transversal}) para realizar el \textit{upsert} del
 usuario. A continuación el servicio devuelve el JWT al gateway para su encapsulación
 en cookie.
 
@@ -468,7 +469,7 @@ instancia PostgreSQL de Neon en el primer despliegue. Esta aproximación es adec
 producción con varios despliegues y equipos conviene usar un gestor de migraciones formal para controlar la evolución del esquema.
 
 Herramientas como Flyway o Liquibase permiten versionar y aplicar los cambios de forma reproducible. Flyway se basa en scripts SQL
-ordenados por versión, lo que facilita su integración en pipelines CI/CD; Liquibase añade además formatos declarativos (XML/JSON/YAML)
+ordenados por versión, lo que facilita su integración en pipelines CI/CD. Liquibase añade además formatos declarativos (XML/JSON/YAML)
 y funciones avanzadas de rollback y auditoría. En proyectos con múltiples entornos estas soluciones reducen el riesgo de desincronización
 del esquema y permiten desplegar cambios de forma trazable y segura~\cite{flyway,liquibase}.
 
@@ -553,7 +554,7 @@ de $0.6$ y $0.4$ respectivamente, priorizando el precio sobre el desvío.
 
 \subsubsection*{Configuración de la petición}
 
-El endpoint \texttt{POST /api/recomendacion/ruta} acepta los parámetros
+El endpoint \texttt{POST~/api/recomendacion/ruta} acepta los parámetros
 \texttt{max\_desvio\_km} y \texttt{max\_desvio\_min} para acotar el espacio de búsqueda,
 \texttt{peso\_precio} y \texttt{peso\_desvio} para personalizar la función de
 \textit{scoring}, el tipo de combustible del vehículo para filtrar estaciones que
@@ -584,10 +585,10 @@ críticas para este sistema: requieren un modelo independiente por cada par
 directa, impidiendo aprovechar la correlación con el precio del crudo Brent. Las redes
 \textbf{LSTM} permiten modelar dependencias temporales largas, pero requieren volúmenes
 de datos superiores a los disponibles por estación, normalización de las entradas y un
-ajuste de hiperparámetros costoso; además, su tiempo de entrenamiento es incompatible con
+ajuste de hiperparámetros costoso, además, su tiempo de entrenamiento es incompatible con
 la ejecución semanal en un entorno serverless con recursos limitados~\cite{hartanto2023lightgbm}.
 
-Se optó por \textbf{LightGBM}~\cite{tandfonline_lightgbm} en régimen de
+Se ha optado por \textbf{LightGBM}~\cite{tandfonline_lightgbm} en régimen de
 \textbf{regresión cuantílica} por tres razones:
 
 \begin{enumerate}
@@ -655,11 +656,11 @@ medio registrado. A partir de ella se generan cuatro grupos de \textit{features}
 
 Como variable exógena se incorpora el precio del crudo \textbf{Brent}, obtenido a través
 de la API pública de la Reserva Federal de St.\ Louis
-(\texttt{FRED:~DCOILBRENTEU})~\cite{LAHMIRI2024105008}. En caso de que esta fuente no
+(\texttt{FRED:~DCOILBRENTEU}) \cite{fred2026brent}. En caso de que esta fuente no
 esté disponible, el servicio recurre a \textbf{yfinance} como fuente alternativa. Los
 \textit{lags} del Brent se añaden al vector de \textit{features} aprovechando la
 correlación conocida entre el precio del crudo en mercados internacionales y los precios
-en surtidor.
+en surtidor \cite{galeotti2003rockets}.
 
 \begin{figure}[H]
   \centering
@@ -676,11 +677,11 @@ en surtidor.
 El pipeline se ejecuta semanalmente mediante un \textbf{Cloud Run Job} disparado por
 \textbf{Cloud Scheduler} cada lunes a las 06:00~UTC. En cada ejecución el job realiza los
 siguientes pasos: descarga los snapshots Parquet de los últimos 180 días desde Google
-Cloud Storage; valida que los datos sean frescos según el umbral \texttt{RAW\_MAX\_AGE\_HOURS};
-construye el vector de \textit{features} para cada par (estación, combustible); entrena
-tres modelos LightGBM independientes para los cuantiles 0.05, 0.50 y 0.95; genera las
+Cloud Storage, valida que los datos sean frescos según el umbral \texttt{RAW\_MAX\_AGE\_HOURS},
+construye el vector de \textit{features} para cada par (estación, combustible), entrena
+tres modelos LightGBM independientes para los cuantiles 0.05, 0.50 y 0.95, genera las
 predicciones de los 7 días siguientes de forma secuencial, de forma que cada día
-predicho alimenta los \textit{lags} de los días posteriores; y persiste los resultados en
+predicho alimenta los \textit{lags} de los días posteriores y persiste los resultados en
 la tabla \texttt{prediction\_forecasts} de PostgreSQL con los campos \texttt{precio\_predicho},
 \texttt{margen\_min} y \texttt{margen\_max}.
 
@@ -707,7 +708,7 @@ en entornos de desarrollo o pruebas sin dependencia del servicio de usuarios.
   \includegraphics[width=0.85\textwidth]{imgs/prediccion_ejemplo_estacion.png}
   \caption{Predicción a 7 días con banda de confianza (cuantiles 0.05--0.95) para la
     estación 15158 (Gasolina 95~E5). La línea naranja representa la mediana
-    predicha; el área sombreada, el intervalo de incertidumbre.}
+    predicha y el área sombreada es el intervalo de incertidumbre.}
   \label{fig:prediccion_ejemplo}
 \end{figure}
 
@@ -718,7 +719,7 @@ pipeline de entrenamiento, sino que expone el endpoint
 \texttt{GET /api/prediction/station/\{ideess\}} que lee directamente de la tabla
 \texttt{prediction\_forecasts}. El entrenamiento y la escritura en base de datos son
 responsabilidad exclusiva del Cloud Run Job periódico, separando los roles de escritura y
-lectura y permitiendo que el servicio de predicción en modo API tenga tiempos de respuesta
+lectura, permitiendo que el servicio de predicción en modo API tenga tiempos de respuesta
 mínimos al no ejecutar ningún cómputo intensivo durante la petición.
 
 \begin{figure}[H]
@@ -726,11 +727,21 @@ mínimos al no ejecutar ningún cómputo intensivo durante la petición.
   % GRÁFICA 4: Importancia de features del modelo LightGBM (feature importance).
   % Gráfico de barras horizontales con las 10-15 features más importantes.
   % Nombrar: prediccion_feature_importance.png
-  %\includegraphics[width=0.80\textwidth]{imgs/prediccion_feature_importance.png}
+  \includegraphics[width=0.80\textwidth]{imgs/prediccion_feature_importance.png}
   \caption{Importancia de \textit{features} del modelo LightGBM (cuantil 0.50)}
   \label{fig:feature_importance}
 \end{figure}
 
+El gráfico revela que el \textit{feature} más determinante es \texttt{lag\_1}, es decir,
+el precio registrado el día anterior, lo que confirma la alta autocorrelación de la serie:
+el precio de mañana se explica en gran medida por el precio de hoy. El segundo grupo en
+importancia lo forman los estadísticos de ventana (\texttt{roll\_mean\_14},
+\texttt{roll\_mean\_30}, \texttt{roll\_std\_7}), que capturan la tendencia y la
+volatilidad recientes. El \texttt{dia\_mes} aparece en tercera posición, reflejando el
+efecto calendario asociado a los ciclos de ajuste de impuestos especiales. Finalmente,
+los \textit{features} del Brent (\texttt{lag\_brent\_7}, \texttt{diff\_brent\_7},
+\texttt{brent}) contribuyen de forma secundaria pero consistente, validando la decisión
+de incorporar el precio del crudo como variable exógena.
 
 % ─────────────────────────────────────────────
 \subsection{Asistente conversacional de voz}
@@ -750,7 +761,7 @@ API de Gemini. En la etapa de \textbf{reconocimiento de voz} (\textit{Speech-to-
 si la petición incluye audio en base64, el servicio invoca \texttt{generateContent} con
 el modelo configurado para transcribir el audio a texto. En la etapa de \textbf{razonamiento}
 (\textit{LLM con function calling}), se realiza una primera llamada con las declaraciones
-de las funciones disponibles (\texttt{get\_prices} y \texttt{get\_nearest\_stations}); si
+de las funciones disponibles (\texttt{get\_prices} y \texttt{get\_nearest\_stations}), si
 el modelo solicita ejecutar alguna de ellas, el servicio las invoca localmente contra el
 API Gateway y realiza una segunda llamada con los resultados, obteniendo así la respuesta
 final fundamentada en datos reales. En la etapa de \textbf{síntesis de voz}
@@ -766,10 +777,10 @@ mayor control sobre cada etapa y facilita el manejo de errores y los fallbacks p
 Dado que el asistente está diseñado para un dominio muy específico, se implementan varios
 mecanismos para evitar un uso fuera de ámbito. Un \textbf{comprobador de alcance}
 (\textit{scope guard}) basado en palabras clave evalúa la transcripción antes de invocar
-el LLM; si la consulta no contiene términos relacionados con combustible, gasolineras,
+el LLM, si la consulta no contiene términos relacionados con combustible, gasolineras,
 precios o navegación, y la variable \texttt{VOICE\_GUARDRAILS\_ENABLED} está activa, el
 servicio devuelve una respuesta predefinida sin consumir tokens del modelo. El modo
-\texttt{strict} rechaza directamente la petición; el modo \texttt{soft} permite continuar
+\texttt{strict} rechaza directamente la petición, mientras que el modo \texttt{soft} permite continuar
 con una advertencia al modelo.
 
 Adicionalmente, el \textbf{system prompt} construido por \texttt{buildSystemInstruction}
@@ -780,7 +791,7 @@ LLM nunca interactúa directamente con el gateway, sino que proporciona los par�
 la llamada y espera los resultados.
 
 Otros controles operativos incluyen límites de tamaño de payload
-(\texttt{VOICE\_MAX\_TEXT\_CHARS}, \texttt{VOICE\_MAX\_AUDIO\_BASE64\_CHARS}), timeouts
+(\texttt{VOICE\_MAX\_TEXT\_CHARS}, \\ \texttt{VOICE\_MAX\_AUDIO\_BASE64\_CHARS}), timeouts
 por llamada a Gemini con \texttt{AbortController}, y rate limiting por IP para el
 transporte WebSocket. Como limitación conocida, el rate limiter no se aplica actualmente
 al endpoint HTTP \texttt{/voice/dialog}, aspecto identificado para una iteración futura.
@@ -922,12 +933,348 @@ de información sensible y aplicación coherente de límites de tasa y reglas de
 (Cloudflare / reglas del gateway). Estas comprobaciones reducen la superficie de ataque
 y facilitan la auditoría de seguridad.
 
+% ============================================================
+%  §8.4  Plan de Pruebas
+% ============================================================
 \section{Plan de Pruebas}
-\subsection{Estrategia}
-\subsection{Pruebas unitarias}
-\subsection{Pruebas de integración}
-\subsection{Pruebas funcionales}
-\subsection{Resultados obtenidos}
+\label{sec:plan-pruebas}
+
+La estrategia de pruebas de TankGo prioriza la verificación de la lógica de negocio crítica y
+la integración entre componentes, dentro de las restricciones temporales propias de un proyecto
+académico individual. Se ha adoptado un enfoque \textit{test-last}: las pruebas se escriben
+una vez estabilizada la implementación, lo que resulta más adecuado cuando los requisitos
+evolucionan durante el desarrollo~\cite{sommerville2011}. La ejecución se delega íntegramente a pipelines 
+de integración continua en GitHub
+Actions~\cite{github_actions}, de modo que los resultados son reproducibles y auditables
+sin depender del entorno local de desarrollo.
+
+La cobertura se mide únicamente sobre lógica de negocio, excluyendo código de infraestructura
+(conexiones a base de datos, configuración de arranque) mediante ficheros \texttt{.coveragerc}.
+Esto evita inflar artificialmente el porcentaje con código trivial y refleja con mayor fidelidad
+la calidad real de las pruebas.
+
+% ------------------------------------------------------------
+\subsection{Pruebas unitarias — servicios Python}
+\label{sec:pruebas-unitarias-python}
+
+Los servicios \texttt{gasolineras-service} y \texttt{recomendacion-service}, implementados con
+FastAPI~\cite{fastapi}, se verifican mediante pytest con el plugin \texttt{pytest-cov}~\cite{pytest_cov}
+para medir cobertura. Las pruebas son unitarias puras: no requieren base de datos ni servicios
+externos, lo que permite ejecutarlas en cualquier runner de CI sin configuración adicional.
+El workflow \texttt{test-unit.yml} se dispara en cada push y pull request a \texttt{master}.
+
+\subsubsection{gasolineras-service}
+
+Las pruebas cubren tres módulos de lógica de negocio:
+
+\begin{itemize}
+    \item \textbf{Modelos Pydantic}~\cite{pydantic} (\texttt{test\_models.py}): se verifica que
+    el modelo \texttt{Gasolinera} rechaza payloads sin el campo \texttt{IDEESS} y acepta
+    precios \texttt{None} para estaciones sin actualización reciente.
+
+    \item \textbf{Parser del Ministerio} (\texttt{test\_sync\_parser.py}): se comprueba el
+    correcto funcionamiento de \texttt{parse\_horario}, \texttt{\_expand\_dias} y
+    \texttt{parse\_float} frente a entradas válidas, vacías y mal formadas.
+
+    \item \textbf{Fetch de la API del Gobierno} (\texttt{test\_fetch\_gobierno.py}): se valida
+    el parseo completo de la respuesta de la API del Ministerio de Industria~\cite{datosgob_carburantes},
+    incluyendo la gestión de campos ausentes o con formato incorrecto.
+\end{itemize}
+
+La cobertura obtenida sobre lógica de negocio alcanza el \textbf{96,8\,\%} (180/186 sentencias),
+tal como se detalla en la Tabla~\ref{tab:coverage-gasolineras}.
+
+\begin{table}[H]
+\centering
+\caption{Cobertura de pruebas unitarias — \texttt{gasolineras-service}}
+\label{tab:coverage-gasolineras}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Módulo} & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
+\midrule
+\texttt{models/gasolinera.py}        & 35  & 2 & 94,3\,\% \\
+\texttt{services/constants.py}       & 13  & 0 & 100,0\,\% \\
+\texttt{services/fetch\_gobierno.py} & 137 & 4 & 97,1\,\% \\
+\midrule
+\textbf{Total} & \textbf{186} & \textbf{6} & \textbf{96,8\,\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{recomendacion-service}
+
+Las pruebas cubren la lógica geoespacial y de puntuación, que constituye el núcleo diferencial
+del servicio:
+
+\begin{itemize}
+    \item \textbf{Geometría y distancias} (\texttt{test\_geo\_math.py}): se verifica la función
+    Haversine con pares de coordenadas conocidos (Madrid--Barcelona $\approx 504$\,km), la
+    propiedad de simetría $d(A,B)=d(B,A)$, la distancia nula entre un punto y sí mismo, y la
+    construcción de corredores geométricos con Shapely para filtrar estaciones dentro y fuera
+    del radio de desvío configurado.
+
+    \item \textbf{Scoring de recomendación} (\texttt{test\_recommender.py}): se comprueba que
+    el algoritmo de puntuación prioriza la estación más barata cuando
+    \texttt{peso\_precio}~=~1,0 y la de menor desvío cuando \texttt{peso\_desvio}~=~1,0; que
+    el cálculo de ahorro estimado (\texttt{diff\_precio} $\times$ \texttt{litros\_deposito})
+    es exacto; y que \texttt{top\_n} limita correctamente el número de resultados.
+
+    \item \textbf{Validación de esquemas} (\texttt{test\_schemas.py}): se verifica la
+    aceptación de alias de campo, la validación de pesos en el rango $[0,1]$ y la coherencia
+    del modelo \texttt{RecomendacionRequest}.
+\end{itemize}
+
+La cobertura alcanza el \textbf{97,9\,\%} (233/238 sentencias). El módulo \texttt{geo\_math.py}
+obtiene el 100\,\% dada su naturaleza de lógica pura sin dependencias externas. El desglose se
+recoge en la Tabla~\ref{tab:coverage-recomendacion}.
+
+\begin{table}[H]
+\centering
+\caption{Cobertura de pruebas unitarias — \texttt{recomendacion-service}}
+\label{tab:coverage-recomendacion}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Módulo} & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
+\midrule
+\texttt{models/schemas.py}                & 109 & 2 & 98,2\,\% \\
+\texttt{services/geo\_math.py}            &  40 & 0 & 100,0\,\% \\
+\texttt{services/recommendation\_core.py} &  89 & 3 & 96,6\,\% \\
+\midrule
+\textbf{Total} & \textbf{238} & \textbf{5} & \textbf{97,9\,\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------
+\subsection{Pruebas unitarias — servicios JavaScript}
+\label{sec:pruebas-unitarias-js}
+
+Los servicios Node.js emplean Vitest~\cite{vitest} como framework de pruebas,
+ejecutado mediante el workflow\\  \texttt{test-unit-js.yml} en cada push y pull request
+a \texttt{master}. El resumen de ejecución se publica automáticamente en el Step Summary de
+GitHub Actions. En la última ejecución registrada se completaron \textbf{131 pruebas} en
+\textbf{12 ficheros de test}, todas con resultado satisfactorio.
+
+\subsubsection{usuarios-service}
+
+Las pruebas cubren la capa de servicios y utilidades de forma aislada mediante mocks de
+repositorio:
+
+\begin{itemize}
+    \item \texttt{authService.test.js}: registro de usuario, inicio de sesión, detección de
+    email duplicado y generación de token JWT~\cite{fastify_jwt}.
+    \item \texttt{favoriteService.test.js}: alta y baja de favoritos, idempotencia en
+    operaciones repetidas.
+    \item \texttt{userService.test.js}: obtención y actualización de perfil, eliminación
+    de cuenta.
+    \item \texttt{validators.test.js}: validación de contraseñas, correos electrónicos y
+    saneamiento de entradas.
+\end{itemize}
+
+La cobertura unitaria del \texttt{usuarios-service} alcanza el \textbf{95,8\,\%} en líneas
+(319/333) con el \textbf{100\,\%} en funciones, tal como se detalla en la
+Tabla~\ref{tab:coverage-usuarios-unit}.
+
+\begin{table}[H]
+\centering
+\caption{Cobertura unitaria — \texttt{usuarios-service}}
+\label{tab:coverage-usuarios-unit}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Módulo} & \textbf{Lines\,\%} & \textbf{Branches\,\%} & \textbf{Fns\,\%} \\
+\midrule
+\texttt{hooks/authHooks.js}              & 100,0 & 100,0 & 100,0 \\
+\texttt{hooks/internalAuthHook.js}       & 100,0 & 100,0 & 100,0 \\
+\texttt{middlewares/errorHandler.js}     & 100,0 &  93,8 & 100,0 \\
+\texttt{repositories/favoriteRepository.js} & 100,0 & 100,0 & 100,0 \\
+\texttt{repositories/userRepository.js} & 100,0 & 100,0 & 100,0 \\
+\texttt{routes/auth.js}                  &  97,1 &  92,8 & 100,0 \\
+\texttt{routes/favorites.js}             & 100,0 &  75,0 & 100,0 \\
+\texttt{routes/health.js}                &  96,3 &  50,0 & 100,0 \\
+\texttt{services/authService.js}         &  90,5 &  83,3 & 100,0 \\
+\texttt{services/favoriteService.js}     &  97,4 &  92,0 & 100,0 \\
+\texttt{services/userService.js}         &  87,3 &  86,1 & 100,0 \\
+\texttt{utils/validators.js}             & 100,0 & 100,0 & 100,0 \\
+\midrule
+\textbf{Total} & \textbf{95,8} & \textbf{90,5} & \textbf{100,0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------
+\subsection{Pruebas de integración — usuarios-service}
+\label{sec:pruebas-integracion}
+
+Las pruebas de integración, ejecutadas mediante el workflow \texttt{test-integration.yml},
+levantan un servidor Fastify~\cite{fastify} real conectado a una instancia de PostgreSQL~15,
+provisionada como contenedor 
+de servicio en el propio runner de GitHub Actions~\cite{github_actions_services}.
+
+En la última ejecución se completaron \textbf{51 pruebas} en \textbf{3 ficheros de test}, todas
+satisfactorias.
+
+Los casos cubiertos incluyen:
+
+\begin{itemize}
+    \item \textbf{Registro}: \texttt{POST /api/usuarios/register} devuelve 201 con un usuario
+    nuevo y 409 ante email duplicado.
+    \item \textbf{Autenticación}: \texttt{POST /api/usuarios/login} devuelve 200 con cookie
+    \texttt{authToken} válida, y 401 con credenciales incorrectas.
+    \item \textbf{Rate limiting}: el sexto intento de login consecutivo desde la misma IP
+    recibe 429, verificando el comportamiento del plugin
+    \texttt{@fastify/rate-limit}~\cite{fastify_ratelimit}.
+    \item \textbf{Favoritos}: el alta (\texttt{POST}) protegida por JWT devuelve 201; sin JWT,
+    401. La eliminación de un favorito inexistente devuelve 404. El endpoint interno
+    \texttt{/favoritos/all-ideess} devuelve 403 sin la cabecera \texttt{X-Internal-Secret}.
+\end{itemize}
+
+La cobertura de integración se sitúa en el \textbf{82,0\,\%} en líneas. La cobertura de ramas
+(\textit{branch coverage}) alcanza el 65,6\,\%, valor esperado dado que numerosas ramas
+corresponden a caminos de error de infraestructura (fallos de conexión a base de datos,
+timeouts de red) que no son reproducibles en un entorno de pruebas sin los servicios reales
+completos.
+
+% ------------------------------------------------------------
+\subsection{Calidad estática del código — SonarCloud}
+\label{sec:calidad-estatica}
+
+El repositorio está integrado con SonarCloud~\cite{sonarcloud}, que analiza
+automáticamente cada push a \texttt{master} sobre las 31\,000 líneas de código del proyecto.
+La Figura~\ref{fig:sonarcloud} muestra el panel de resultados del análisis más reciente.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{imgs/sonarcloud_dashboard.png}
+    \caption{Panel de SonarCloud — análisis sobre rama \texttt{master}}
+    \label{fig:sonarcloud}
+\end{figure}
+
+Los resultados muestran una \textbf{duplicación del 2,4\,\%} sobre 39\,000 líneas
+analizadas, esto indica que hay una alta cohesión del código sin repetición estructural.
+Los \textbf{157 issues de mantenibilidad} (rating~A) corresponden mayoritariamente a
+\textit{code smells} menores  (nombres de variables, complejidad ciclomática puntual) propios
+de un proyecto desarrollado de forma iterativa por un único desarrollador.
+
+En el apartado de seguridad se detecta \textbf{1 issue con rating~C}, localizado en el servicio
+\texttt{mcp-gasolineras-server}. Dicho servicio no está habilitado en el despliegue de
+producción y el issue no afecta a
+ningún flujo de usuario activo. Los \textbf{2 bugs de fiabilidad} (rating~A) son de severidad
+menor y no impactan en los flujos principales de la aplicación.
+
+Hay que señalar que la cobertura de código no está integrada en SonarCloud,
+ya que los reportes de cobertura se gestionan directamente en los workflows de
+GitHub Actions descritos en las secciones anteriores.
+
+% ------------------------------------------------------------
+\subsection{Smoke tests en producción}
+\label{sec:smoke-tests}
+
+Tras cada despliegue en Cloud Run~\cite{cloud_run2026}, los pipelines de Cloud
+Build~\cite{cloud_build2026} verifican que los servicios responden correctamente antes de
+marcar la build como exitosa. El gateway comprueba \texttt{GET /health} (HTTP~200 con
+\texttt{status: "UP"}) y \texttt{GET /api/gasolineras/count} (presencia del campo
+\texttt{total}). Para el resto de servicios se verifica el estado \texttt{Ready: True}
+mediante \texttt{gcloud run services describe}.
+
+Adicionalmente, el workflow manual \texttt{smoke-test.yml} permite lanzar desde GitHub Actions
+una batería de comprobaciones contra el gateway público en producción, verificando la
+disponibilidad del sistema completo en cualquier momento.
+
+% ------------------------------------------------------------
+\subsection{Evaluación del agente de voz}
+\label{sec:eval-agente-voz}
+
+El servicio \texttt{voice-assistant-service} no tiene pruebas unitarias
+por su dependencia de llamadas en tiempo real a la API de
+Gemini~\cite{gemini_2_5}. En su lugar, se ha desarrollado una evaluación
+(\textit{eval}) offline sobre los componentes de lógica pura del pipeline, sin
+coste de API y ejecutable en cualquier entorno mediante \texttt{npm run eval}.
+
+Se evalúan tres métricas sobre conjuntos de datos etiquetados manualmente:
+
+\begin{itemize}
+    \item \textbf{Precisión en selección de herramientas}: mide la tasa de acierto
+    de \texttt{classifyIntent()}, que determina qué herramienta (\texttt{get\_prices},
+    \texttt{get\_nearest\_stations} o ninguna) debe invocar el agente ante una
+    consulta de usuario. Resultado: \textbf{100,0\,\%} (19/19 casos).
+
+    \item \textbf{Efectividad de los guardarraíles}: mide la precisión de
+    \texttt{isInScope()}, que filtra consultas fuera del dominio de gasolineras y
+    combustible. Durante el desarrollo del eval se detectó un bug real: los
+    términos \textit{barato}, \textit{combustible} y \textit{repostar} no estaban
+    contemplados como señales de contexto válidas. Tras la corrección, el
+    resultado alcanza \textbf{100,0\,\%} de accuracy y F1 (20/20 casos).
+
+    \item \textbf{Detección de idioma} (regresión): verifica que el agente
+    identifica correctamente el idioma de la consulta para adaptar la respuesta.
+    Resultado: \textbf{100,0\,\%} (14/14 casos).
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Resultados de la evaluación offline — agente de voz}
+\label{tab:eval-voz}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Métrica} & \textbf{Score} & \textbf{Estado} \\
+\midrule
+Precisión en selección de herramientas & 100,0\,\% (19/19) & \checkmark \\
+Efectividad de guardarraíles (accuracy / F1) & 100,0\,\% (20/20) & \checkmark \\
+Detección de idioma                    & 100,0\,\% (14/14) & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para la monitorización en producción, el pipeline emite trazas a
+Langfuse~\cite{ai_studio} con scores \texttt{task\_success},
+\texttt{guardrails\_triggered} y \texttt{tool\_called} cuando las variables de
+entorno \texttt{LANGFUSE\_PUBLIC\_KEY} y \texttt{LANGFUSE\_SECRET\_KEY} están
+configuradas. En ausencia de dichas variables el servicio opera con un trazador
+no operativo (\textit{no-op}), sin impacto en el comportamiento.
+
+% ------------------------------------------------------------
+\subsection{Resumen de la cobertura de integración continua}
+\label{sec:ci-pruebas}
+
+La Tabla~\ref{tab:ci-workflows} resume los cinco workflows de CI configurados en el repositorio.
+
+\begin{table}[H]
+\centering
+\caption{Workflows de integración continua — TankGo}
+\label{tab:ci-workflows}
+\begin{tabular}{p{4.2cm} p{3.2cm} p{4.5cm} p{2.3cm}}
+\toprule
+\textbf{Workflow} & \textbf{Herramientas} & \textbf{Qué verifica} & \textbf{Trigger} \\
+\midrule
+\texttt{test-unit.yml}
+  & pytest + pytest-cov
+  & Unitarios Python; cobertura gasolineras y recomendación
+  & push/PR → master \\[4pt]
+\texttt{test-unit-js.yml}
+  & Vitest
+  & Unitarios JS; cobertura usuarios y frontend
+  & push/PR → master \\[4pt]
+\texttt{test-integration.yml}
+  & Vitest + PostgreSQL~15
+  & Integración usuarios con BD real
+  & push/PR → master \\[4pt]
+\texttt{smoke-test.yml}
+  & curl
+  & Endpoints de producción vía gateway
+  & Manual \\[4pt]
+\texttt{sonarcloud.yml}
+  & SonarCloud
+  & Calidad, duplicación, seguridad
+  & push/PR → master \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El servicio de \texttt{gateway-hono} y \texttt{voice-assistant-service} no disponen de pruebas
+unitarias automatizadas. El gateway actúa principalmente como proxy y su comportamiento queda
+cubierto por los smoke tests de producción. El asistente de voz depende de llamadas en tiempo
+real a la API de Gemini~\cite{gemini_2_5}, lo que hace inviable su automatización sin un
+entorno de simulación complejo fuera del alcance de este proyecto.
 
 % ═════════════════════════════════════════════
 \section{Manual de Usuario}
@@ -981,7 +1328,7 @@ navegación del navegador.
   % CAPTURA: Pantalla de instalación PWA en móvil (Android preferiblemente).
   % El aviso emergente de "Añadir a pantalla de inicio" o el icono en barra de Chrome.
   % Nombrar el archivo: manual_pwa_install.png
-  %\includegraphics[width=0.45\textwidth]{imgs/manual_pwa_install.png}
+  \includegraphics[width=0.45\textwidth]{imgs/manual_pwa_install.png}
   \caption{Opción de instalación de TankGo como PWA en dispositivo móvil}
   \label{fig:manual_pwa}
 \end{figure}
@@ -1126,7 +1473,7 @@ preferencias del perfil para que las recomendaciones sean coherentes con su veh�
   \centering
   % CAPTURA: Vista de rutado con origen/destino introducidos y paradas recomendadas visibles en mapa.
   % Nombrar: manual_ruta.png
-  %\includegraphics[width=0.85\textwidth]{imgs/manual_ruta.png}
+  \includegraphics[width=0.85\textwidth]{imgs/manual_ruta.png}
   \caption{Recomendación de paradas de repostaje en ruta}
   \label{fig:manual_ruta}
 \end{figure}
@@ -1135,8 +1482,7 @@ preferencias del perfil para que las recomendaciones sean coherentes con su veh�
 
 El asistente de voz permite realizar consultas en lenguaje natural sobre gasolineras y
 precios. El usuario accede al asistente desde el icono del micrófono en la interfaz
-principal. Puede formular preguntas como \textit{«¿Cuál es la gasolinera más barata
-  cerca de mí?»}, tanto por voz
+principal. Puede formular preguntas como \textit{«¿Cuál es la gasolinera más barata cerca de mí?»}, tanto por voz
 como por texto. El asistente procesa la consulta, obtiene los datos en tiempo real de la
 plataforma y devuelve la respuesta en audio.
 
@@ -1144,7 +1490,7 @@ plataforma y devuelve la respuesta en audio.
   \centering
   % CAPTURA: Interfaz del asistente de voz con el micrófono activo o con una respuesta visible.
   % Idealmente en móvil para reflejar el caso de uso principal. Nombrar: manual_voz.png
-  %\includegraphics[width=0.55\textwidth]{imgs/manual_voz.png}
+  \includegraphics[width=0.55\textwidth]{imgs/manual_voz.png}
   \caption{Asistente conversacional de voz en TankGo}
   \label{fig:manual_voz}
 \end{figure}
@@ -1295,8 +1641,8 @@ de administración genéricos, así como para limitar la tasa de peticiones desd
 generaran un número anómalo de errores \texttt{404} en un intervalo corto. Además, se
 incorporaron reglas a nivel DNS y de firewall específicas para mitigar vectores dirigidos
 a componentes PHP (por ejemplo, detección de rutas y extensiones típicas), reduciendo la
-superficie de ataque sobre ese tipo de recursos. Se añadió también un análisis de
-cabeceras y patrones de petición HTTP/1.1 para identificar clientes automatizados; ante
+superficie de ataque sobre ese tipo de recursos. Se ha añadido también un análisis de
+cabeceras y patrones de petición HTTP/1.1 para identificar clientes automatizados, para
 peticiones con comportamiento sospechoso el perímetro puede responder con un reto de
 verificación (challenge), por ejemplo comprobaciones JavaScript o CAPTCHA, antes de
 permitir el acceso, lo que ayuda a filtrar bots y ahorrar peticiones fraudulentas.
@@ -1342,7 +1688,7 @@ las respuestas deben ser breves, directas y estrictamente relacionadas con la ta
 
 Se ha diseñado un sistema de guardarraíles en dos niveles. El primer nivel es un
 \textbf{comprobador de alcance} previo al LLM que evalúa la presencia de términos del
-dominio en la transcripción; si no se detecta ninguno, el servicio devuelve directamente
+dominio en la transcripción, si no se detecta ninguno, el servicio devuelve directamente
 una respuesta predefinida sin consumir tokens del modelo. El segundo nivel actúa mediante
 el \textbf{system prompt}: las instrucciones del sistema definen explícitamente el papel
 del asistente, los temas permitidos, el formato de respuesta esperado y la obligación de

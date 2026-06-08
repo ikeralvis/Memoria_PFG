@@ -184,15 +184,15 @@ La plataforma especificada comprende los siguientes componentes funcionales:
             \cite{web_dev_pwa,i18next}.
 \end{enumerate}
 
+
 \subsection{Entorno de despliegue}
 
-La plataforma se despliega íntegramente en Google Cloud Platform (GCP) \cite{cloud_run2026},
-utilizando Cloud Run como servicio de ejecución de contenedores serverless,
-Artifact Registry \cite{artifact_registry} para el almacenamiento de imágenes Docker \cite{docker}, Cloud Build
-\cite{cloud_build2026} para la automatización del pipeline CI/CD y Secret Manager \cite{secret_manager} para la
-gestión segura de credenciales en producción. La base de datos relacional
-se externaliza en Neon (PostgreSQL gestionado) y el almacenamiento de
-objetos para el pipeline de ML se realiza en Google Cloud Storage \cite{cloud_storage2026}.
+La plataforma se aloja en la nube. El trabajo exploratorio ha permitido seleccionar Google Cloud Platform (GCP) \cite{cloud_run2026} como entorno principal, 
+aprovechando su oferta de servicios serverless y gestionados que facilitan el desarrollo y escalado de aplicaciones cloud-native. La arquitectura se basa en 
+microservicios alojados en Cloud Run para la ejecución de contenedores, Artifact Registry \cite{artifact_registry} para el almacenamiento de imágenes 
+Docker \cite{docker}, Cloud Build \cite{cloud_build2026} para la automatización del pipeline CI/CD y Secret Manager \cite{secret_manager} para la gestión 
+segura de credenciales. Por último, la base de datos relacional se delega en Neon (PostgreSQL gestionado), mientras que el almacenamiento de objetos para 
+el pipeline de ML se realiza en Google Cloud Storage \cite{cloud_storage2026}.
 
 \section{Limitaciones}
 
@@ -213,7 +213,7 @@ conocidas en la versión entregada.
             predicción limita su cobertura a las estaciones que disponen de historial suficiente y a las marcadas como favoritas por los usuarios,
             priorizando la relación coste/beneficio y la utilidad práctica frente a una cobertura completa que sería costosa e innecesaria para
             estaciones con datos escasos. El diseño detallado del pipeline de entrenamiento, la política de refresco y las estimaciones de coste
-            computacional se documentan en el Capítulo 8 (Sección \ref{sec:implementacion}).
+            computacional se documentan en el Capítulo 8 (Sección \ref{subsec:prediccion_impl}).
 
       \item \textbf{Precisión de la recomendación por ruta:} La calidad
             de la recomendación depende de la disponibilidad y precisión del

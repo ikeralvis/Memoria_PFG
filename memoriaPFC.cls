@@ -282,3 +282,4 @@
 \usepackage{lscape}   % en vez de pdflscape
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds}
+\usepackage{tabularx}
