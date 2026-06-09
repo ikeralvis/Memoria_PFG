@@ -1,50 +1,55 @@
 \chapter{Conclusiones}
 \label{ch:conclusiones}
-
-Este capítulo recoge la valoración final del proyecto: los objetivos que se han cumplido, los obstáculos que surgieron durante el desarrollo,
-la reflexión personal sobre el trabajo realizado y las posibilidades de evolución que quedan abiertas.
+Este capítulo expone la valoración final del desarrollo de TankGo. Se evalúa el grado de cumplimiento de los objetivos planteados,
+se analizan las principales dificultades técnicas surgidas durante la ejecución, se ofrece una reflexión crítica sobre la aportación
+de ingeniería y se proponen las líneas de evolución tecnológica que quedan abiertas para el sistema.
 
 % ─────────────────────────────────────────────
 \section{Objetivos alcanzados}
 \label{sec:objetivos-alcanzados}
+La evaluación de los resultados confirma la consecución de los objetivos técnicos fijados al inicio del proyecto.
+TankGo se ha consolidado como una plataforma de microservicios funcional y desplegada en producción.
+El sistema unifica la consulta de estaciones de servicio con datos del Ministerio, la geolocalización de puntos de recarga eléctrica,
+un motor de recomendación de rutas optimizado según criterios de desvío y ahorro económico, la predicción de tarifas a corto plazo en
+estaciones preferentes y una interfaz conversacional por voz basada en el LLM Gemini con capacidades de ejecución de funciones (\textit{tool calling}).
 
-Todos los objetivos definidos al inicio del proyecto se han cumplido. TankGo es una plataforma de microservicios completamente funcional y
-desplegada en producción que permite consultar precios de combustible con datos oficiales del Ministerio, integrar puntos de recarga eléctrica,
-recibir recomendaciones de ruta personalizadas según el desvío y el ahorro estimado, predecir la evolución del precio en las estaciones favoritas
-del usuario y conversar con un asistente de voz basado en Gemini con capacidad de \textit{tool calling}.
-
-El sistema se ha entregado con siete pipelines de CI/CD independientes, cobertura de tests superior al 95\,\% en los servicios principales y una
-valoración de mantenibilidad de grado~A en SonarCloud. Esto no solo demuestra que la plataforma funciona, sino que está construida para poder
-mantenerse y crecer.
+Desde el punto de vista de la calidad del software, la plataforma se ha estructurado mediante siete pipelines de integración y entrega continua (CI/CD) independientes.
+Los servicios del núcleo de negocio registran una cobertura de pruebas unitarias superior al 95\% y el análisis estático de código en SonarCloud otorga al proyecto
+una calificación de mantenibilidad de grado A. Estos indicadores garantizan la viabilidad operativa del software, asegurando su capacidad de escalado y mantenimiento evolutivo.
 
 % ─────────────────────────────────────────────
 \section{Dificultades encontradas}
 \label{sec:dificultades}
 
-El desarrollo no ha estado exento de retos. Uno de los más relevantes ha sido la elección y justificación del modelo de predicción: LightGBM no supera a
-ARIMA en MAE de forma sistemática, y fue necesario construir una argumentación sólida centrada en su escalabilidad a más de 11.000 estaciones y en
-su capacidad de generar intervalos de confianza nativos, algo que un modelo clásico de series temporales no ofrece directamente.
+El ciclo de desarrollo ha presentado retos técnicos complejos en diferentes capas del sistema.
+En el módulo analítico, la justificación del modelo predictivo ha exigido un análisis riguroso: aunque el algoritmo LightGBM no superó
+al modelo clásico ARIMA en términos absolutos de error medio absoluto (MAE), su selección se ha validado por su capacidad para escalar
+eficientemente sobre un universo superior a las 11.000 estaciones de servicio y por su soporte nativo para el cálculo de intervalos
+de confianza cuantílicos.
 
-El motor de recomendación de ruta también ha presentado dificultades importantes. Combinar geometría vectorial con Shapely, consultas espaciales en PostGIS
-y la API de enrutamiento de OpenRouteService ha  un diseño cuidadoso para que el sistema respondiera en tiempos razonables sin comprometer la
-precisión del cálculo de desvío.
+El motor de recomendación de rutas ha requerido resolver problemas de rendimiento geométrico. La integración de operaciones vectoriales
+con la librería Shapely, el indexado espacial en PostGIS y el consumo asíncrono de la API de enrutamiento de OpenRouteService
+ha demandado una optimización estricta de las peticiones para mitigar las latencias de red sin penalizar la precisión en el cálculo de los costes de desvío.
 
-En el plano de infraestructura, Cloud Run ha presentado limitaciones inesperadas: la gestión de conexiones WebSocket en el asistente de voz ha resultado inestable
-en el entorno serverless, lo que ha obligado a priorizar el transporte HTTP como vía principal del pipeline de diálogo. Por último, coordinar siete servicios
-con ciclos de despliegue independientes ha exigido que una completa integración continua, aunque costosa de configurar, ha demostrado ser una de
-las decisiones más acertadas del proyecto.
+En el plano de la infraestructura, se identificaron limitaciones en el entorno \textbf{serverless}  de Google Cloud Run. La gestión de conexiones
+persistentes mediante WebSockets para el asistente conversacional mostró dificultades ante el autoescalado y la naturaleza efímera de
+los contenedores. Esto motivó la reconfiguración del pipeline de diálogo hacia un flujo basado en transporte HTTP tradicional.
+Por último, la gobernanza de siete microservicios con ciclos de vida independientes introdujo una alta complejidad inicial en la
+configuración de la infraestructura de CI/CD, que se mitigó mediante la modularización de los flujos de compilación en Cloud Build.
 
 % ─────────────────────────────────────────────
 \section{Aportación personal y reflexión crítica}
 \label{sec:aportacion-personal}
 
-Este proyecto ha supuesto completar, por primera vez de forma autónoma, el ciclo completo de un sistema \textit{cloud-native}: desde el modelado de
-datos espaciales y el diseño de contratos API hasta el entrenamiento de modelos de ML, la autenticación sin estado con JWT y el despliegue serverless
-en Google Cloud. Trabajar en el entorno de investigación de MORElab/DEUSTEK ha añadido además la exigencia de justificar cada decisión con rigor técnico,
-algo que va más allá de lo que habitualmente se pide en un proyecto comercial.
+La ejecución de este proyecto ha permitido completar de forma autónoma el ciclo de vida de una arquitectura \textit{cloud-native}.
+El desarrollo ha abarcado desde el modelado de datos geoespaciales y la definición de contratos de API REST, hasta el entrenamiento
+e inferencia de modelos de machine learning, la gestión de sesiones sin estado mediante tokens JWT y el despliegue elástico en la nube.
+Asimismo, el marco de colaboración técnica con el grupo de investigación DEUSTEK/MORElab ha aportado una metodología rigurosa para la toma de
+decisiones tecnológicas, fundamentada en la evaluación de alternativas.
 
-Si el proyecto tuviera que rehacerse, probablemente se iniciaría con una estrategia de testing más temprana y se establecerían desde el principio
-contratos de API más estrictos entre servicios. La deuda técnica acumulada en las primeras iteraciones fue real, aunque se fue corrigiendo a lo largo del desarrollo.
+En un análisis retrospectivo, el flujo de trabajo habría mejorado mediante la adopción de una estrategia de desarrollo guiado por pruebas
+(TDD) en fases más tempranas y la definición de contratos de interfaz más estrictos entre microservicios. Estas carencias iniciales generaron
+una deuda técnica que ha requerido fases adicionales de refactorización antes de proceder a la integración final en Google Cloud Platform.
 
 % ─────────────────────────────────────────────
 \section{Líneas futuras de mejora}
@@ -52,7 +57,7 @@ contratos de API más estrictos entre servicios. La deuda técnica acumulada en 
 
 TankGo está en condiciones de evolucionar en varias direcciones. A corto plazo, la prioridad más clara es estabilizar el canal WebSocket del
 asistente de voz en Cloud Run y completar la integración del servidor MCP (\texttt{mcp-gasolineras-server}) en el flujo conversacional, lo que
-permitiría al asistente delegar consultas de forma más flexible. Asimismo, a nivel de despliegue web, se contempla la configuración de cabeceras de 
+permitiría al asistente delegar consultas de forma más flexible. Asimismo, a nivel de despliegue web, se contempla la configuración de cabeceras de
 seguridad estrictas (CSP y HSTS) para fortificar el \textit{frontend}, tal y como se identificó en las auditorías de calidad.
 
 A medio plazo, el modelo de predicción podría extenderse a más tipos de combustible y a un horizonte temporal más amplio, aprovechando el histórico

@@ -3,54 +3,43 @@
 %  CAPÍTULO 7 — METODOLOGÍA
 % =========================================================
 
-\chapter{Capítulo Séptimo - Metodología}
-Este capítulo describe el enfoque metodológico adoptado para la gestión y el desarrollo de
-TankGo. Se justifica la elección de una metodología ágil iterativa frente a enfoques clásicos
-en cascada, se describe el marco de trabajo Kanban implementado mediante Todoist, y se detalla
-el uso del control de versiones y las dinámicas de coordinación seguidas a lo largo del
-proyecto.
+\chapter{Metodología}
+Este capítulo describe el marco metodológico adoptado para la gestión, ejecución y control
+de calidad en el desarrollo de TankGo. Se justifica la elección de un enfoque ágil iterativo
+frente a los modelos predictivos tradicionales; se detalla la adaptación del paradigma Kanban
+mediante el uso estratégico de Todoist como entorno de orquestación visual, y se exponen las políticas
+de control de versiones y las dinámicas de coordinación académica y técnica que articularon el ciclo
+de vida del proyecto.
 
 \section{Enfoque de desarrollo: metodología ágil iterativa}
+El desarrollo de TankGo se ha guiado por los principios de las metodologías ágiles de desarrollo
+de software \cite{sommerville2011}, priorizando la entrega incremental de valor, la adaptabilidad
+ante la evolución de requisitos y la validación continua de las capacidades funcionales del sistema.
 
-El desarrollo de TankGo se ha abordado siguiendo los principios de las metodologías ágiles
-de desarrollo de software~\cite{sommerville2011}, que priorizan la entrega incremental de
-valor, la capacidad de respuesta ante cambios en los requisitos y la colaboración continua
-con los interesados del proyecto.
-
-Frente a un enfoque en cascada (\textit{waterfall}), en el que las fases de análisis, diseño,
-implementación y pruebas se realizan de forma lineal y cerrada, un modelo iterativo resulta
-adecuado en proyectos con requisitos emergentes o sujetos a
-evolución~\cite{sommerville2011}. TankGo al partir de un prototipo previo y como se ha ido
-ampliando el alcance lo largo de las dos fases, este alcance dinámico hace inviable
-un planteamiento en cascada y justifica la adopción de un enfoque iterativo e incremental.
+Frente al enfoque tradicional en cascada (\textit{waterfall}), donde las fases de especificación,
+diseño, codificación y pruebas se ejecutan de manera lineal y estricta, el modelo iterativo proporciona
+la flexibilidad necesaria para gestionar proyectos con requisitos emergentes \cite{sommerville2011}. Dado
+que TankGo evolucionó a partir de un prototipo inicial hacia una arquitectura de microservicios extendida
+durante el periodo del PFG, el alcance dinámico del proyecto hacía inviable una planificación rígida.
+El enfoque adoptado ha permitido mitigar riesgos técnicos mediante ciclos iterativos, donde cada incremento
+incrementaba la madurez del sistema global.
 
 \section{Relación con Scrum y elección de Kanban}
+Dentro del ecosistema ágil, marcos de trabajo como Scrum estructuran el desarrollo en iteraciones
+fijas (\textit{sprints}) soportadas por reuniones diarias, revisiones de código y retrospectivas,
+y roles especializados (\textit{Product Owner} y \textit{Scrum Master}) \cite{anderson2010kanban}.
+Aunque estos artefactos son efectivos en equipos multidisciplinares, su aplicación en un proyecto
+desarrollado de forma individual introduce una sobrecarga de gestión que penaliza la productividad.
 
-Entre las metodologías ágiles más extendidas se encuentran Scrum y Kanban. Scrum estructura
-el desarrollo en iteraciones de duración fija denominadas \textit{sprints}, con revisiones
-periódicas, \textit{daily stand-up}, revisión de sprint, retrospectiva, y roles diferenciados
-como \textit{Product Owner} y \textit{Scrum Master}~\cite{anderson2010kanban}. Este marco está
-concebido para equipos multidisciplinares y requiere una coordinación constante entre sus
-miembros para que sea efectivo.
+Por este motivo, se seleccionó Kanban como marco de referencia para la gestión operativa.
+Kanban se centra en la optimización del flujo continuo de trabajo y la visualización del estado de las tareas,
+prescindiendo de una cadencia temporal estricta \cite{anderson2010kanban}.
+Sus principios son la representación visual del tablero y la limitación del trabajo en progreso (\textit{work in progress}, WIP).
+Se adaptaron para maximizar el foco técnico del desarrollador y garantizar la detección temprana de cuellos de botella.
 
-TankGo ha sido desarrollado íntegramente por un único estudiante, con supervisión
-del director del PFG y colaboración del grupo MORElab. En este contexto de
-desarrollo en solitario, las revisiones y artefactos de Scrum resultan desproporcionados y
-difíciles de aplicar. Kanban, en cambio, es un marco de gestión
-visual del trabajo orientado al flujo continuo de tareas, sin imponer una cadencia
-estricta de iteraciones~\cite{anderson2010kanban}. Su principio fundamental es limitar
-el trabajo en progreso (\textit{work in progress}, WIP) y hacer visible el estado de
-cada tarea en un tablero compartido, lo que favorece la concentración y la detección
-temprana de bloqueos. Por estas razones, Kanban se adoptó como marco de referencia
-para la gestión del proyecto.
-
-No obstante, el flujo de trabajo adoptado incorpora elementos propios del desarrollo
-iterativo que recuerdan a Scrum: para cada módulo o bloque funcional
-del sistema se han definido un conjunto de tareas concretas, se han estimado su duración, se
-priorizaron y se ejecutaron de forma ordenada hasta su integración y despliegue.
-El ciclo por bloque seguía las fases de análisis y diseño,
-implementación, pruebas, corrección y despliegue en producción, reproduciendo
-el ciclo ágil básico de forma recurrente a lo largo de ambas fases del proyecto.
+Para cada componente o microservicio del sistema, se identificaban un conjunto de tareas específicas que pasaban secuencialmente
+por las fases de análisis de alternativas, diseño arquitectónico, implementación de código, pruebas de integración y despliegue automatizado.
+De este modo, se replicaba el ciclo ágil básico de forma recurrente en cada bloque funcional de la plataforma.
 
 \section{Gestión de tareas: Todoist como tablero Kanban y agenda diaria}
 
@@ -77,21 +66,22 @@ entre sesiones.
 
 \section{Control de versiones}
 
-El código fuente del proyecto se ha gestionado mediante Git~\cite{git_scm2026,github2026}, con un 
-repositorio alojado en GitHub organizado como monorepo. Todo el desarrollo se ha
-realizado sobre una única rama principal (\texttt{master}), sin emplear ramas de características
-ni flujos de trabajo basados en \textit{pull requests}, decisión coherente con el contexto
-de desarrollo en solitario, donde la sobrecarga de un modelo de ramas más elaborado no
-aporta beneficio real.
+El código fuente de la plataforma se ha gestionado mediante el sistema distribuido Git \cite{git_scm2026,github2026},
+centralizando los componentes en un repositorio único (\textit{monorepo}) alojado en GitHub.
+El flujo de desarrollo se ha realizado sobre una única rama principal (\texttt{master}).
+Al tratarse de un entorno de desarrollo individual, se descartó la complejidad estructural de flujos basados
+en ramas de características (\textit{feature branches}) o validaciones cruzadas mediante \textit{pull requests},
+evitando procesos de integración manuales que no aportaban valor real a la auditoría del código.
 
-Los \textit{commits} se han realizado de forma frecuente, tras la finalización de
-cada tarea o subtarea significativa, lo que permite reconstruir la evolución del
-sistema y revertir cambios de forma controlada si fuera necesario. La integración
-del repositorio con los pipelines de Cloud Build~\cite{cloud_build2026} cierra el
-ciclo de control de versiones: cada \textit{push} a \texttt{master} desencadena
-automáticamente la construcción, publicación y despliegue del microservicio correspondiente
-en Google Cloud Run, convirtiendo el propio flujo de control de versiones en el disparador
-del proceso de entrega continua.
+La política de registro de cambios se ha basado en \textit{commits} frecuentes, ejecutados tras
+la estabilización de cada unidad o subtarea. Esta práctica asegura la trazabilidad del software,
+permitiendo revertir el estado del sistema de forma controlada ante regresiones técnicas.
+
+El ciclo de control de versiones se integra con la infraestructura en la nube
+mediante los pipelines de Google Cloud Build \cite{cloud_build2026}.
+Cada actualización confirmada en la rama \texttt{master} desencadena de forma automática la compilación del código,
+la construcción de la imagen Docker correspondiente, su almacenamiento en el registro de artefactos y su posterior
+despliegue en Google Cloud Run; esto materializa un flujo completo de integración y entrega continua (CI/CD).
 
 \section{Coordinación y seguimiento}
 

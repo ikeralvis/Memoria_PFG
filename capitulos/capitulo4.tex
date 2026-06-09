@@ -1,45 +1,36 @@
-\chapter{Capítulo Cuarto - Objetivos y Alcance}
+\chapter{Objetivos y Alcance}
 
-Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita
-el alcance del sistema resultante. Se definen tanto el objetivo general como los
-objetivos específicos y medibles, siguiendo criterios de claridad, relevancia y
-viabilidad. Además, se establecen las limitaciones conocidas y las exclusiones
-explícitas para evitar ambigüedades en la evaluación del trabajo realizado.
+Este capítulo concreta los objetivos que guían el desarrollo del proyecto y delimita el alcance del sistema resultante.
+Se estructuran las metas generales y específicas bajo criterios verificables, detallando asimismo las
+limitaciones técnicas y las exclusiones explícitas que enmarcan la evaluación del sistema.
 
 \section{Objetivo general}
 
-Diseñar, desarrollar y desplegar una plataforma software \textit{cloud-native} que
-integre, en un único sistema, la consulta y comparación de precios de combustibles
-y puntos de recarga eléctrica en España, incorporando capacidades de análisis
-histórico, predicción de precios a corto plazo, recomendación de repostaje basada
-en rutas y asistencia conversacional, con el fin de transformar datos energéticos
-dispersos en conocimiento accionable y accesible para el usuario final.
-
+Diseñar, desarrollar y desplegar una plataforma software \textit{cloud-native}
+que integre la consulta y comparación de precios de combustibles y puntos de recarga
+eléctrica en España. El sistema incorporará capacidades de análisis histórico, predicción de
+precios a corto plazo, recomendación de repostaje basada en rutas y asistencia conversacional,
+unificando fuentes de datos heterogéneas en una interfaz de soporte a la decisión accesible para el usuario.
 
 \section{Objetivos específicos y medibles}
-
-Los objetivos específicos desglosan el objetivo general en metas concretas,
-verificables y acotadas en el tiempo, siguiendo el criterio SMART
-(\textit{Specific, Measurable, Achievable, Relevant, Time-bound})
-\cite{Doran1981}. Se organizan en torno a los cinco ejes funcionales
-del sistema:
+Los objetivos específicos desglosan el objetivo general en hitos verificables y acotados,
+siguiendo el criterio SMART (\textit{Specific, Measurable, Achievable, Relevant, Time-bound}) \cite{Doran1981}, organizados en torno a cinco ejes funcionales:
 
 \subsection{Ingesta y gestión de datos}
 
 \begin{itemize}
       \item \textbf{OE-01.} Implementar un pipeline de sincronización automática
             con la API REST del Ministerio de Industria (MinITUR) que garantice la
-            disponibilidad de datos de precios de combustible fósiles atualizados con una frecuencia mínima
-            diaria, con persistencia histórica en base de datos relacional.
+            disponibilidad de datos de precios de combustible fósiles actualizados con una frecuencia mínima
+            diaria, asegurando su persistencia histórica en un almacén relacional.
 
-      \item \textbf{OE-02.} Integrar una fuente de datos de puntos de recarga
-            eléctrica en el mismo modelo de datos que los combustibles convencionales,
-            permitiendo consultas unificadas sobre ambas fuentes energéticas.
+      \item \textbf{OE-02.} Integrar los registros de puntos de recarga eléctrica bajo
+            un modelo de datos unificado que permita ejecutar consultas combinadas
+            junto a los combustibles convencionales.
 
-      \item \textbf{OE-03.} Diseñar e implementar un pipeline de exportación de
-            datos históricos en formato Apache Parquet hacia Google Cloud Storage,
-            como base de datos de entrenamiento reproducible para los modelos de
-            aprendizaje automático.
+      \item \textbf{OE-03.} Diseñar e implementar un flujo de exportación de
+            series históricas en formato Apache Parquet hacia Google Cloud Storage
+            para servir como base de entrenamiento reproducible de los modelos de aprendizaje automático.
 \end{itemize}
 
 \subsection{Consulta y visualización geoespacial}
@@ -47,85 +38,70 @@ del sistema:
 \begin{itemize}
       \item \textbf{OE-04.} Desarrollar una interfaz web progresiva (PWA)
             con mapa interactivo que permita la búsqueda y filtrado de estaciones
-            por provincia, municipio, marca y tipo de combustible e internacionalización en tres idiomas
-            (español, inglés y euskera).
+            por criterios geográficos (provincia y municipio) y comerciales (marca y tipo de energía),
+            con soporte de internacionalización en castellano, inglés y euskera.
 
-      \item \textbf{OE-05.} Implementar la visualización del historial de
+      \item \textbf{OE-05.} Implementar la representación del histórico de
             precios por estación mediante gráficos temporales interactivos.
 \end{itemize}
 
 \subsection{Predicción de precios}
 
 \begin{itemize}
-      \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción
-            de precios, incorporando el precio del crudo Brent como
-            variable exógena \cite{LAHMIRI2024105008}, con capacidad de generar
-            predicciones individualizadas por estación de servicio en un periodo de 7 días.
-
-      \item \textbf{OE-07.} Evaluar comparativamente el rendimiento del modelo
-            de predicción seleccionado frente a a otras alternativas (XGBoost, regresión lineal como
-            \textit{baseline}) mediante métricas estándar de regresión
-            (MAE, RMSE, $R^2$) \cite{s24124013}.
+      \item \textbf{OE-06.} Desarrollar e integrar un servicio de predicción de precios que
+            incorpore el precio del crudo Brent como variable exógena \cite{LAHMIRI2024105008},
+            con capacidad de generar predicciones individualizadas por estación para un horizonte temporal de 7 días.
+      \item \textbf{OE-07.} Evaluar el rendimiento del algoritmo seleccionado frente a
+            alternativas de regresión y modelos base (\textit{baselines}) mediante métricas
+            estándar de evaluación ($MAE$, $RMSE$ y $R^2$) \cite{s24124013}.
 \end{itemize}
 
 \subsection{Recomendación basada en rutas}
 
 \begin{itemize}
-      \item \textbf{OE-08.} Implementar un servicio de recomendación de
-            gasolineras para rutas A$\rightarrow$B que identifique las
-            estaciones óptimas dentro del corredor geográfico de la ruta,
-            evalúe las candidatas según una función de puntuación ponderada
-            que combine precio del combustible y desvío respecto al trayecto
-            original, y devuelva al usuario un ranking de recomendaciones con
-            estimación del ahorro económico frente a la opción menos favorable.
-
-      \item \textbf{OE-09.} Integrar un servicio de enrutamiento externo
-            como backend único de cálculo de rutas en el entorno de producción
-            cloud, garantizando la resiliencia del sistema ante la
-            indisponibilidad temporal de la API externa mediante mecanismos
-            de control de concurrencia y fallback configurable.
+      \item \textbf{OE-08.} Desarrollar un motor de recomendación para trayectos
+            entre dos puntos que identifique las estaciones óptimas dentro de un corredor
+            geométrico, aplicando una función de puntuación ponderada basada en el coste
+            económico y el tiempo de desvío.
+      \item \textbf{OE-09.} Garantizar la resiliencia del módulo de enrutamiento
+            en el entorno de producción mediante el diseño de políticas de control de
+            concurrencia y mecanismos de contingencia (\textit{fallback}) ante la indisponibilidad
+            de las APIs geoespaciales externas.
 \end{itemize}
 
 \subsection{Arquitectura, despliegue y calidad}
 
 \begin{itemize}
-      \item \textbf{OE-10.} Diseñar e implementar una arquitectura de
-            microservicios con API Gateway centralizado, donde cada servicio
-            sea independientemente desplegable y escalable, siguiendo los
-            principios de las arquitecturas cloud-native \cite{Gartner2026Trends}.
+      \item \textbf{OE-10.} Diseñar una arquitectura orientada a microservicios
+            desacoplados mediante un API Gateway centralizado, asegurando que cada componente
+            sea gobernable, desplegable y escalable de forma independiente \cite{Gartner2026Trends}.
 
-      \item \textbf{OE-11.} Desplegar la totalidad de la plataforma en
-            Google Cloud Run mediante pipelines de integración y entrega continua
-            (CI/CD) con Google Cloud Build, con un mínimo de siete pipelines
-            independientes (uno por servicio).
+      \item \textbf{OE-11.} Desplegar la plataforma en Google Cloud Run mediante
+            la automatización de flujos de integración y entrega continua (CI/CD)
+            distribuidos en siete pipelines independientes en Google Cloud Build.
 
-      \item \textbf{OE-12.} Implementar un sistema de autenticación seguro
-            basado en JWT almacenado en \textit{httpOnly cookies}, con soporte
-            para autenticación OAuth 2.0 mediante Google y gestión de perfiles
-            de usuario persistentes.
-
-      \item \textbf{OE-13.} Desarrollar e integrar un asistente de voz
-            basado en un pipeline STT$\rightarrow$LLM$\rightarrow$TTS implementado
-            sobre la API REST de Google GenAI (Gemini 2.5 Flash) \cite{gemini_2_5}, con capacidad
-            de \textit{tool calling} \cite{genai_tool_calling} para consultar precios y estaciones cercanas
-            en tiempo real a través del API Gateway del sistema.
+      \item \textbf{OE-12.} Implementar un módulo de identidad basado en el estándar 
+      JWT transmitido mediante \textit{cookies} seguras (\textit{httpOnly}), compatible 
+      con autenticación federada a través de Google OAuth 2.0.
+      
+      \item \textbf{OE-13.} Integrar un asistente de voz basado en un pipeline síncrono 
+      (STT $\rightarrow$ LLM $\rightarrow$ TTS) utilizando la API de Gemini \cite{gemini_2_5}, 
+      habilitando capacidades de \textit{tool calling} \cite{genai_tool_calling} para interactuar 
+      con los servicios internos a través del gateway.
 \end{itemize}
 
 \section{Alcance del sistema}
 \label{sec:alcance}
 
-El alcance define los límites funcionales y técnicos del sistema desarrollado,
-estableciendo qué está incluido en la solución entregada.
+El alcance define los límites funcionales y técnicos de la solución entregada, delimitando las capacidades operativas del sistema.
 
 \subsection{Ámbito geográfico y de datos}
-
-El sistema cubre la totalidad del territorio español continental e insular,
-utilizando como fuente primaria de datos de carburantes la API pública del
-Ministerio de Industria, Turismo y Comercio (MinITUR) \cite{datosgob_carburantes},
-que publica precios de aproximadamente 11.000 estaciones de servicio activas
+La plataforma cubre la totalidad del territorio español. 
+La ingesta de datos de carburantes utiliza la API pública del Ministerio de Industria, Comercio y Turismo 
+\cite{datosgob_carburantes}, que publica precios de aproximadamente 11.000 estaciones de servicio activas
 en España. Los puntos de recarga eléctrica se obtienen del portal
 mapareve.es, complementando la oferta de datos de movilidad eléctrica
-disponible institucionalmente \cite{reve_mapa}. 
+disponible institucionalmente \cite{reve_mapa}.
 
 \subsection{Componentes funcionales incluidos}
 
@@ -187,11 +163,11 @@ La plataforma especificada comprende los siguientes componentes funcionales:
 
 \subsection{Entorno de despliegue}
 
-La plataforma se aloja en la nube. El trabajo exploratorio ha permitido seleccionar Google Cloud Platform (GCP) \cite{cloud_run2026} como entorno principal, 
-aprovechando su oferta de servicios serverless y gestionados que facilitan el desarrollo y escalado de aplicaciones cloud-native. La arquitectura se basa en 
-microservicios alojados en Cloud Run para la ejecución de contenedores, Artifact Registry \cite{artifact_registry} para el almacenamiento de imágenes 
-Docker \cite{docker}, Cloud Build \cite{cloud_build2026} para la automatización del pipeline CI/CD y Secret Manager \cite{secret_manager} para la gestión 
-segura de credenciales. Por último, la base de datos relacional se delega en Neon (PostgreSQL gestionado), mientras que el almacenamiento de objetos para 
+La plataforma se aloja en la nube. El trabajo exploratorio ha permitido seleccionar Google Cloud Platform (GCP) \cite{cloud_run2026} como entorno principal,
+aprovechando su oferta de servicios serverless y gestionados que facilitan el desarrollo y escalado de aplicaciones cloud-native. La arquitectura se basa en
+microservicios alojados en Cloud Run para la ejecución de contenedores, Artifact Registry \cite{artifact_registry} para el almacenamiento de imágenes
+Docker \cite{docker}, Cloud Build \cite{cloud_build2026} para la automatización del pipeline CI/CD y Secret Manager \cite{secret_manager} para la gestión
+segura de credenciales. Por último, la base de datos relacional se delega en Neon (PostgreSQL gestionado), mientras que el almacenamiento de objetos para
 el pipeline de ML se realiza en Google Cloud Storage \cite{cloud_storage2026}.
 
 \section{Limitaciones}

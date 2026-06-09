@@ -2,12 +2,12 @@
 % =========================================================
 %  CAPÍTULO 8 — Desarrollo del sistema
 % =========================================================
-\chapter{Capítulo Octavo - Desarrollo del Sistema}
+\chapter{Desarrollo, Prueba y Despliegue}
 \label{cap:desarrollo_sistema}
 
-Este capítulo recoge la especificación, el diseño y la implementación de TankGo, así como
-el plan de pruebas y el manual de usuario. Es el núcleo técnico del proyecto y documenta
-las decisiones de arquitectura, las tecnologías empleadas y el resultado final del sistema.
+Este capítulo detalla la especificación de requisitos, el diseño arquitectónico y el modelado de datos de TankGo.
+Se describen las necesidades funcionales del sistema, los atributos de calidad exigidos, la topología de la arquitectura
+de microservicios y la estructura de persistencia que soporta la plataforma.
 
 % ═════════════════════════════════════════════
 \section{Especificación de Requisitos}
@@ -17,33 +17,30 @@ las decisiones de arquitectura, las tecnologías empleadas y el resultado final 
 \subsection{Contexto del sistema}
 \label{subsec:contexto}
 
-TankGo es una plataforma de inteligencia de datos orientada a la movilidad y la eficiencia
-energética. Su propósito es transformar los datos abiertos del Geoportal de Gasolineras del
-Ministerio para la Transición Ecológica~\cite{geoportal_gasolineras} en información
-accionable para el conductor, añadiendo capas de valor mediante análisis histórico,
-predicción de precios y recomendación geoespacial de repostaje.
+TankGo es una plataforma software orientada a la optimización de la movilidad y el consumo energético en el transporte por carretera.
+Su objetivo principal es procesar y enriquecer los datos abiertos del Geoportal de Gasolineras del Ministerio para la Transición Ecológica \cite{geoportal_gasolineras},
+transformando registros de precios brutos en servicios de valor añadido mediante análisis histórico, predicción estadística de tarifas y recomendaciones de ruta geoespaciales.
 
-El sistema actúa como intermediario entre las fuentes de datos públicos y el usuario final,
-operando en un entorno cloud que permite tanto la consulta en tiempo real como el
-entrenamiento y servicio de modelos de machine learning. A diferencia de un visor estático,
-TankGo integra en una única plataforma la consulta de gasolineras y electrolineras, la
-estimación de precios futuros y un asistente conversacional por voz para interacción en
-manos libres.
+El sistema opera como un middleware cloud intermedio entre las fuentes de datos públicas y las interfaces de usuario.
+A diferencia de un visor cartográfico estático, TankGo integra en una única arquitectura el consumo unificado de estaciones
+de servicio convencionales y puntos de recarga eléctrica, la inferencia de precios a corto plazo y la interacción
+con un asistente conversacional diseñado para entornos de conducción en manos libres.
 
 \subsection{Identificación de usuarios}
 \label{subsec:identificacion_usuarios}
+El sistema define dos roles de acceso diferenciados:
 
-El sistema contempla dos perfiles de usuario diferenciados. El \textbf{usuario no registrado}
-puede acceder a las funciones de consulta pública: visualización de gasolineras y
-electrolineras en mapa y tabla, detalle de cada estación y precios actuales. El
-\textbf{usuario registrado} dispone, además, de la gestión de estaciones favoritas, el
-acceso al histórico de precios de cada estación y las predicciones a 7 días generadas por
-el modelo de machine learning.
+\begin{description}
+  \item[\textbf{usuario no registrado:}] Rol con permisos de lectura para funciones de consulta pública.
+        Accede a la visualización cartográfica y tabular de estaciones de servicio, fichas de detalle técnico y tarifas vigentes.
+  \item[\textbf{usuario registrado:}] Rol con acceso extendido. Además de las capacidades de consulta pública,
+        dispone de persistencia para una lista de estaciones favoritas, acceso a la representación visual de series
+        históricas de precios y consulta del pronóstico de tarifas a 7 días generado por el modelo predictivo, ademas del uso del agente conversacional.
+\end{description}
 
-Dentro de estos perfiles, los casos de uso más representativos son el conductor particular
-que busca repostar barato en su área, el transportista profesional que planifica rutas de
-larga distancia con criterios de coste, y el usuario de vehículo eléctrico que necesita
-localizar puntos de recarga en ruta.
+Estos perfiles cubren tres casos de uso operativos: el conductor particular que optimiza su gasto local,
+el transportista profesional que planifica paradas de repostaje en trayectos de larga distancia y
+el usuario de vehículo eléctrico que requiere geolocalizar puntos de carga compatibles en ruta.
 
 \subsection{Requisitos funcionales}
 \label{subsec:requisitos_funcionales}
@@ -106,10 +103,10 @@ El sistema opera bajo tres restricciones principales. En primer lugar, existe un
 pública del Ministerio para la Transición Ecológica~\cite{datosgob_carburantes}, cuya
 disponibilidad y frecuencia de actualización están fuera del control del sistema. En segundo
 lugar, las funciones de consulta, predicción y recomendación requieren \textbf{conectividad
-activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
+  activa a internet}, ya que toda la lógica reside en el backend cloud. Finalmente, el
 \textbf{asistente conversacional} está diseñado para responder consultas puntuales, no para
 mantener diálogos extendidos mientras se conduce, en línea con las directrices de seguridad
-vial aplicables. El sistema de recomendación de rutas también añade una dependencia que está fuera del control del sistema, 
+vial aplicables. El sistema de recomendación de rutas también añade una dependencia que está fuera del control del sistema,
 ya que se basa en la API de Open Route Service para el cálculo de rutas y distancias.
 
 % ═════════════════════════════════════════════
@@ -225,7 +222,7 @@ funcionalidades avanzadas y diferenciadas de TankGo.
 % · · · · · · · · · · · · · · · · · · · · · ·
 
 El sistema distingue dos actores principales. El \textit{usuario no
-registrado} puede visualizar el mapa de gasolineras, buscar por provincia
+  registrado} puede visualizar el mapa de gasolineras, buscar por provincia
 o municipio, consultar el detalle de una estación junto a su historial de
 precios, explorar los puntos de carga eléctrica y cambiar el idioma de la
 interfaz. El \textit{usuario registrado} hereda todas esas capacidades y
@@ -235,7 +232,7 @@ la visualización de predicciones de precio para dichas estaciones, la
 edición del perfil y la eliminación de la cuenta.
 
 La relación \textit{«include»} entre \textit{Consultar detalle de
-gasolinera} y \textit{Ver historial de precios} refleja que el segundo se
+  gasolinera} y \textit{Ver historial de precios} refleja que el segundo se
 carga de forma obligatoria como parte del primero. De igual modo,
 \textit{Ver predicción de precio} incluye \textit{Gestionar favoritos},
 dado que las predicciones se calculan únicamente sobre las estaciones
@@ -256,11 +253,11 @@ marcadas como favoritas por el usuario.
 
 El segundo diagrama recoge las funcionalidades de TankGo
 respecto a un comparador de precios convencional. El \textit{usuario
-registrado} puede solicitar una recomendación de parada de repostaje para
+  registrado} puede solicitar una recomendación de parada de repostaje para
 una ruta origen-destino, esta acción incluye el cálculo
 de la ruta y los desvíos mediante OpenRouteService, actor externo situado
 en el lado receptor del diagrama. El caso de uso \textit{Filtrar por tipo
-de combustible} extiende la recomendación de ruta, ya que únicamente se
+  de combustible} extiende la recomendación de ruta, ya que únicamente se
 activa cuando el usuario especifica un combustible concreto.
 
 El asistente de voz constituye un caso de uso independiente que incluye
@@ -310,7 +307,7 @@ actuales para su renderizado en mapa y tabla.
   \centering
   \includegraphics[width=\textwidth]{imgs/secuencia-consulta.png}
   \caption{Diagrama de secuencia: sincronización de datos y consulta de
-           gasolineras cercanas}
+    gasolineras cercanas}
   \label{fig:secuencia_consulta}
 \end{figure}
 
@@ -335,7 +332,7 @@ puntuación ponderada por precio y desvío y devuelve al frontend las
   \centering
   \includegraphics[width=\textwidth]{imgs/secuencia-recomendacion.png}
   \caption{Diagrama de secuencia: recomendación de parada de repostaje
-           en ruta}
+    en ruta}
   \label{fig:secuencia_ruta}
 \end{figure}
 
@@ -426,7 +423,7 @@ ser un servicio externo puede experimentar latencias de conexión en arranques e
 
 \subsubsection*{Integración de electrolineras}
 
-Los puntos de recarga eléctrica se obtienen de la API de Mapareve~\cite{reve_api}
+Los puntos de recarga eléctrica se obtienen de la API de Mapareve~\cite{reve_mapa}
 y están integrados directamente dentro del \texttt{gasolineras-service}, bajo el prefijo
 de rutas \texttt{/api/charging/}. Esta decisión evita la proliferación de microservicios
 para funcionalidades que comparten el mismo patrón de acceso (consulta geoespacial, caché
@@ -437,19 +434,24 @@ corta) y reduce la complejidad operacional del despliegue.
 \label{subsec:usuarios_impl}
 % ─────────────────────────────────────────────
 
-El \texttt{usuarios-service} gestiona el ciclo completo de identidad: registro,
-autenticación tradicional, autenticación federada con Google OAuth y gestión de favoritos.
-Está implementado con \textbf{Fastify}~\cite{fastify}, que en combinación con el plugin
-\texttt{@fastify/jwt}~\cite{fastify_jwt} proporciona la firma y verificación de tokens sin código boilerplate.
+El servicio \texttt{usuarios-service} se encarga de gestionar el ciclo completo de identidad, 
+incluyendo el registro, la autenticación tradicional, la autenticación federada con Google OAuth 
+y la administración de favoritos. Está implementado con \textbf{Fastify}~\cite{fastify}, que en 
+combinación con el plugin \texttt{@fastify/jwt}~\cite{fastify_jwt} proporciona la firma y 
+verificación de tokens sin código boilerplate.
 
 \subsubsection*{Autenticación y tokens JWT}
 
 Tras un inicio de sesión correcto, el servicio genera un token \textbf{JWT}~\cite{jwt_rfc7519}
-firmado con el algoritmo HS256 y una caducidad de 7 días. El token no se devuelve en el
-cuerpo de la respuesta, sino que el API Gateway lo establece como una \textit{cookie}
-\texttt{httpOnly} con los flags \texttt{Secure} y \texttt{SameSite=None} en producción.
-Este mecanismo impide que el token sea accesible desde JavaScript del navegador, mitigando
-ataques XSS~\cite{owasp_xss}.
+firmado con el algoritmo HS256 y una caducidad de 7 días. Este token no se devuelve en el
+cuerpo de la respuesta, sino que el API Gateway lo aloja directamente dentro de una 
+\textit{cookie} de sesión del navegador.
+
+Para proteger dicha credencial, la \textit{cookie} se configura estrictamente con el atributo 
+\texttt{httpOnly}. Además, en el entorno de producción se le aplican las directivas 
+\texttt{Secure} y \texttt{SameSite=None}. Este mecanismo impide por completo que el token 
+sea accesible a través de scripts maliciosos, mitigando de forma efectiva los riesgos 
+asociados a ataques de tipo XSS~\cite{owasp_xss}.
 
 Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
 \texttt{id\_token} de Google, lo verifica y llama a un endpoint interno protegido
@@ -597,10 +599,10 @@ Se ha optado por \textbf{LightGBM}~\cite{tandfonline_lightgbm} en régimen de
   \item \textbf{Intervalos de confianza nativos:} la regresión cuantílica con cuantiles
         0.05, 0.50 y 0.95 produce directamente una banda de incertidumbre para cada predicción,
         enriqueciendo la información presentada al usuario sin una etapa adicional de estimación.
-  \item \textbf{Rendimiento competitivo:} en la validación sobre datos reales de tres
-        estaciones representativas, LightGBM alcanzó un MAPE inferior al 2.3\% en todos los
-        casos y superó a ARIMA y XGBoost en las series con mayor variabilidad, donde la
-        incorporación de \textit{features} exógenas del Brent aporta mayor
+  \item \textbf{Rendimiento competitivo:} tras validar el modelo con datos reales de tres
+        estaciones representativas, LightGBM obtuvo un MAPE inferior al 2.3\% en todos los
+        casos. Superó a ARIMA y XGBoost en las series con mayor variabilidad, donde la
+        adición de \textit{features} exógenas del Brent aporta mayor
         capacidad predictiva~\cite{hartanto2023lightgbm}.
 \end{enumerate}
 
@@ -943,7 +945,7 @@ La estrategia de pruebas de TankGo prioriza la verificación de la lógica de ne
 la integración entre componentes, dentro de las restricciones temporales propias de un proyecto
 académico individual. Se ha adoptado un enfoque \textit{test-last}: las pruebas se escriben
 una vez estabilizada la implementación, lo que resulta más adecuado cuando los requisitos
-evolucionan durante el desarrollo~\cite{sommerville2011}. La ejecución se delega íntegramente a pipelines 
+evolucionan durante el desarrollo~\cite{sommerville2011}. La ejecución se delega íntegramente a pipelines
 de integración continua en GitHub
 Actions~\cite{github_actions}, de modo que los resultados son reproducibles y auditables
 sin depender del entorno local de desarrollo.
@@ -968,37 +970,37 @@ El workflow \texttt{test-unit.yml} se dispara en cada push y pull request a \tex
 Las pruebas cubren tres módulos de lógica de negocio:
 
 \begin{itemize}
-    \item \textbf{Modelos Pydantic}~\cite{pydantic} (\texttt{test\_models.py}): se verifica que
-    el modelo \texttt{Gasolinera} rechaza payloads sin el campo \texttt{IDEESS} y acepta
-    precios \texttt{None} para estaciones sin actualización reciente.
+  \item \textbf{Modelos Pydantic}~\cite{pydantic} (\texttt{test\_models.py}): se verifica que
+        el modelo \texttt{Gasolinera} rechaza payloads sin el campo \texttt{IDEESS} y acepta
+        precios \texttt{None} para estaciones sin actualización reciente.
 
-    \item \textbf{Parser del Ministerio} (\texttt{test\_sync\_parser.py}): se comprueba el
-    correcto funcionamiento de \texttt{parse\_horario}, \texttt{\_expand\_dias} y
-    \texttt{parse\_float} frente a entradas válidas, vacías y mal formadas.
+  \item \textbf{Parser del Ministerio} (\texttt{test\_sync\_parser.py}): se comprueba el
+        correcto funcionamiento de \texttt{parse\_horario}, \texttt{\_expand\_dias} y
+        \texttt{parse\_float} frente a entradas válidas, vacías y mal formadas.
 
-    \item \textbf{Fetch de la API del Gobierno} (\texttt{test\_fetch\_gobierno.py}): se valida
-    el parseo completo de la respuesta de la API del Ministerio de Industria~\cite{datosgob_carburantes},
-    incluyendo la gestión de campos ausentes o con formato incorrecto.
+  \item \textbf{Fetch de la API del Gobierno} (\texttt{test\_fetch\_gobierno.py}): se valida
+        el parseo completo de la respuesta de la API del Ministerio de Industria~\cite{datosgob_carburantes},
+        incluyendo la gestión de campos ausentes o con formato incorrecto.
 \end{itemize}
 
 La cobertura obtenida sobre lógica de negocio alcanza el \textbf{96,8\,\%} (180/186 sentencias),
 tal como se detalla en la Tabla~\ref{tab:coverage-gasolineras}.
 
 \begin{table}[H]
-\centering
-\caption{Cobertura de pruebas unitarias — \texttt{gasolineras-service}}
-\label{tab:coverage-gasolineras}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Módulo} & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
-\midrule
-\texttt{models/gasolinera.py}        & 35  & 2 & 94,3\,\% \\
-\texttt{services/constants.py}       & 13  & 0 & 100,0\,\% \\
-\texttt{services/fetch\_gobierno.py} & 137 & 4 & 97,1\,\% \\
-\midrule
-\textbf{Total} & \textbf{186} & \textbf{6} & \textbf{96,8\,\%} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Cobertura de pruebas unitarias — \texttt{gasolineras-service}}
+  \label{tab:coverage-gasolineras}
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Módulo}                      & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
+    \midrule
+    \texttt{models/gasolinera.py}        & 35             & 2             & 94,3\,\%           \\
+    \texttt{services/constants.py}       & 13             & 0             & 100,0\,\%          \\
+    \texttt{services/fetch\_gobierno.py} & 137            & 4             & 97,1\,\%           \\
+    \midrule
+    \textbf{Total}                       & \textbf{186}   & \textbf{6}    & \textbf{96,8\,\%}  \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 \subsubsection{recomendacion-service}
@@ -1007,21 +1009,21 @@ Las pruebas cubren la lógica geoespacial y de puntuación, que constituye el n�
 del servicio:
 
 \begin{itemize}
-    \item \textbf{Geometría y distancias} (\texttt{test\_geo\_math.py}): se verifica la función
-    Haversine con pares de coordenadas conocidos (Madrid--Barcelona $\approx 504$\,km), la
-    propiedad de simetría $d(A,B)=d(B,A)$, la distancia nula entre un punto y sí mismo, y la
-    construcción de corredores geométricos con Shapely para filtrar estaciones dentro y fuera
-    del radio de desvío configurado.
+  \item \textbf{Geometría y distancias} (\texttt{test\_geo\_math.py}): se verifica la función
+        Haversine con pares de coordenadas conocidos (Madrid--Barcelona $\approx 504$\,km), la
+        propiedad de simetría $d(A,B)=d(B,A)$, la distancia nula entre un punto y sí mismo, y la
+        construcción de corredores geométricos con Shapely para filtrar estaciones dentro y fuera
+        del radio de desvío configurado.
 
-    \item \textbf{Scoring de recomendación} (\texttt{test\_recommender.py}): se comprueba que
-    el algoritmo de puntuación prioriza la estación más barata cuando
-    \texttt{peso\_precio}~=~1,0 y la de menor desvío cuando \texttt{peso\_desvio}~=~1,0; que
-    el cálculo de ahorro estimado (\texttt{diff\_precio} $\times$ \texttt{litros\_deposito})
-    es exacto; y que \texttt{top\_n} limita correctamente el número de resultados.
+  \item \textbf{Scoring de recomendación} (\texttt{test\_recommender.py}): se comprueba que
+        el algoritmo de puntuación prioriza la estación más barata cuando
+        \texttt{peso\_precio}~=~1,0 y la de menor desvío cuando \texttt{peso\_desvio}~=~1,0; que
+        el cálculo de ahorro estimado (\texttt{diff\_precio} $\times$ \texttt{litros\_deposito})
+        es exacto; y que \texttt{top\_n} limita correctamente el número de resultados.
 
-    \item \textbf{Validación de esquemas} (\texttt{test\_schemas.py}): se verifica la
-    aceptación de alias de campo, la validación de pesos en el rango $[0,1]$ y la coherencia
-    del modelo \texttt{RecomendacionRequest}.
+  \item \textbf{Validación de esquemas} (\texttt{test\_schemas.py}): se verifica la
+        aceptación de alias de campo, la validación de pesos en el rango $[0,1]$ y la coherencia
+        del modelo \texttt{RecomendacionRequest}.
 \end{itemize}
 
 La cobertura alcanza el \textbf{97,9\,\%} (233/238 sentencias). El módulo \texttt{geo\_math.py}
@@ -1029,20 +1031,20 @@ obtiene el 100\,\% dada su naturaleza de lógica pura sin dependencias externas.
 recoge en la Tabla~\ref{tab:coverage-recomendacion}.
 
 \begin{table}[H]
-\centering
-\caption{Cobertura de pruebas unitarias — \texttt{recomendacion-service}}
-\label{tab:coverage-recomendacion}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Módulo} & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
-\midrule
-\texttt{models/schemas.py}                & 109 & 2 & 98,2\,\% \\
-\texttt{services/geo\_math.py}            &  40 & 0 & 100,0\,\% \\
-\texttt{services/recommendation\_core.py} &  89 & 3 & 96,6\,\% \\
-\midrule
-\textbf{Total} & \textbf{238} & \textbf{5} & \textbf{97,9\,\%} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Cobertura de pruebas unitarias — \texttt{recomendacion-service}}
+  \label{tab:coverage-recomendacion}
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Módulo}                           & \textbf{Stmts} & \textbf{Miss} & \textbf{Cobertura} \\
+    \midrule
+    \texttt{models/schemas.py}                & 109            & 2             & 98,2\,\%           \\
+    \texttt{services/geo\_math.py}            & 40             & 0             & 100,0\,\%          \\
+    \texttt{services/recommendation\_core.py} & 89             & 3             & 96,6\,\%           \\
+    \midrule
+    \textbf{Total}                            & \textbf{238}   & \textbf{5}    & \textbf{97,9\,\%}  \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 % ------------------------------------------------------------
@@ -1061,14 +1063,14 @@ Las pruebas cubren la capa de servicios y utilidades de forma aislada mediante m
 repositorio:
 
 \begin{itemize}
-    \item \texttt{authService.test.js}: registro de usuario, inicio de sesión, detección de
-    email duplicado y generación de token JWT~\cite{fastify_jwt}.
-    \item \texttt{favoriteService.test.js}: alta y baja de favoritos, idempotencia en
-    operaciones repetidas.
-    \item \texttt{userService.test.js}: obtención y actualización de perfil, eliminación
-    de cuenta.
-    \item \texttt{validators.test.js}: validación de contraseñas, correos electrónicos y
-    saneamiento de entradas.
+  \item \texttt{authService.test.js}: registro de usuario, inicio de sesión, detección de
+        email duplicado y generación de token JWT~\cite{fastify_jwt}.
+  \item \texttt{favoriteService.test.js}: alta y baja de favoritos, idempotencia en
+        operaciones repetidas.
+  \item \texttt{userService.test.js}: obtención y actualización de perfil, eliminación
+        de cuenta.
+  \item \texttt{validators.test.js}: validación de contraseñas, correos electrónicos y
+        saneamiento de entradas.
 \end{itemize}
 
 La cobertura unitaria del \texttt{usuarios-service} alcanza el \textbf{95,8\,\%} en líneas
@@ -1076,29 +1078,29 @@ La cobertura unitaria del \texttt{usuarios-service} alcanza el \textbf{95,8\,\%}
 Tabla~\ref{tab:coverage-usuarios-unit}.
 
 \begin{table}[H]
-\centering
-\caption{Cobertura unitaria — \texttt{usuarios-service}}
-\label{tab:coverage-usuarios-unit}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Módulo} & \textbf{Lines\,\%} & \textbf{Branches\,\%} & \textbf{Fns\,\%} \\
-\midrule
-\texttt{hooks/authHooks.js}              & 100,0 & 100,0 & 100,0 \\
-\texttt{hooks/internalAuthHook.js}       & 100,0 & 100,0 & 100,0 \\
-\texttt{middlewares/errorHandler.js}     & 100,0 &  93,8 & 100,0 \\
-\texttt{repositories/favoriteRepository.js} & 100,0 & 100,0 & 100,0 \\
-\texttt{repositories/userRepository.js} & 100,0 & 100,0 & 100,0 \\
-\texttt{routes/auth.js}                  &  97,1 &  92,8 & 100,0 \\
-\texttt{routes/favorites.js}             & 100,0 &  75,0 & 100,0 \\
-\texttt{routes/health.js}                &  96,3 &  50,0 & 100,0 \\
-\texttt{services/authService.js}         &  90,5 &  83,3 & 100,0 \\
-\texttt{services/favoriteService.js}     &  97,4 &  92,0 & 100,0 \\
-\texttt{services/userService.js}         &  87,3 &  86,1 & 100,0 \\
-\texttt{utils/validators.js}             & 100,0 & 100,0 & 100,0 \\
-\midrule
-\textbf{Total} & \textbf{95,8} & \textbf{90,5} & \textbf{100,0} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Cobertura unitaria — \texttt{usuarios-service}}
+  \label{tab:coverage-usuarios-unit}
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Módulo}                             & \textbf{Lines\,\%} & \textbf{Branches\,\%} & \textbf{Fns\,\%} \\
+    \midrule
+    \texttt{hooks/authHooks.js}                 & 100,0              & 100,0                 & 100,0            \\
+    \texttt{hooks/internalAuthHook.js}          & 100,0              & 100,0                 & 100,0            \\
+    \texttt{middlewares/errorHandler.js}        & 100,0              & 93,8                  & 100,0            \\
+    \texttt{repositories/favoriteRepository.js} & 100,0              & 100,0                 & 100,0            \\
+    \texttt{repositories/userRepository.js}     & 100,0              & 100,0                 & 100,0            \\
+    \texttt{routes/auth.js}                     & 97,1               & 92,8                  & 100,0            \\
+    \texttt{routes/favorites.js}                & 100,0              & 75,0                  & 100,0            \\
+    \texttt{routes/health.js}                   & 96,3               & 50,0                  & 100,0            \\
+    \texttt{services/authService.js}            & 90,5               & 83,3                  & 100,0            \\
+    \texttt{services/favoriteService.js}        & 97,4               & 92,0                  & 100,0            \\
+    \texttt{services/userService.js}            & 87,3               & 86,1                  & 100,0            \\
+    \texttt{utils/validators.js}                & 100,0              & 100,0                 & 100,0            \\
+    \midrule
+    \textbf{Total}                              & \textbf{95,8}      & \textbf{90,5}         & \textbf{100,0}   \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 % ------------------------------------------------------------
@@ -1107,7 +1109,7 @@ Tabla~\ref{tab:coverage-usuarios-unit}.
 
 Las pruebas de integración, ejecutadas mediante el workflow \texttt{test-integration.yml},
 levantan un servidor Fastify~\cite{fastify} real conectado a una instancia de PostgreSQL~15,
-provisionada como contenedor 
+provisionada como contenedor
 de servicio en el propio runner de GitHub Actions~\cite{github_actions_services}.
 
 En la última ejecución se completaron \textbf{51 pruebas} en \textbf{3 ficheros de test}, todas
@@ -1116,16 +1118,16 @@ satisfactorias.
 Los casos cubiertos incluyen:
 
 \begin{itemize}
-    \item \textbf{Registro}: \texttt{POST /api/usuarios/register} devuelve 201 con un usuario
-    nuevo y 409 ante email duplicado.
-    \item \textbf{Autenticación}: \texttt{POST /api/usuarios/login} devuelve 200 con cookie
-    \texttt{authToken} válida, y 401 con credenciales incorrectas.
-    \item \textbf{Rate limiting}: el sexto intento de login consecutivo desde la misma IP
-    recibe 429, verificando el comportamiento del plugin
-    \texttt{@fastify/rate-limit}~\cite{fastify_ratelimit}.
-    \item \textbf{Favoritos}: el alta (\texttt{POST}) protegida por JWT devuelve 201; sin JWT,
-    401. La eliminación de un favorito inexistente devuelve 404. El endpoint interno
-    \texttt{/favoritos/all-ideess} devuelve 403 sin la cabecera \texttt{X-Internal-Secret}.
+  \item \textbf{Registro}: \texttt{POST /api/usuarios/register} devuelve 201 con un usuario
+        nuevo y 409 ante email duplicado.
+  \item \textbf{Autenticación}: \texttt{POST /api/usuarios/login} devuelve 200 con cookie
+        \texttt{authToken} válida, y 401 con credenciales incorrectas.
+  \item \textbf{Rate limiting}: el sexto intento de login consecutivo desde la misma IP
+        recibe 429, verificando el comportamiento del plugin
+        \texttt{@fastify/rate-limit}~\cite{fastify_ratelimit}.
+  \item \textbf{Favoritos}: el alta (\texttt{POST}) protegida por JWT devuelve 201; sin JWT,
+        401. La eliminación de un favorito inexistente devuelve 404. El endpoint interno
+        \texttt{/favoritos/all-ideess} devuelve 403 sin la cabecera \texttt{X-Internal-Secret}.
 \end{itemize}
 
 La cobertura de integración se sitúa en el \textbf{82,0\,\%} en líneas. La cobertura de ramas
@@ -1143,26 +1145,27 @@ automáticamente cada push a \texttt{master} sobre las 32\,000 líneas de códig
 La Figura~\ref{fig:sonarcloud} muestra el panel de resultados del análisis más reciente.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{imgs/sonarcloud_dashboard.png}
-    \caption{Panel de SonarCloud — análisis sobre rama \texttt{master}}
-    \label{fig:sonarcloud}
+  \centering
+  \includegraphics[width=0.92\textwidth]{imgs/sonarcloud_dashboard.png}
+  \caption{Panel de SonarCloud — análisis sobre rama \texttt{master}.}
+  \label{fig:sonarcloud}
 \end{figure}
 
-Los resultados muestran una \textbf{duplicación del 2,4\,\%} sobre 32\,000 líneas
+Los resultados muestran una \textbf{duplicación del 2,4\,\%} sobre las 32\,000 líneas
 analizadas, esto indica que hay una alta cohesión del código sin repetición estructural.
-Los \textbf{157 issues de mantenibilidad} (rating~A) corresponden mayoritariamente a
-\textit{code smells} menores  (nombres de variables, complejidad ciclomática puntual) propios
+Los \textbf{157 \textit{issues} de mantenibilidad} (rating~A) corresponden mayoritariamente a
+\textit{code smells} menores (nombres de variables, complejidad ciclomática puntual) propios
 de un proyecto desarrollado de forma iterativa por un único desarrollador.
 
-En el apartado de seguridad se detecta \textbf{1 issue con rating~C}, localizado en el servicio
-\texttt{mcp-gasolineras-server}. Dicho servicio no está habilitado en el despliegue de
-producción y el issue no afecta a
-ningún flujo de usuario activo. Los \textbf{2 bugs de fiabilidad} (rating~A) son de severidad
-menor y no impactan en los flujos principales de la aplicación.
+En el apartado de seguridad se detecta \textbf{1 \textit{issue} con rating~C},
+localizado en el servicio \texttt{mcp-gasolineras-server}. Dicho servicio no está
+habilitado en el despliegue de producción y el \textit{issue} no afecta a
+ningún flujo de usuario activo. Los \textbf{2 \textit{bugs} de fiabilidad} (rating~A)
+son de severidad menor y no impactan en los flujos principales de la aplicación.
+
 
 Hay que señalar que la cobertura de código no está integrada en SonarCloud,
-ya que los reportes de cobertura se gestionan directamente en los workflows de
+ya que los reportes de cobertura se gestionan directamente en los \textit{workflows} de
 GitHub Actions descritos en las secciones anteriores.
 
 % ------------------------------------------------------------
@@ -1193,36 +1196,36 @@ coste de API y ejecutable en cualquier entorno mediante \texttt{npm run eval}.
 Se evalúan tres métricas sobre conjuntos de datos etiquetados manualmente:
 
 \begin{itemize}
-    \item \textbf{Precisión en selección de herramientas}: mide la tasa de acierto
-    de \texttt{classifyIntent()}, que determina qué herramienta (\texttt{get\_prices},
-    \texttt{get\_nearest\_stations} o ninguna) debe invocar el agente ante una
-    consulta de usuario. Resultado: \textbf{100,0\,\%} (19/19 casos).
+  \item \textbf{Precisión en selección de herramientas}: mide la tasa de acierto
+        de \texttt{classifyIntent()}, que determina qué herramienta (\texttt{get\_prices},
+        \texttt{get\_nearest\_stations} o ninguna) debe invocar el agente ante una
+        consulta de usuario. Resultado: \textbf{100,0\,\%} (19/19 casos).
 
-    \item \textbf{Efectividad de los guardarraíles}: mide la precisión de
-    \texttt{isInScope()}, que filtra consultas fuera del dominio de gasolineras y
-    combustible. Durante el desarrollo del eval se detectó un bug real: los
-    términos \textit{barato}, \textit{combustible} y \textit{repostar} no estaban
-    contemplados como señales de contexto válidas. Tras la corrección, el
-    resultado alcanza \textbf{100,0\,\%} de accuracy y F1 (20/20 casos).
+  \item \textbf{Efectividad de los guardarraíles}: mide la precisión de
+        \texttt{isInScope()}, que filtra consultas fuera del dominio de gasolineras y
+        combustible. Durante el desarrollo del eval se detectó un bug real: los
+        términos \textit{barato}, \textit{combustible} y \textit{repostar} no estaban
+        contemplados como señales de contexto válidas. Tras la corrección, el
+        resultado alcanza \textbf{100,0\,\%} de accuracy y F1 (20/20 casos).
 
-    \item \textbf{Detección de idioma} (regresión): verifica que el agente
-    identifica correctamente el idioma de la consulta para adaptar la respuesta.
-    Resultado: \textbf{100,0\,\%} (14/14 casos).
+  \item \textbf{Detección de idioma} (regresión): verifica que el agente
+        identifica correctamente el idioma de la consulta para adaptar la respuesta.
+        Resultado: \textbf{100,0\,\%} (14/14 casos).
 \end{itemize}
 
 \begin{table}[H]
-\centering
-\caption{Resultados de la evaluación offline — agente de voz}
-\label{tab:eval-voz}
-\begin{tabular}{lrr}
-\toprule
-\textbf{Métrica} & \textbf{Score} & \textbf{Estado} \\
-\midrule
-Precisión en selección de herramientas & 100,0\,\% (19/19) & \checkmark \\
-Efectividad de guardarraíles (accuracy / F1) & 100,0\,\% (20/20) & \checkmark \\
-Detección de idioma                    & 100,0\,\% (14/14) & \checkmark \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Resultados de la evaluación offline — agente de voz}
+  \label{tab:eval-voz}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Métrica}                             & \textbf{Score}    & \textbf{Estado} \\
+    \midrule
+    Precisión en selección de herramientas       & 100,0\,\% (19/19) & \checkmark      \\
+    Efectividad de guardarraíles (accuracy / F1) & 100,0\,\% (20/20) & \checkmark      \\
+    Detección de idioma                          & 100,0\,\% (14/14) & \checkmark      \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 Para la monitorización en producción, el pipeline emite trazas a
@@ -1239,35 +1242,35 @@ no operativo (\textit{no-op}), sin impacto en el comportamiento.
 La Tabla~\ref{tab:ci-workflows} resume los cinco workflows de CI configurados en el repositorio.
 
 \begin{table}[H]
-\centering
-\caption{Workflows de integración continua — TankGo}
-\label{tab:ci-workflows}
-\begin{tabular}{p{4.2cm} p{3.2cm} p{4.5cm} p{2.3cm}}
-\toprule
-\textbf{Workflow} & \textbf{Herramientas} & \textbf{Qué verifica} & \textbf{Trigger} \\
-\midrule
-\texttt{test-unit.yml}
-  & pytest + pytest-cov
-  & Unitarios Python; cobertura gasolineras y recomendación
-  & push/PR → master \\[4pt]
-\texttt{test-unit-js.yml}
-  & Vitest
-  & Unitarios JS; cobertura usuarios y frontend
-  & push/PR → master \\[4pt]
-\texttt{test-integration.yml}
-  & Vitest + PostgreSQL~15
-  & Integración usuarios con BD real
-  & push/PR → master \\[4pt]
-\texttt{smoke-test.yml}
-  & curl
-  & Endpoints de producción vía gateway
-  & Manual \\[4pt]
-\texttt{sonarcloud.yml}
-  & SonarCloud
-  & Calidad, duplicación, seguridad
-  & push/PR → master \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Workflows de integración continua — TankGo}
+  \label{tab:ci-workflows}
+  \begin{tabular}{p{4.2cm} p{3.2cm} p{4.5cm} p{2.3cm}}
+    \toprule
+    \textbf{Workflow} & \textbf{Herramientas}                                   & \textbf{Qué verifica} & \textbf{Trigger} \\
+    \midrule
+    \texttt{test-unit.yml}
+                      & pytest + pytest-cov
+                      & Unitarios Python; cobertura gasolineras y recomendación
+                      & push/PR → master                                                                                   \\[4pt]
+    \texttt{test-unit-js.yml}
+                      & Vitest
+                      & Unitarios JS; cobertura usuarios y frontend
+                      & push/PR → master                                                                                   \\[4pt]
+    \texttt{test-integration.yml}
+                      & Vitest + PostgreSQL~15
+                      & Integración usuarios con BD real
+                      & push/PR → master                                                                                   \\[4pt]
+    \texttt{smoke-test.yml}
+                      & curl
+                      & Endpoints de producción vía gateway
+                      & Manual                                                                                             \\[4pt]
+    \texttt{sonarcloud.yml}
+                      & SonarCloud
+                      & Calidad, duplicación, seguridad
+                      & push/PR → master                                                                                   \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 El servicio de \texttt{gateway-hono} y \texttt{voice-assistant-service} no disponen de pruebas
@@ -1275,6 +1278,57 @@ unitarias automatizadas. El gateway actúa principalmente como proxy y su compor
 cubierto por los smoke tests de producción. El asistente de voz depende de llamadas en tiempo
 real a la API de Gemini~\cite{gemini_2_5}, lo que hace inviable su automatización sin un
 entorno de simulación complejo fuera del alcance de este proyecto.
+
+\subsection{Auditoría de calidad web con Lighthouse}
+\label{subsec:lighthouse}
+
+Con el objetivo de validar la calidad del \textit{frontend} desde una perspectiva objetiva y
+reproducible, se ha realizado una auditoría con Google Lighthouse~\cite{lighthouse} sobre la vista
+principal de consulta de gasolineras (\texttt{https://tankgo.dev/gasolineras}), accesible
+públicamente en producción. La herramienta evalúa cuatro dimensiones: rendimiento,
+accesibilidad, buenas prácticas y SEO.
+
+Los resultados obtenidos en la auditoría de escritorio fueron los siguientes:
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{lcc}
+    \hline
+    \textbf{Categoría} & \textbf{Puntuación} & \textbf{Valoración} \\
+    \hline
+    Performance        & 83 / 100            & Naranja             \\
+    Accessibility      & 93 / 100            & Verde               \\
+    Best Practices     & 81 / 100            & Naranja             \\
+    SEO                & 100 / 100           & Verde               \\
+    \hline
+  \end{tabular}
+  \caption{Resultados de la auditoría Lighthouse sobre \texttt{/gasolineras} (escritorio).}
+  \label{tab:lighthouse}
+\end{table}
+
+Las métricas de rendimiento más relevantes fueron: \texttt{FCP} de 1,0\,s, \texttt{LCP}
+de 2,5\,s, \texttt{TBT} de 0\,ms, \texttt{CLS} de 0,085 y un \texttt{Speed Index} de 1,2\,s. La puntuación de rendimiento se ve penalizada
+principalmente por el volumen de JavaScript no utilizado en la carga inicial (estimado en
+360\,KiB de ahorro potencial) y por el peso de las imágenes de las marcas que se sirven a resolución
+completa cuando se renderizan a 32\,px (ej. \texttt{cepsa.jpg}, 527\,KB). Ambos aspectos son
+limitaciones conocidas del bundle generado por Vite al incluir todas las dependencias de Leaflet
+y de la librería de gráficos en el chunk principal.
+
+La puntuación de accesibilidad refleja que el contraste de ciertos elementos informativos
+(clases \texttt{text-green-700} sobre \texttt{bg-green-50}) no supera el umbral recomendado. Además, se ha detectado un salto en la
+jerarquía semántica de los encabezados (uso de un \texttt{<h3>} desordenado) y la necesidad de pulir los atributos \texttt{alt}
+de los iconos de las marcas para evitar descripciones redundantes en lectores de pantalla. Estas incidencias están
+registradas como mejoras pendientes.
+
+En cuanto a buenas prácticas, la penalización proviene por un lado de un script de terceros
+(\texttt{main.js}), presumiblemente de la plataforma de protección de Cloudflare, que hace uso de APIs deprecadas
+(\textit{SharedStorage}, \textit{Fledge}, \texttt{StorageType.persistent}). Por otro lado, la auditoría señala la
+ausencia del \textit{Source Map} del \textit{bundle} de JavaScript y la falta de implementación de cabeceras de seguridad
+estrictas (CSP y HSTS), configuraciones que se abordarán a nivel de servidor en futuras iteraciones.
+
+La auditoría confirma que el \textit{frontend} cumple los objetivos de calidad definidos para
+una PWA en producción: carga inicial rápida, sin errores de consola, sin cookies de terceros,
+con HTTPS, SEO completo y accesibilidad mayoritariamente conforme a WCAG~2.1~AA.
 
 % ═════════════════════════════════════════════
 \section{Manual de Usuario}
@@ -1308,7 +1362,7 @@ conversacional y gestión de favoritos) es necesario iniciar sesión.
   \centering
   % CAPTURA: Pantalla de inicio / landing con mapa visible y botón de login en la barra superior.
   % Válida tanto en escritorio como en móvil. Nombrar el archivo: manual_landing.png
-  \includegraphics[width=0.85\textwidth]{imgs/manual_landing.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_landing.png}
   \caption{Vista principal de TankGo al acceder desde el navegador}
   \label{fig:manual_landing}
 \end{figure}
@@ -1328,7 +1382,7 @@ navegación del navegador.
   % CAPTURA: Pantalla de instalación PWA en móvil (Android preferiblemente).
   % El aviso emergente de "Añadir a pantalla de inicio" o el icono en barra de Chrome.
   % Nombrar el archivo: manual_pwa_install.png
-  \includegraphics[width=0.45\textwidth]{imgs/manual_pwa_install.png}
+  \includegraphics[width=0.3\textwidth]{imgs/manual_pwa_install.png}
   \caption{Opción de instalación de TankGo como PWA en dispositivo móvil}
   \label{fig:manual_pwa}
 \end{figure}
@@ -1363,7 +1417,7 @@ tipos de combustible disponibles y precios actuales.
 \begin{figure}[H]
   \centering
   % CAPTURA: Vista del mapa con gasolineras marcadas y panel lateral con tabla de resultados.
-  \includegraphics[width=0.85\textwidth]{imgs/manual_mapa_gasolineras.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_mapa_gasolineras.png}
   \caption{Vista del mapa de gasolineras con tabla de resultados}
   \label{fig:manual_mapa}
 \end{figure}
@@ -1376,7 +1430,7 @@ disponibles en esa estación, junto con su horario de apertura.
 \begin{figure}[H]
   \centering
   % CAPTURA: Panel de detalle de una gasolinera concreta (precios, horario, nombre).
-  \includegraphics[width=0.75\textwidth]{imgs/manual_detalle_gasolinera.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_detalle_gasolinera.png}
   \caption{Panel de detalle de una estación de servicio}
   \label{fig:manual_detalle}
 \end{figure}
@@ -1393,7 +1447,7 @@ planificar paradas de recarga en ruta.
 \begin{figure}[H]
   \centering
   % CAPTURA: Mapa con marcadores de electrolineras visibles.
-  \includegraphics[width=0.85\textwidth]{imgs/manual_mapa_electrolineras.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_mapa_electrolineras.png}
   \caption{Mapa de puntos de recarga eléctrica}
   \label{fig:manual_electrolineras}
 \end{figure}
@@ -1410,7 +1464,7 @@ plataforma con su sesión activa.
   \centering
   % CAPTURA: Pantalla o modal de login con el botón "Iniciar sesión con Google".
   % Nombrar: manual_login.png
-  \includegraphics[width=0.65\textwidth]{imgs/manual_login.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_login.png}
   \caption{Pantalla de inicio de sesión mediante Google OAuth}
   \label{fig:manual_login}
 \end{figure}
@@ -1438,7 +1492,7 @@ esa estación concreta.
   \centering
   % CAPTURA: Gráfico de histórico de precios de una estación favorita.
   % Mostrar la línea de evolución temporal del precio. Nombrar: manual_historico.png
-  \includegraphics[width=0.85\textwidth]{imgs/manual_historico.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_historico.png}
   \caption{Histórico de precios de una estación de servicio favorita}
   \label{fig:manual_historico}
 \end{figure}
@@ -1455,7 +1509,7 @@ si el precio tenderá a subir o bajar en los próximos días.
   \centering
   % CAPTURA: Gráfica de predicción a 7 días con la banda de confianza visible.
   % Nombrar: manual_prediccion.png
-  \includegraphics[width=0.85\textwidth]{imgs/manual_prediccion.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_prediccion.png}
   \caption{Predicción de precios a 7 días para una estación favorita}
   \label{fig:manual_prediccion}
 \end{figure}
@@ -1473,7 +1527,7 @@ preferencias del perfil para que las recomendaciones sean coherentes con su veh�
   \centering
   % CAPTURA: Vista de rutado con origen/destino introducidos y paradas recomendadas visibles en mapa.
   % Nombrar: manual_ruta.png
-  \includegraphics[width=0.85\textwidth]{imgs/manual_ruta.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_ruta.png}
   \caption{Recomendación de paradas de repostaje en ruta}
   \label{fig:manual_ruta}
 \end{figure}
@@ -1490,7 +1544,7 @@ plataforma y devuelve la respuesta en audio.
   \centering
   % CAPTURA: Interfaz del asistente de voz con el micrófono activo o con una respuesta visible.
   % Idealmente en móvil para reflejar el caso de uso principal. Nombrar: manual_voz.png
-  \includegraphics[width=0.55\textwidth]{imgs/manual_voz.png}
+  \includegraphics[width=0.4\textwidth]{imgs/manual_voz.png}
   \caption{Asistente conversacional de voz en TankGo}
   \label{fig:manual_voz}
 \end{figure}
@@ -1506,7 +1560,7 @@ personalizar las respuestas.
   \centering
   % CAPTURA: Pantalla de perfil de usuario con campos de preferencias visibles.
   % Nombrar: manual_perfil.png
-  \includegraphics[width=0.75\textwidth]{imgs/manual_perfil.png}
+  \includegraphics[width=0.7\textwidth]{imgs/manual_perfil.png}
   \caption{Gestión del perfil y preferencias del usuario}
   \label{fig:manual_perfil}
 \end{figure}
@@ -1516,8 +1570,8 @@ personalizar las respuestas.
 \label{sec:incidencias}
 % ═════════════════════════════════════════════
 
-Esta sección analiza los problemas técnicos más relevantes surgidos durante el desarrollo de TankGo, detallando sus causas 
-y las soluciones aplicadas. Más allá de un registro de errores, este apartado documenta cómo se adaptó la arquitectura del 
+Esta sección analiza los problemas técnicos más relevantes surgidos durante el desarrollo de TankGo, detallando sus causas
+y las soluciones aplicadas. Más allá de un registro de errores, este apartado documenta cómo se adaptó la arquitectura del
 proyecto ante imprevistos técnicos y los criterios seguidos para resolverlos.
 
 % ─────────────────────────────────────────────
@@ -1533,42 +1587,48 @@ en la respuesta del navegador y una experiencia visualmente saturada con más de
 marcadores activos. El problema no solo era de red, sino de rendering en el hilo principal
 del navegador.
 
-La solución que se ha abordado son dos enfoques. En el backend, las consultas de gasolineras se
-limitaron geoespacialmente mediante PostGIS~\cite{postgis}, devolviendo las
-estaciones dentro del radio de búsqueda del usuario en lugar del catálogo completo. En el
-frontend, se ha integrado \textbf{Leaflet MarkerCluster}~\cite{leaflet_markercluster} para
-agrupar los marcadores en función del nivel de zoom, de modo que a escalas reducidas el
-mapa muestra agregados en lugar de marcadores individuales. Esta combinación redujo el
-tiempo de renderizado inicial a valores aceptables y ha mejorado la
-usabilidad en dispositivos móviles.
+  {\sloppy
+    La solución que se ha abordado consta de dos enfoques. En el \textit{backend}, las consultas de
+    gasolineras se limitaron geoespacialmente mediante PostGIS~\cite{postgis}, devolviendo únicamente las
+    estaciones dentro del radio de búsqueda del usuario en lugar del catálogo completo. En el
+    \textit{frontend}, se ha integrado \textbf{Leaflet MarkerCluster}~\cite{leaflet_markercluster} para
+    agrupar los marcadores en función del nivel de zoom, de modo que a escalas reducidas el
+    mapa muestra agregados en lugar de marcadores individuales. Esta combinación redujo considerablemente el
+    tiempo de renderizado inicial a valores aceptables y ha mejorado notablemente la
+    usabilidad en dispositivos móviles.
+    \par}
 
 \subsubsection*{Algoritmo de recomendación: estaciones cercanas y cálculo de desvíos}
 
-El servicio de recomendación de ruta ha presentado varias dificultades durante su
-implementación. El primer problema ha sido la definición de \textit{cercanía} a una ruta: una
-búsqueda por radio desde el punto de origen no tiene sentido para rutas largas, ya que
-excluye las estaciones ubicadas a lo largo del trayecto. Se ha adoptado un enfoque basado en
-un corredor geométrico alrededor de la polilínea de la ruta, implementado con
-\textbf{PostGIS}~\cite{postgis} (\texttt{ST\_DWithin} sobre la geometría de la ruta) y
-refinado con la librería \textbf{Shapely} para el cálculo de buffers vectoriales.
+El servicio de recomendación de ruta ha presentado varias dificultades durante su 
+implementación. El primer problema radicaba en definir la \textit{cercanía} a un trayecto: 
+una búsqueda por radio desde el origen no es viable en rutas largas, ya que excluye 
+las estaciones situadas a lo largo del camino. 
 
-El segundo problema ha sido el cálculo del tiempo de desvío real para cada estación candidata.
-Las primeras versiones calculaban el desvío como la distancia haversine al punto más
-cercano de la ruta, pero este valor no correlaciona bien con el tiempo de desvío en
-carretera, que depende de la red viaria real. La solución ha sido utilizar la
-\textbf{Matrix API de OpenRouteService}~\cite{gisops_routing_overview} para obtener
-tiempos de desvío reales, refinando posteriormente los resultados mediante llamadas
-individuales a la Directions API para los candidatos con mejor puntuación.
+Para solucionarlo, se ha adoptado un enfoque basado en un corredor geométrico alrededor de la 
+polilínea de la ruta. Este mecanismo se ha implementado mediante la extensión 
+\textbf{PostGIS} \cite{postgis}, empleando la función \texttt{ST\_\allowbreak DWithin} sobre 
+la geometría del trazado, y se ha refinado con la librería \textbf{Shapely} para el 
+cálculo de \textit{buffers} vectoriales.
 
-Adicionalmente, la evasión de peajes solicitada como parámetro de la ruta no siempre
-producía buenos resultados,
-debido a que la API de Matrix de OpenRouteService no tiene en cuenta esta variable
-en el cálculo de tiempos de desvío,
-lo que llevaba a recomendar estaciones que técnicamente cumplían el criterio
-de cercanía pero que implicaban ir por carreteras de pago. Sin embargo, la llamada para
-marcar el recorrido si que permite evitar peajes.
-Esta limitación quedó documentada como restricción conocida del sistema
-(véase la sección~\ref{sec:alcance}).
+El segundo reto ha consistido en calcular el tiempo de desvío real para cada estación candidata. 
+Las primeras versiones estimaban el desvío mediante la distancia \textit{haversine} al punto 
+más cercano de la ruta; sin embargo, este valor no correlaciona de forma óptima con el tiempo 
+en carretera, el cual depende estrictamente de la red viaria real. 
+
+La solución definitiva consiste en utilizar la herramienta \textbf{Matrix API} de 
+OpenRouteService \cite{gisops_routing_overview} para obtener matrices de tiempos reales. 
+Posteriormente, estos resultados se refinan realizando llamadas individuales a la 
+\textit{Directions API} para aquellos candidatos que presentan una mejor puntuación.
+
+Adicionalmente, la evasión de peajes solicitada como parámetro no siempre ofrecía los resultados 
+esperados. Esto se debe a que la API de Matrix de OpenRouteService no computa esta variable 
+al calcular tiempos de desvío, lo que provocaba la recomendación de estaciones cercanas 
+pero que requerían transitar por vías de pago. 
+
+Por el contrario, la llamada empleada para trazar el recorrido final sí que permite activar 
+esta restricción. Esta limitación del backend quedó correctamente documentada como una 
+restricción conocida del sistema (véase la sección~\ref{sec:alcance}).
 
 % ─────────────────────────────────────────────
 \subsection{Infraestructura y despliegue en Google Cloud Platform}
@@ -1657,7 +1717,7 @@ apropiados.
 
 El diseño inicial del asistente de voz contemplaba una conexión \textbf{WebSocket}
 persistente entre el cliente y el servicio, con el objetivo de permitir streaming de
-audio en tiempo real y reducir la latencia percibida. Durante el desarrollo se implementó
+audio en tiempo real y reducir la latencia percibida. Durante el desarrollo se ha implementado
 el endpoint \texttt{/ws/voice} y se probó su funcionamiento en entorno local, donde se
 comportaba correctamente.
 

@@ -2,7 +2,7 @@
 %  CAPÍTULO 9: VALORACIÓN ÉTICA DEL PROYECTO
 % ============================================================
 
-\chapter{Capítulo Noveno: Valoración Ética del Proyecto}
+\chapter{Valoración Ética del Proyecto}
 \label{ch:etica}
 
 Este capítulo recoge la valoración ética de \textit{TankGo}, identificando las cuestiones
@@ -20,41 +20,35 @@ al proceso de desarrollo.
 
 \subsection{Identificación de la cuestión ética}
 
-\textit{TankGo} maneja datos con implicaciones directas para la privacidad de sus usuarios.
-La plataforma procesa: (i) la ubicación geográfica del usuario, necesaria para
-mostrar estaciones próximas y calcular rutas de repostaje, (ii) las estaciones marcadas como
-favoritas, que revelan patrones de movilidad y hábitos de consumo, y (iii) las consultas
-realizadas al asistente de voz, que pueden contener información contextual sobre desplazamientos
-y preferencias.
+TankGo procesa información con implicaciones directas en el perímetro de privacidad de los usuarios: 
+(i) las coordenadas geográficas en tiempo real, necesarias para localizar estaciones próximas y trazar rutas, 
+(ii) el registro de estaciones favoritas, que revela hábitos de consumo y patrones recurrentes de movilidad, y 
+(iii) los flujos de audio del asistente conversacional, que contienen datos contextuales sobre desplazamientos. 
 
-La cuestión ética principal es la tensión entre la
-\textbf{utilidad de las funcionalidades personalizadas}, que requieren cierto grado de
-persistencia o procesamiento de datos, y el \textbf{derecho a la privacidad} del usuario,
-entendido como principio deontológico irrenunciable en el diseño de sistemas de información.
+El núcleo ético radica en equilibrar la \textbf{utilidad de los servicios personalizados} 
+con el \textbf{derecho fundamental a la privacidad}, evitando el almacenamiento innecesario de trazas de comportamiento.
 
 \subsection{Análisis de opciones}
 
 Se han considerado dos aproximaciones principales para el tratamiento de estos datos:
 
 \begin{itemize}
-    \item \textbf{Opción A — Perfilado amplio:} almacenar el historial completo de consultas,
-          ubicaciones y rutas para mejorar la personalización y las predicciones del modelo
-          de \textit{machine learning}. Esta opción maximiza la utilidad funcional, pero compromete
-          la privacidad, incrementa la superficie de ataque ante posibles vulnerabilidades y puede
-          generar desconfianza en el usuario.
-
-    \item \textbf{Opción B — Minimización de datos:} recopilar únicamente los datos
-          estrictamente necesarios para cada funcionalidad concreta. La ubicación se procesa
-          en tiempo real sin almacenamiento persistente más allá de la sesión, las predicciones
-          de precio se calculan exclusivamente para las estaciones marcadas como favoritas por
-          el usuario, de forma voluntaria y explícita.
+    \item \textbf{Opción A — Perfilado de comportamiento masivo:} Almacenar de forma persistente el historial completo de coordenadas, 
+    consultas por voz y rutas calculadas. Esta opción maximiza la capacidad analítica para reentrenar modelos predictivos personalizados, 
+    pero incrementa drásticamente la superficie de ataque y compromete la privacidad del usuario.
+    \item \textbf{Opción B — Minimización de datos en origen:} Restringir la captura de registros al mínimo técnico necesario 
+    para la ejecución del servicio instantáneo. Las coordenadas de geolocalización se procesan en memoria volatil durante la 
+    sesión y las proyecciones de precios se acotan estrictamente a las estaciones añadidas de forma activa por el usuario.
 \end{itemize}
 
 \subsection{Decisión adoptada y justificación}
 
-Se ha optado por la \textbf{Opción B}, basada en el principio de minimización de datos
-(\textit{data minimisation}), coherente con el Reglamento General de Protección de
-Datos (RGPD) \cite{rgpd2016}. Esta decisión no se deriva de un dilema de difícil
+La plataforma adopta la \textbf{Opción B} con base en los principios de minimización de datos y privacidad por defecto (\textit{privacy by design}) 
+recogidos en el Reglamento General de Protección de Datos (RGPD) \cite{rgpd2016}.
+
+Se ha optado por la \textbf{Opción B}, con base en los principios de minimización de datos y privacidad por defecto (\textit{privacy by design}) 
+recogidos en el Reglamento General de Protección de Datos (RGPD) \cite{rgpd2016}. 
+Esta decisión no se deriva de un dilema de difícil
 resolución, sino de la aplicación del principio de que \textbf{la privacidad prima por
 defecto} cuando existe incertidumbre sobre la necesidad real de un dato. Desde el
 principio de \textit{privacy by design} \cite{rgpd2016}, el sistema se ha diseñado para
@@ -72,11 +66,10 @@ de la consulta en curso.
 
 \subsection{Identificación de la cuestión ética}
 
-\textit{TankGo} incorpora un módulo de predicción de precios de carburante basado en
-LightGBM con regresión por cuantiles. Este tipo de sistema plantea una cuestión ética
-relacionada con la \textbf{confianza del usuario en las predicciones}: si el usuario
-interpreta una predicción como un dato certero en lugar de como una estimación probabilística,
-podría tomar decisiones de repostaje basadas en información que no tiene garantía de exactitud.
+El módulo analítico de \textit{TankGo} utiliza el algoritmo LightGBM con regresión cuantílica para predecir fluctuaciones de precios. 
+El riesgo deontológico reside en la asimetría de información: si la interfaz presenta los resultados con una falsa certeza, 
+el usuario puede confundir una estimación probabilística con un dato contractual, condicionando su decisión económica 
+bajo una premisa inexacta.
 
 \subsection{Análisis de opciones}
 

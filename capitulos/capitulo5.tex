@@ -3,57 +3,50 @@
 %  CAPÍTULO 5 — PLANIFICACIÓN DEL PROYECTO
 % =========================================================
 
-\chapter{Capítulo Quinto - Planificación del Proyecto}
+\chapter{Planificación del Proyecto}
 
-Este capítulo describe cómo se ha organizado y gestionado el desarrollo de TankGo a lo largo de sus
-dos fases. Se detalla la descomposición del trabajo en tareas, la
-estimación de tiempos, el cronograma seguido, los hitos alcanzados y las replanificaciones
-que surgieron durante el proceso.
+Este capítulo detalla la estrategia de gestión, estructuración y control temporal aplicada en 
+el desarrollo de TankGo. Se describe la descomposición jerárquica del trabajo, la estimación 
+del esfuerzo computado en horas, el cronograma de ejecución y la secuencia de dependencias entre actividades. 
+Finalmente, se exponen los recursos humanos implicados y las replanificaciones estratégicas que adaptaron el 
+alcance inicial a los requerimientos del entorno de investigación.
 
 % ─────────────────────────────────────────────
 \section{Descomposición en tareas (EDT)}
 % ─────────────────────────────────────────────
 
-La Estructura de Descomposición del Trabajo (\textit{Work Breakdown Structure}, WBS) organiza
-el proyecto en bloques funcionales que reflejan la evolución real del desarrollo. Se distinguen
-dos grandes fases, cada una subdividida en paquetes de trabajo.
+La Estructura de Descomposición del Trabajo (\textit{Work Breakdown Structure}, WBS) organiza el 
+proyecto en paquetes de trabajo que reflejan la evolución secuencial e incremental del
+sistema, estructurada en dos fases principales:
 
 \begin{description}
   \item \textbf{Fase 1 - Prototipo inicial (octubre--diciembre 2025)}
         \begin{enumerate}
           \item \textbf{Definición del alcance y arquitectura inicial.}
-                Estudio de fuentes de datos disponibles, definición de objetivos del sistema y diseño
-                de la arquitectura de microservicios.
+          Análisis de viabilidad de las fuentes de datos públicas, especificación de requisitos mínimos y diseño de la topología inicial de servicios.
           \item \textbf{Módulo de gasolineras.}
-                Integración con la API del Ministerio para obtener datos de precios en tiempo real,
-                diseño del modelo de datos y desarrollo del microservicio correspondiente.
+                Modelado de datos e implementación del pipeline de ingesta y normalización de la API del Ministerio.
           \item \textbf{Módulo de usuarios.}
-                Implementación del sistema de autenticación, gestión de perfiles y preferencias.
+                Desarrollo del subsistema de identidad, persistencia de perfiles y control de sesiones.
           \item \textbf{API Gateway.}
-                Configuración del gateway como punto de entrada unificado para los distintos
-                microservicios.
+                Configuración del punto de entrada unificado y enrutamiento base de las peticiones del cliente.
           \item \textbf{Interfaz de usuario (frontend).}
-                Diseño UX/UI y desarrollo de la aplicación web para consulta y comparación de precios.
+                Diseño e implementación de la aplicación web interactiva para la consulta cartográfica de precios.
           \item \textbf{Primer despliegue (Render PaaS).}
-                Puesta en producción del sistema en la plataforma Render como validación del
-                funcionamiento integral.
+                Validación de la integración del sistema mediante un despliegue inicial en una plataforma como servicio.
         \end{enumerate}
 
   \item \textbf{Fase 2 - Ampliación como PFG (febrero--mayo 2026)}
         \begin{enumerate}
           \setcounter{enumi}{6}
           \item \textbf{Migración y mejora del despliegue a GCP.}
-                Reconfiguración de la infraestructura en Google Cloud Platform, incluyendo Cloud Run
-                y Cloud Storage, manteniendo la base de datos en Neon Tech.
+                Reingeniería del despliegue mediante contenedores serverless en Google Cloud Run y almacenamiento de objetos en Cloud Storage.
           \item \textbf{Módulo de electromovilidad.}
-                Integración de puntos de recarga de vehículos eléctricos como extensión del dominio
-                de datos del sistema.
+                Extensión del modelo del dominio e integración de los puntos de recarga eléctrica.
           \item \textbf{Sistema de recomendación de rutas.}
-                Desarrollo del módulo de rutado que sugiere paradas de repostaje óptimas en función
-                de la ruta del usuario.
+                Diseño e implementación del algoritmo de optimización geográfica y cálculo de desvíos en el corredor de transporte.
           \item \textbf{Módulo de predicción de precios (ML).}
-                Entrenamiento y despliegue del modelo LightGBM para la estimación de precios futuros
-                de carburante.
+                Configuración del pipeline de preparación de datos, entrenamiento del modelo LightGBM e inferencia predictiva cuantílica.
           \item \textbf{Asistente conversacional.}
                 Implementación del agente de voz para la interacción en lenguaje natural
                 con el sistema.
@@ -68,12 +61,10 @@ dos grandes fases, cada una subdividida en paquetes de trabajo.
 % ─────────────────────────────────────────────
 \section{Estimación de tiempos}
 % ─────────────────────────────────────────────
-
-La estimación de tiempos se ha realizado de forma incremental: la Fase~1 ha contado con una dedicación
-propia de una asignatura de proyecto, mientras que la Fase~2 se ha desarrollado a un
-ritmo de entre 10 y 15 horas semanales, compatibilizando el trabajo con otras actividades
-académicas y la colaboración con el grupo de investigación DEUSTEK/MORElab \cite{MORElab2026}
-de la Facultad de Ingeniería de la Universidad de Deusto.
+La asignación de tiempos se ha estructurado de forma incremental. La Fase 1 ha contado con una dedicación
+propia de una asignatura de proyecto. Por su parte, la Fase 2 se ha desarrollado con dedicación 
+de entre 10 y 15 horas semanales, compatibilizando la ejecución técnica con las actividades académicas 
+y la colaboración con el grupo de investigación DEUSTEK/MORElab \cite{MORElab2026} de la Facultad de Ingeniería de la Universidad de Deusto.
 
 La tabla siguiente recoge la estimación de horas por paquete de trabajo:
 
@@ -109,13 +100,13 @@ La tabla siguiente recoge la estimación de horas por paquete de trabajo:
   \end{tabular}
 \end{table}
 
+
 Las estimaciones recogidas en la tabla constituyen una aproximación del esfuerzo
 real invertido, elaborada a partir del registro de tareas y del seguimiento del tablero Kanban.
-La naturaleza incremental del proyecto hace que la estimación prospectiva de horas presente
+La naturaleza incremental del proyecto hace que la estimación de horas presente
 mayor incertidumbre que en proyectos con alcance cerrado desde el inicio, por eso, las cifras
 reflejan el tiempo efectivamente dedicado con mayor fidelidad que una planificación previa
 al desarrollo.
-
 
 % ─────────────────────────────────────────────
 \section{Cronograma (Diagrama de Gantt)}
@@ -135,43 +126,35 @@ proyecto distribuidas en el tiempo.
 % ─────────────────────────────────────────────
 \section{Hitos del proyecto}
 % ─────────────────────────────────────────────
-
-A lo largo del proyecto se han definido tres hitos principales que han marcado el cierre de etapas
-importantes y han servido como puntos de validación con el director:
+El control de la planificación se ha articulado en torno a tres hitos de control, que marcaron la finalización de las fases críticas y la validación de los entregables:
 
 \begin{description}
-  \item[M1 - Prototipo funcional (diciembre 2025).] Finalización de la primera versión
-        operativa del sistema, con los módulos de gasolineras, usuarios, gateway y frontend
-        integrados y desplegados en Render. Este hito cerró la fase correspondiente a la
-        asignatura de proyecto y sentó las bases del PFG.
+  \item[M1 - Prototipo funcional (diciembre 2025).] Cierre de la arquitectura base del sistema, 
+  consolidando los servicios de combustibles y usuarios 
+  integrados a través del gateway y desplegados de forma centralizada en Render.
 
-  \item[M2 - Sistema completo en GCP (mayo 2026).] Finalización de todos los módulos
-        avanzados: migración a Google Cloud Platform, sistema de recomendación de rutas, módulo
-        de predicción de precios con LightGBM y asistente conversacional. Este hito ha supuesto la
-        validación funcional del sistema en su versión completa.
+  \item[M2 - Sistema completo en GCP (mayo 2026).] Finalización del desarrollo técnico avanzado, 
+  incluyendo la migración estructural a la arquitectura serverless de Google Cloud, el 
+  despliegue del pipeline predictivo de LightGBM y la estabilización de la lógica conversacional.
 
-  \item[M3 - Entrega del PFG (junio 2026).] Cierre del proyecto con la entrega de la memoria
-        técnica y la presentación ante el tribunal. Este hito incluye la revisión final de la
-        documentación y la preparación de la defensa.
+  \item[M3 - Entrega del PFG (junio 2026).] Finalización del ciclo del proyecto mediante la 
+  consolidación de la documentación técnica, redacción de la memoria y preparación del acto de defensa pública.
 \end{description}
 
 % ─────────────────────────────────────────────
 \section{Encadenamiento de actividades}
 % ─────────────────────────────────────────────
-
-El encadenamiento de actividades refleja las dependencias entre los distintos paquetes
-de trabajo, es decir, qué tareas deben completarse antes de que otras puedan comenzar. Dado que
-el proyecto ha seguido un enfoque incremental, muchas dependencias son secuenciales dentro de cada
-módulo, aunque algunas tareas de la segunda fase podían abordarse en paralelo una vez
+El diagrama PERT de la Figura~\ref{fig:pert} modela las restricciones de precedencia y las oportunidades de paralelismo identificadas durante el ciclo de vida del desarrollo. 
+Dado que el proyecto ha seguido un enfoque incremental, muchas dependencias son secuenciales dentro de cada
+módulo, aunque algunas tareas de la segunda fase se han podido realizarse en paralelo una vez
 estabilizado el núcleo del sistema.
 
 La \textbf{definición del alcance y la arquitectura} constituye la actividad de partida del
 proyecto: ningún módulo puede iniciarse sin tener clara la estructura general del sistema y las
 fuentes de datos a integrar. A partir de ella, el \textbf{módulo de gasolineras} y el
-\textbf{módulo de usuarios} pueden desarrollarse en paralelo, ya que ambos son funcionalmente
-independientes. El primero es el componente central de la plataforma y su finalización es
-prerequisito para el desarrollo del frontend, que consume los datos que expone. El
-\textbf{API Gateway}, por su parte, se ha desarrollado de forma incremental conforme se añadían
+\textbf{módulo de usuarios} se ejecutan en paralelo, ya que ambos son funcionalmente
+independientes. El
+\textbf{API Gateway}, se ha desarrollado de forma incremental conforme se añadían
 nuevos microservicios, requiriendo que al menos uno de ellos estuviera operativo para poder
 configurar el enrutamiento. El \textbf{frontend} no puede configurarse hasta que tanto el
 gateway como los módulos principales expongan endpoints para ser consumidos. El

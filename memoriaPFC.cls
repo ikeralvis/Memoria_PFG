@@ -283,3 +283,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds}
 \usepackage{tabularx}
+\usepackage[spanish]{babel}
+%\usepackage[none]{hyphenat}
+%\sloppy
+\RequirePackage{microtype} % Manejo inteligente y invisible de márgenes

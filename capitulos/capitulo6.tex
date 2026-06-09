@@ -3,52 +3,46 @@
 %  CAPÍTULO 6 — PRESUPUESTO Y EVALUACIÓN DE COSTES
 % =========================================================
 
-\chapter{Capítulo Sexto - Presupuesto y evaluación de costes}
+\chapter{Presupuesto y evaluación de costes}
 
-Este capítulo presenta la evaluación económica del proyecto TankGo desde dos perspectivas
-complementarias: el \textbf{coste teórico}, equivalente a contratar en el mercado el trabajo
-técnico realizado, y el \textbf{coste real} incurrido durante el desarrollo, que se ha mantenido
-mínimo gracias al uso estratégico de herramientas gratuitas y de los niveles de uso gratuito
-(\textit{free tier}) de los principales proveedores cloud. La diferencia entre ambas magnitudes
-ilustra que es posible construir y desplegar una plataforma de microservicios cloud-native de
-complejidad real con una inversión económica muy reducida.
+Este capítulo presenta la evaluación económica de la plataforma TankGo bajo dos enfoques complementarios:
+el \textbf{coste de desarrollo teórico}, que representa la valoración en el mercado del esfuerzo de ingeniería invertido,
+y el \textbf{coste de explotación real}, derivado del despliegue y mantenimiento de la infraestructura en producción.
+El análisis demuestra la viabilidad financiera del proyecto y la optimización de costes lograda mediante la adopción
+de paradigmas \textit{serverless} y arquitecturas elásticas de pago por uso.
 
 % ------------------------------------------------------------
 \section{Costes laborales}
 % ------------------------------------------------------------
-
-El coste laboral es la partida más significativa del proyecto. El autor ha desempeñado
-varios roles técnicos a lo largo de los nueve meses de desarrollo. Para la
-valoración del trabajo se emplea una tarifa de referencia de \textbf{30~€/hora}, coherente
-con el rango de mercado para un perfil de Ingeniero de Software Junior con conocimientos en
-desarrollo fullstack, arquitecturas cloud y aprendizaje automático en España en 2025--2026:
-según datos de Glassdoor y Jobted, la tarifa freelance para este perfil se sitúa entre 18 y
-35~€/hora, siendo 30~€/hora una estimación conservadora dentro de ese intervalo
-\cite{glassdoor2026salarios, jobted2026salarios}.
+El coste laboral constituye la partida más significativa del presupuesto de desarrollo.
+Para homogeneizar el cómputo, las tareas ejecutadas por el autor se han valorado bajo una tarifa lineal de \textbf{30~€/hora}.
+Este valor se alinea de forma conservadora con las referencias de mercado en España para el periodo 2025--2026 correspondientes
+a perfiles de Ingeniería de Software Junior con competencias transversales en desarrollo web, arquitecturas cloud y pipelines de
+machine learning \cite{glassdoor2026salarios, jobted2026salarios}.
 
 Las 400 horas de trabajo efectivo registradas se distribuyen entre los distintos roles
 desempeñados según se recoge en la Tabla~\ref{tab:costes_laborales}:
 
 \begin{table}[H]
-\centering
-\caption{Distribución de horas por rol y coste laboral estimado}
-\label{tab:costes_laborales}
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Rol} & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
-\midrule
-Arquitecto de software / diseño del sistema    &  55 & 30 & 1.650 \\
-Desarrollador backend (Python / FastAPI)       & 100 & 30 & 3.000 \\
-Desarrollador backend (Node.js / Fastify/Hono) &  65 & 30 & 1.950 \\
-Desarrollador frontend (React / TypeScript)    &  55 & 30 & 1.650 \\
-Ingeniería de datos / ML (LightGBM, pipeline)  &  55 & 30 & 1.650 \\
-DevOps / cloud / CI-CD (GCP, Docker)           &  40 & 30 & 1.200 \\
-Análisis de requisitos y documentación         &  30 & 30 &   900 \\
-\midrule
-\textbf{Total estudiante} & \textbf{400} & 30 & \textbf{12.000} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Distribución de horas por rol y coste laboral estimado}
+  \label{tab:costes_laborales}
+  \small
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Rol}                                   & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
+    \midrule
+    Arquitecto de software / diseño del sistema    & 55             & 30                    & 1.650                 \\
+    Desarrollador backend (Python / FastAPI)       & 100            & 30                    & 3.000                 \\
+    Desarrollador backend (Node.js / Fastify/Hono) & 65             & 30                    & 1.950                 \\
+    Desarrollador frontend (React / TypeScript)    & 55             & 30                    & 1.650                 \\
+    Ingeniería de datos / ML (LightGBM, pipeline)  & 55             & 30                    & 1.650                 \\
+    DevOps / cloud / CI-CD (GCP, Docker)           & 40             & 30                    & 1.200                 \\
+    Análisis de requisitos y documentación         & 30             & 30                    & 900                   \\
+    \midrule
+    \textbf{Total estudiante}                      & \textbf{400}   & 30                    & \textbf{12.000}       \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 Se incluye igualmente el coste del director del PFG, estimado a partir de las reuniones de
@@ -56,20 +50,20 @@ seguimiento mantenidas durante la Fase~2 (febrero--mayo 2026) y la revisión de 
 una tarifa de referencia de 60~€/hora para el perfil de Catedrático de Universidad:
 
 \begin{table}[H]
-\centering
-\caption{Coste del director del proyecto}
-\label{tab:coste_director}
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Concepto} & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
-\midrule
-Reuniones y seguimiento (aprox.\ 20 semanas $\times$ 1~h) & 20 & 60 & 1.200 \\
-Revisión de la memoria                                     & 10 & 60 &   600 \\
-\midrule
-\textbf{Total director} & \textbf{30} & 60 & \textbf{1.800} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Coste del director del proyecto}
+  \label{tab:coste_director}
+  \small
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Concepto}                                         & \textbf{Horas} & \textbf{Tarifa (€/h)} & \textbf{Subtotal (€)} \\
+    \midrule
+    Reuniones y seguimiento (aprox.\ 20 semanas $\times$ 1~h) & 20             & 60                    & 1.200                 \\
+    Revisión de la memoria                                    & 10             & 60                    & 600                   \\
+    \midrule
+    \textbf{Total director}                                   & \textbf{30}    & 60                    & \textbf{1.800}        \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 % ------------------------------------------------------------
@@ -80,16 +74,16 @@ El único elemento hardware empleado ha sido el ordenador personal del autor, va
 1.200~€. Aplicando amortización lineal a 4 años con un uso dedicado al proyecto del 60\,\%
 durante 9 meses, la amortización imputable es de \textbf{135~€}.
 
-Practicamente todo el software es de código abierto o gratuito: Python, Node.js, React,
-Docker Desktop, Visual Studio Code, Git/GitHub y Overleaf suponen un coste de \textbf{0~€}.
+Las herramientas de software empleadas (entornos de ejecución Python y Node.js, librerías de cliente,
+orquestadores Docker Desktop, editores Visual Studio Code y los sistemas de control de versiones Git/GitHub)
+se rigen por licencias de código abierto o modalidades comunitarias sin coste, representando una partida de \textbf{0~€}.
 
-Respecto a la infraestructura cloud, todos los servicios utilizados durante el desarrollo
-(Cloud Run, Cloud Storage, Cloud Build, Artifact Registry, Neon PostgreSQL y Google AI Studio)
-se han mantenido dentro de sus niveles de uso gratuito o mediante créditos académicos de
-vigencia limitada. Dado que estos créditos están sujetos a expiración, la sección~\ref{subsec:infra_prod}
-recoge una estimación del coste real en un escenario de producción. El único gasto efectivo
-durante el desarrollo ha sido el registro del dominio \texttt{tankgo.dev} por
-\textbf{$\approx$~11~€}.
+En lo que respecta a la infraestructura en la nube durante la fase de desarrollo, los servicios distribuidos
+(Google Cloud Run, Cloud Storage, Cloud Build, Artifact Registry, Neon PostgreSQL y las llamadas de testeo en Google AI Studio)
+se mantuvieron dentro de las capas de uso gratuito (\textit{free tier}) o se financiaron mediante créditos académicos de vigencia limitada. Sin embargo una vez pasada la fecha,
+es posible que se hayan incurrido en costes menores, aunque no se dispone de un desglose detallado. Para reflejar el coste real durante el desarrollo,
+se ha considerado únicamente el gasto efectivo del registro del dominio \texttt{tankgo.dev}, que ascendió a \textbf{11~€}. Este registro se realizó a traves de Cloudflare,
+que ofrece un precio competitivo y una gestión sencilla de DNS, y se ha mantenido activo durante todo el periodo de desarrollo.
 
 % ------------------------------------------------------------
 \section{Coste total estimado del proyecto}
@@ -99,69 +93,55 @@ La Tabla~\ref{tab:coste_total} consolida todas las partidas para obtener el cost
 estimado si el proyecto se hubiera contratado en el mercado bajo condiciones laborales estándar.
 
 \begin{table}[H]
-\centering
-\caption{Coste total estimado del proyecto}
-\label{tab:coste_total}
-\begin{tabular}{lr}
-\toprule
-\textbf{Partida} & \textbf{Importe (€)} \\
-\midrule
-Costes laborales — estudiante (400\,h $\times$ 30\,€/h) & 12.000 \\
-Costes laborales — director (30\,h $\times$ 60\,€/h)    &  1.800 \\
-Amortización de hardware                                 &    135 \\
-Software y herramientas                                  &      0 \\
-Infraestructura cloud (dominio incluido)                 &     11 \\
-\midrule
-\textbf{Total estimado}                                  & \textbf{13.946} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Coste total estimado del proyecto}
+  \label{tab:coste_total}
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Partida}                                        & \textbf{Importe (€)} \\
+    \midrule
+    Costes laborales — estudiante (400\,h $\times$ 30\,€/h) & 12.000               \\
+    Costes laborales — director (30\,h $\times$ 60\,€/h)    & 1.800                \\
+    Amortización de hardware                                & 135                  \\
+    Software y herramientas                                 & 0                    \\
+    Infraestructura cloud (dominio incluido)                & 11                   \\
+    \midrule
+    \textbf{Total estimado}                                 & \textbf{13.946}      \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
-El coste estimado de \textbf{13.946~€} refleja la complejidad del trabajo realizado:
-diseño de una arquitectura de microservicios con siete componentes, desarrollo fullstack,
-integración de modelos de aprendizaje automático, despliegue en Google Cloud Platform y
-extensión con capacidades conversacionales basadas en IA generativa.
+El coste estimado de \textbf{13.946~€} cuantifica el esfuerzo integral necesario para materializar la solución.
+Esta cifra absorbe la carga de ingeniería requerida para la construcción de los servicios desacoplados, los pipelines
+analíticos de machine learning y la integración del perímetro conversacional.
 
 % ------------------------------------------------------------
 \section{Estimación del coste en producción}
 \label{subsec:infra_prod}
 % ------------------------------------------------------------
-
-Con el fin de contextualizar la viabilidad económica más allá de la fase académica, la
-Tabla~\ref{tab:prod_cost} recoge una estimación orientativa del coste mensual de infraestructura
-para un escenario de producción real con carga moderada (500.000 peticiones mensuales). A
-diferencia del entorno de desarrollo, en producción los servicios cloud se facturarían a tarifa
-completa una vez agotados los créditos de uso gratuito.
+Para evaluar la viabilidad financiera de la plataforma a largo plazo, la Tabla~\ref{tab:prod_cost}
+proyecta una estimación de los costes recurrentes de infraestructura bajo un escenario operativo real.
+El modelo asume una carga mensual moderada estabilizada en 500.000 peticiones agregadas al API Gateway,
+prescindiendo de créditos promocionales y aplicando las tarifas completas de los proveedores cloud.
 
 \begin{table}[H]
-\centering
-\caption{Estimación orientativa de costes mensuales en producción}
-\label{tab:prod_cost}
-\begin{tabular}{lp{7cm}r}
-\toprule
-\textbf{Servicio} & \textbf{Criterio de estimación} & \textbf{Coste mensual} \\
-\midrule
-Google Cloud Run (7 servicios) &
-  Basado en la calculadora oficial de GCP \cite{gcp_run_pricing} para
-  500.000 peticiones/mes con latencia media de 300~ms por servicio. &
-  20 -- 50~€ \\
-Neon PostgreSQL (plan Pro) &
-  Plan mínimo de pago: 10~GiB de almacenamiento y cómputo escalable,
-  suficiente para el volumen de datos de TankGo. &
-  $\approx$ 18~€ \\
-Google Cloud Storage &
-  Almacenamiento de snapshots Parquet y modelos LightGBM. &
-  $<$ 1~€ \\
-Gemini 2.5 Flash \cite{gemini_pricing_2025} &
-  Pipeline STT-LLM-TTS; coste unitario por interacción $<$ 0,001~USD. &
-  1 -- 5~€ \\
-Dominio y DNS &
-  Renovación anual de \texttt{tankgo.dev} prorrateada al mes. &
-  $\approx$ 1~€ \\
-\midrule
-\textbf{Total mensual estimado} & & \textbf{40 -- 75~€/mes} \\
-\bottomrule
-\end{tabular}
+  \centering
+  \caption{Estimación proyectada de costes mensuales de operación}
+  \label{tab:prod_cost}
+  \small
+  \begin{tabularx}{\textwidth}{lXr}
+    \toprule
+    \textbf{Servicio cloud}                                         & \textbf{Mecanismo de tarificación e hipótesis de carga}                                                                                                           & \textbf{Coste estimado} \\
+    \midrule
+    Google Cloud Run                                                & Cómputo elástico para 7 servicios bajo un volumen de 500.000~peticiones/mes con una ventana de latencia media de 300~ms por instancia \cite{gcp_run_pricing}.     & 20 -- 50~€              \\
+    Neon PostgreSQL                                                 & Plan profesional con 10~GiB de persistencia e instancias de cómputo con escalado dinámico a cero.                                                                 & $\approx$ 18~€          \\
+    Google Cloud Storage                                            & Custodia y versionado de snapshots en formato Parquet y artefactos binarios del modelo LightGBM.                                                                  & $< 1$~€                 \\
+    Gemini 2.5 Flash                                                & Consumo de la API multimodal para flujos de voz; coste computado por volumen de tokens en transacciones de la interfaz conversacional \cite{gemini_pricing_2025}. & 1 -- 5~€                \\
+    Dominio y DNS                                                   & Renovación anual prorrateada del dominio \texttt{tankgo.dev}.                                                                                                     & $\approx$ 1~€           \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{Gasto operativo mensual proyectado}} & \textbf{40 -- 75~€/mes}                                                                                                                                                                     \\
+    \bottomrule
+  \end{tabularx}
 \end{table}
 
 TankGo podría operar como servicio real con un coste de infraestructura inferior a
