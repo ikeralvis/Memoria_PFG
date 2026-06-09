@@ -1,6 +1,63 @@
-\chapter{Capítulo Décimo - Conclusiones}
+\chapter{Conclusiones}
+\label{ch:conclusiones}
 
+Este capítulo recoge la valoración final del proyecto: los objetivos que se han cumplido, los obstáculos que surgieron durante el desarrollo,
+la reflexión personal sobre el trabajo realizado y las posibilidades de evolución que quedan abiertas.
+
+% ─────────────────────────────────────────────
 \section{Objetivos alcanzados}
+\label{sec:objetivos-alcanzados}
+
+Todos los objetivos definidos al inicio del proyecto se han cumplido. TankGo es una plataforma de microservicios completamente funcional y
+desplegada en producción que permite consultar precios de combustible con datos oficiales del Ministerio, integrar puntos de recarga eléctrica,
+recibir recomendaciones de ruta personalizadas según el desvío y el ahorro estimado, predecir la evolución del precio en las estaciones favoritas
+del usuario y conversar con un asistente de voz basado en Gemini con capacidad de \textit{tool calling}.
+
+El sistema se ha entregado con siete pipelines de CI/CD independientes, cobertura de tests superior al 95\,\% en los servicios principales y una
+valoración de mantenibilidad de grado~A en SonarCloud. Esto no solo demuestra que la plataforma funciona, sino que está construida para poder
+mantenerse y crecer.
+
+% ─────────────────────────────────────────────
 \section{Dificultades encontradas}
+\label{sec:dificultades}
+
+El desarrollo no ha estado exento de retos. Uno de los más relevantes ha sido la elección y justificación del modelo de predicción: LightGBM no supera a
+ARIMA en MAE de forma sistemática, y fue necesario construir una argumentación sólida centrada en su escalabilidad a más de 11.000 estaciones y en
+su capacidad de generar intervalos de confianza nativos, algo que un modelo clásico de series temporales no ofrece directamente.
+
+El motor de recomendación de ruta también ha presentado dificultades importantes. Combinar geometría vectorial con Shapely, consultas espaciales en PostGIS
+y la API de enrutamiento de OpenRouteService ha  un diseño cuidadoso para que el sistema respondiera en tiempos razonables sin comprometer la
+precisión del cálculo de desvío.
+
+En el plano de infraestructura, Cloud Run ha presentado limitaciones inesperadas: la gestión de conexiones WebSocket en el asistente de voz ha resultado inestable
+en el entorno serverless, lo que ha obligado a priorizar el transporte HTTP como vía principal del pipeline de diálogo. Por último, coordinar siete servicios
+con ciclos de despliegue independientes ha exigido que una completa integración continua, aunque costosa de configurar, ha demostrado ser una de
+las decisiones más acertadas del proyecto.
+
+% ─────────────────────────────────────────────
 \section{Aportación personal y reflexión crítica}
+\label{sec:aportacion-personal}
+
+Este proyecto ha supuesto completar, por primera vez de forma autónoma, el ciclo completo de un sistema \textit{cloud-native}: desde el modelado de
+datos espaciales y el diseño de contratos API hasta el entrenamiento de modelos de ML, la autenticación sin estado con JWT y el despliegue serverless
+en Google Cloud. Trabajar en el entorno de investigación de MORElab/DEUSTEK ha añadido además la exigencia de justificar cada decisión con rigor técnico,
+algo que va más allá de lo que habitualmente se pide en un proyecto comercial.
+
+Si el proyecto tuviera que rehacerse, probablemente se iniciaría con una estrategia de testing más temprana y se establecerían desde el principio
+contratos de API más estrictos entre servicios. La deuda técnica acumulada en las primeras iteraciones fue real, aunque se fue corrigiendo a lo largo del desarrollo.
+
+% ─────────────────────────────────────────────
 \section{Líneas futuras de mejora}
+\label{sec:lineas-futuras}
+
+TankGo está en condiciones de evolucionar en varias direcciones. A corto plazo, la prioridad más clara es estabilizar el canal WebSocket del
+asistente de voz en Cloud Run y completar la integración del servidor MCP (\texttt{mcp-gasolineras-server}) en el flujo conversacional, lo que
+permitiría al asistente delegar consultas de forma más flexible. Asimismo, a nivel de despliegue web, se contempla la configuración de cabeceras de 
+seguridad estrictas (CSP y HSTS) para fortificar el \textit{frontend}, tal y como se identificó en las auditorías de calidad.
+
+A medio plazo, el modelo de predicción podría extenderse a más tipos de combustible y a un horizonte temporal más amplio, aprovechando el histórico
+de datos que ya se está acumulando en Cloud Storage. También sería valioso incorporar la variación del precio del Brent como \textit{feature} en
+tiempo real, en lugar de depender únicamente del dato diario de FRED.
+
+A largo plazo, la plataforma tiene recorrido para un lanzamiento público con usuarios reales, lo que abriría ciclos de validación y mejora continua
+que exceden el alcance de este PFG pero para los que la arquitectura actual ya está preparada.
