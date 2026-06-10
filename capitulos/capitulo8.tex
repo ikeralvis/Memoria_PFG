@@ -138,6 +138,18 @@ electrolineras, recomendación y predicción. Finalmente, la \textbf{capa de per
 centraliza el almacenamiento en PostgreSQL, accesible desde cada servicio según sus
 necesidades.
 
+La heterogeneidad tecnológica de la capa de servicios refleja una de las
+ventajas prácticas de esta arquitectura: cada microservicio adopta el
+lenguaje y \textit{framework} más adecuado para su dominio sin imponer
+restricciones al resto. Así, los servicios de mayor carga computacional
+(\texttt{gasolineras-service}, \texttt{recomendacion-service},
+\texttt{prediction-service}) se implementan en Python con
+FastAPI~\cite{fastapi}, aprovechando el ecosistema científico de ese
+lenguaje, mientras que los servicios orientados a I/O y autenticación
+(\texttt{usuarios-service}, \texttt{gateway-hono}) emplean Node.js con
+Fastify y Hono respectivamente, optimizados para alta concurrencia con
+bajo consumo de recursos.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{imgs/arquitectura_tankgo.png}
@@ -265,7 +277,7 @@ dos subcasos: la consulta de precios en tiempo real y la búsqueda de
 estaciones cercanas, ambos resueltos mediante \textit{tool calling} hacia
 la API del gateway. En el bloque de sincronización de datos se representan
 los dos actores externos que alimentan la base de datos en segundo plano:
-la API del Ministerio de Industria (MITECO) y la Reve API para los puntos
+la API del Ministerio de Industria (MITECO) y la Reve API \cite{geoportal_gasolineras,reve_mapa} para los puntos
 de carga eléctrica. Ambas sincronizaciones son iniciadas por el propio
 sistema mediante tareas programadas y no requieren intervención del
 usuario.
@@ -294,7 +306,7 @@ complementarios. En segundo plano, Cloud Scheduler lanza diariamente a
 las 06:00 una petición al endpoint
 \texttt{/gasolineras/daily-sync-export}, protegido mediante la cabecera
 \texttt{X-Internal-Secret}, el servicio descarga el listado actualizado
-desde la API del Ministerio de Industria (MITECO), persiste los datos en
+desde la API del Ministerio de Industria (MITECO) \cite{geoportal_gasolineras}, persiste los datos en
 PostgreSQL y exporta un \textit{snapshot} en formato Parquet a Cloud
 Storage para el pipeline de predicción. En el flujo síncrono, el usuario
 activa la geolocalización y el frontend envía la petición al API Gateway,
@@ -320,12 +332,14 @@ El diagrama de la figura~\ref{fig:secuencia_ruta} detalla el flujo de
 recomendación de parada de repostaje para una ruta origen-destino. El
 servicio de recomendación orquesta el proceso en tres fases: primero
 consulta OpenRouteService para obtener el trazado GeoJSON de la ruta
-principal. Luego genera un corredor geométrico alrededor de
-dicha traza mediante Shapely, recupera el catálogo completo de gasolineras
-desde el servicio y filtra las candidatas que quedan dentro del
-corredor. Finalmente, invoca la Matrix API de OpenRouteService para
-calcular los desvíos reales de cada candidata, aplica una función de
-puntuación ponderada por precio y desvío y devuelve al frontend las
+principal. A continuación construye un corredor geométrico alrededor de
+dicha traza y recupera únicamente las estaciones candidatas cuya geometría
+queda dentro de ese corredor, utilizando la función \texttt{ST\_DWithin}
+de PostGIS directamente en la cláusula \texttt{WHERE} de la consulta, sin
+traer el catálogo completo a memoria. Finalmente, invoca la Matrix API de
+OpenRouteService para calcular los desvíos reales de cada candidata, aplica
+la función de puntuación ponderada descrita en la
+sección~\ref{subsec:recomendacion_impl} y devuelve al frontend las
 \textit{top-n} estaciones recomendadas con su ahorro estimado.
 
 \begin{figure}[H]
@@ -383,14 +397,14 @@ frescura respecto a una fuente externa que actualiza sus precios varias veces al
 día~\cite{datosgob_carburantes}.
 
 \subsubsection*{Ciclo de sincronización}
-El servicio mantiene la frescura de los datos mediante tres mecanismos complementarios:
+El servicio asegura la actualización continua de los datos mediante tres mecanismos complementarios:
 
 \begin{itemize}
   \item Comprobación al arranque: si \texttt{AUTO\_ENSURE\_FRESH\_ON\_STARTUP} está activa, se
         valida la antigüedad local y se lanza una sincronización condicional.
-  \item Job programado: un \textbf{Cloud Scheduler} ejecuta diariamente un Cloud Run Job que
+  \item Job programado: un \textbf{Cloud Scheduler} \cite{cloud_scheduler2026} ejecuta diariamente un Cloud Run Job \cite{cloud_run2026} que
         sincroniza desde la API del Ministerio y exporta un snapshot Parquet a Google Cloud
-        Storage para el pipeline de ML.
+        Storage \cite{cloud_storage2026} para el pipeline de ML.
   \item Sincronización bajo demanda: si una lectura detecta datos obsoletos y
         \texttt{AUTO\_SYNC\_ON\_READ=true}, se puede desencadenar una sincronización en
         segundo plano (en producción esta opción suele estar desactivada para evitar latencia).
@@ -402,12 +416,14 @@ en producción sin depender de un sistema de colas externo.
 \subsubsection*{Almacenamiento y consultas geoespaciales}
 
 Los precios actuales se almacenan en la tabla \texttt{gasolineras} junto con las
-coordenadas geográficas de cada estación. Para las búsquedas por proximidad se utiliza
-\textbf{PostGIS}~\cite{postgis}, la extensión geoespacial de PostgreSQL, que permite
-ejecutar consultas basadas en distancia con los operadores \texttt{ST\_DWithin} y
-\texttt{ST\_Distance} de forma eficiente mediante índices espaciales. Esto evita el
-cálculo de la distancia haversine en capa de aplicación para el filtrado inicial,
-reservándolo únicamente para el refinamiento de resultados.
+coordenadas geográficas de cada estación. Para optimizar las búsquedas por proximidad se utiliza
+\textbf{PostGIS}~\cite{postgis}, la extensión geoespacial de PostgreSQL. Esta herramienta permite
+ejecutar consultas basadas en distancia de forma eficiente mediante índices espaciales
+(operadores \texttt{ST\_DWithin} y \texttt{ST\_Distance}).
+Esta estrategia evita tener que calcular la fórmula de Haversine en la capa de aplicación
+para el filtrado inicial, lo cual requeriría un coste computacional elevado al iterar
+sobre todo el universo de datos, reservando dicho cálculo exclusivamente para el refinamiento y
+ordenación de los resultados finales.
 
 El histórico de precios se registra en la tabla \texttt{precios\_historicos}, donde cada
 fila representa una instantánea de los precios de una estación en una fecha concreta.
@@ -417,7 +433,7 @@ fila representa una instantánea de los precios de una estación en una fecha co
 Si al arrancar el servicio no dispone de conexión a la base de datos, entra en modo
 \textit{memory-fallback}: carga los datos desde la última sincronización disponible en
 memoria y continúa respondiendo peticiones, aunque sin capacidad de escritura. Este modo
-garantiza la resiliencia ante interrupciones transitorias de conectividad con Neon, que al
+garantiza la resiliencia ante interrupciones transitorias de conectividad con la base de datos Neon \cite{neon_tech2026}, que al
 ser un servicio externo puede experimentar latencias de conexión en arranques en frío
 (\textit{cold starts}) de Cloud Run.
 
@@ -434,23 +450,23 @@ corta) y reduce la complejidad operacional del despliegue.
 \label{subsec:usuarios_impl}
 % ─────────────────────────────────────────────
 
-El servicio \texttt{usuarios-service} se encarga de gestionar el ciclo completo de identidad, 
-incluyendo el registro, la autenticación tradicional, la autenticación federada con Google OAuth 
-y la administración de favoritos. Está implementado con \textbf{Fastify}~\cite{fastify}, que en 
-combinación con el plugin \texttt{@fastify/jwt}~\cite{fastify_jwt} proporciona la firma y 
+El servicio \texttt{usuarios-service} se encarga de gestionar el ciclo completo de identidad,
+incluyendo el registro, la autenticación tradicional, la autenticación federada con Google OAuth
+y la administración de favoritos. Está implementado con \textbf{Fastify}~\cite{fastify}, que en
+combinación con el plugin \texttt{@fastify/jwt}~\cite{fastify_jwt} proporciona la firma y
 verificación de tokens sin código boilerplate.
 
 \subsubsection*{Autenticación y tokens JWT}
 
 Tras un inicio de sesión correcto, el servicio genera un token \textbf{JWT}~\cite{jwt_rfc7519}
 firmado con el algoritmo HS256 y una caducidad de 7 días. Este token no se devuelve en el
-cuerpo de la respuesta, sino que el API Gateway lo aloja directamente dentro de una 
+cuerpo de la respuesta, sino que el API Gateway lo aloja directamente dentro de una
 \textit{cookie} de sesión del navegador.
 
-Para proteger dicha credencial, la \textit{cookie} se configura estrictamente con el atributo 
-\texttt{httpOnly}. Además, en el entorno de producción se le aplican las directivas 
-\texttt{Secure} y \texttt{SameSite=None}. Este mecanismo impide por completo que el token 
-sea accesible a través de scripts maliciosos, mitigando de forma efectiva los riesgos 
+Para proteger dicha credencial, la \textit{cookie} se configura estrictamente con el atributo
+\texttt{httpOnly}. Además, en el entorno de producción se le aplican las directivas
+\texttt{Secure} y \texttt{SameSite=None}. Este mecanismo impide por completo que el token
+sea accesible a través de scripts maliciosos, mitigando de forma efectiva los riesgos
 asociados a ataques de tipo XSS~\cite{owasp_xss}.
 
 Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
@@ -459,9 +475,11 @@ Para el flujo de Google OAuth, el gateway actúa como intermediario: recibe el
 usuario. A continuación el servicio devuelve el JWT al gateway para su encapsulación
 en cookie.
 
-Las contraseñas se almacenan únicamente como hash generado con \textbf{bcrypt}~\cite{bcrypt}
-con 12 rondas de sal, lo que hace computacionalmente inviable su recuperación por fuerza
-bruta incluso en caso de exfiltración de la base de datos.
+Las contraseñas se almacenan únicamente como un hash generado con \textbf{bcrypt} \cite{bcrypt,provos1999bcrypt}
+utilizando un factor de coste de 12 rondas (lo que equivale a $2^{12}$ iteraciones del algoritmo).
+Este retardo intencionado incrementa el tiempo de procesamiento por intento, haciendo que la recuperación
+de claves por fuerza bruta o mediante ataques de diccionario sea computacionalmente inviable,
+incluso en caso de exfiltración de la base de datos.
 
 \subsubsection*{Gestión del esquema de base de datos}
 
@@ -477,11 +495,22 @@ del esquema y permiten desplegar cambios de forma trazable y segura~\cite{flyway
 
 \subsubsection*{Rate limiting}
 
-Los endpoints de registro e inicio de sesión aplican un límite de 5 peticiones por IP
-cada 15 minutos mediante el plugin \texttt{@fastify/rate-limit}~\cite{fastify_ratelimit},
-configurado con \texttt{global: false} para no afectar al resto de rutas. Las direcciones
-de loopback (\texttt{127.0.0.1}, \texttt{::1}) quedan exentas para no interferir con las
-pruebas locales.
+El API Gateway no se limita a enrutar peticiones hacia los microservicios
+internos: actúa como punto de control centralizado encargado de la
+autenticación, la validación de tokens JWT y la protección frente a abusos
+(véase la figura~\ref{fig:arquitectura}). Concentrar estas responsabilidades
+en el gateway evita replicar lógica de seguridad en cada servicio y reduce
+la superficie de ataque expuesta al exterior.
+
+En este contexto, los endpoints de registro e inicio de sesión son los más
+vulnerables a ataques de fuerza bruta y \textit{credential stuffing}, ya que
+permiten probar combinaciones de credenciales sin necesidad de token previo.
+Por ello se les aplica un límite de 5 peticiones por IP cada 15 minutos
+mediante el plugin \texttt{@fastify/rate-limit}~\cite{fastify_ratelimit},
+configurado con \texttt{global: false} para restringir la protección a esas
+rutas sin penalizar el resto del tráfico autenticado. Las direcciones de
+loopback (\texttt{127.0.0.1}, \texttt{::1}) quedan exentas para no interferir
+con las pruebas locales y los flujos de integración continua.
 
 % ─────────────────────────────────────────────
 \subsection{Servicio de recomendación de ruta}
@@ -493,7 +522,7 @@ que, dada una ruta entre origen y destino, sugiere las paradas de repostaje ópt
 ponderando el precio del combustible y el desvío necesario para alcanzar cada estación.
 Está implementado en \textbf{FastAPI}~\cite{fastapi} con Python, y
 combina consultas geoespaciales sobre PostGIS, geometría vectorial con
-\textbf{Shapely} y llamadas a la API de \textbf{OpenRouteService}~\cite{openrouteservice}
+\textbf{Shapely} \cite{shapely} y llamadas a la API de \textbf{OpenRouteService}~\cite{openrouteservice}
 para el cálculo de rutas y matrices de tiempos.
 
 \subsubsection*{Flujo del algoritmo}
@@ -538,21 +567,29 @@ El algoritmo se ejecuta en siete etapas secuenciales:
 
 \subsubsection*{Función de \textit{scoring}}
 
-La puntuación de cada estación candidata se calcula mediante una combinación lineal
-ponderada de dos factores normalizados:
+La puntuación de cada candidata combina precio y desvío mediante una
+suma ponderada:
 
 \begin{equation}
-  \text{score} = w_p \cdot (1 - \hat{p}) + w_d \cdot (1 - \hat{d}) + b_{\text{area}}
+  \text{score}_i = w_p \cdot (1 - \hat{p}_i) + w_d \cdot (1 - \hat{d}_i) + b_i
   \label{eq:scoring}
 \end{equation}
 
-donde $\hat{p}$ es el precio normalizado de la estación respecto al rango de precios del
-conjunto de candidatas, $\hat{d}$ es el desvío normalizado respecto al desvío máximo
-permitido, y $b_{\text{area}} = 0.08$ es un bonus aplicado a estaciones clasificadas como
-áreas de servicio, que compensan su habitualmente mayor precio con una mayor accesibilidad
-desde la vía principal. Los pesos $w_p$ y $w_d$ son configurables por el usuario en cada
-petición y se normalizan automáticamente para que $w_p + w_d = 1$, con valores por defecto
-de $0.6$ y $0.4$ respectivamente, priorizando el precio sobre el desvío.
+Ambos factores se normalizan por min-max sobre el conjunto de candidatas,
+de modo que la estación más barata obtiene $\hat{p}_i = 0$ (máxima
+contribución al score) y la más cara $\hat{p}_i = 1$ (mínima). Lo mismo
+aplica al desvío. Los pesos por defecto son $w_p = 0{,}6$ y $w_d = 0{,}4$,
+con la restricción $w_p + w_d = 1$: el precio pondera más porque el
+objetivo principal del sistema es el ahorro económico, pero el desvío
+actúa como penalización para descartar estaciones baratas que exigen un
+rodeo que consumiría parte del ahorro obtenido. Ambos pesos son
+configurables por petición, lo que permite a un usuario que priorice el
+tiempo ajustar la función sin modificar el algoritmo.
+
+El término $b_i$ es una bonificación de ${,}08$ para áreas de servicio,
+que compensa su habitual sobreprecio con la mayor accesibilidad directa
+desde la vía principal.
+
 
 \subsubsection*{Configuración de la petición}
 
@@ -570,11 +607,19 @@ transportista profesional que prefiere minimizar el tiempo de desvío.
 \label{subsec:prediccion_impl}
 % ─────────────────────────────────────────────
 
-El \texttt{prediction-service} implementa un pipeline de machine learning para estimar el
+El \texttt{prediction-service} implementa un pipeline \ref{fig:prediccion_pipeline} de machine learning para estimar el
 precio de combustible de las estaciones favoritas de los usuarios durante los próximos 7
 días. El diseño se orienta a la ejecución periódica en lote (\textit{batch}) más que a la
 inferencia en tiempo real, separando físicamente el rol de entrenamiento del rol de
 consulta.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{imgs/prediccion_pipeline.png}
+  \caption{Pipeline de entrenamiento y predicción de precios}
+  \label{fig:prediccion_pipeline}
+\end{figure}
+
 
 \subsubsection*{Selección del modelo}
 
@@ -652,8 +697,13 @@ medio registrado. A partir de ella se generan cuatro grupos de \textit{features}
         capturan la autocorrelación de la serie a distintas escalas.
   \item \textbf{Estadísticos de ventana:} media móvil y desviación típica en ventanas de
         7, 14 y 30 días.
-  \item \textbf{Diferencias:} variación de precio a 1 y 7 días, que aproximan la
-        derivada de la serie y ayudan al modelo a detectar tendencias recientes.
+  \item \textbf{Diferencias:} variación de precio respecto al día anterior
+        y respecto a hace 7 días. Mientras los \textit{lags} le dicen al modelo
+        cuánto costaba el combustible en un momento pasado, las diferencias le
+        dicen si el precio lleva días subiendo o bajando. Sin este \textit{feature},
+        el modelo no distingue entre un precio estable en 1{,}65~€/L y uno que
+        lleva tres días cayendo hasta ese mismo valor, información que sí es
+        relevante para predecir el día siguiente.
 \end{itemize}
 
 Como variable exógena se incorpora el precio del crudo \textbf{Brent}, obtenido a través
@@ -761,15 +811,24 @@ mediante llamadas HTTP REST al cliente \texttt{@google/genai}.
 El pipeline se ejecuta en tres etapas secuenciales, cada una con su propia llamada a la
 API de Gemini. En la etapa de \textbf{reconocimiento de voz} (\textit{Speech-to-Text}),
 si la petición incluye audio en base64, el servicio invoca \texttt{generateContent} con
-el modelo configurado para transcribir el audio a texto. En la etapa de \textbf{razonamiento}
-(\textit{LLM con function calling}), se realiza una primera llamada con las declaraciones
-de las funciones disponibles (\texttt{get\_prices} y \texttt{get\_nearest\_stations}), si
-el modelo solicita ejecutar alguna de ellas, el servicio las invoca localmente contra el
-API Gateway y realiza una segunda llamada con los resultados, obteniendo así la respuesta
-final fundamentada en datos reales. En la etapa de \textbf{síntesis de voz}
-(\textit{Text-to-Speech}), se realiza una llamada adicional a Gemini con modalidad de
-respuesta \texttt{AUDIO}, la respuesta PCM se convierte a WAV y se devuelve en base64
-al cliente.
+el modelo configurado para transcribir el audio a texto. 
+
+En la etapa de \textbf{razonamiento} 
+(\textit{LLM con function calling}),
+el servicio envía la transcripción al modelo junto con las declaraciones
+de las dos funciones disponibles: \texttt{get\_prices}, para consultar
+precios por municipio o provincia, y \texttt{get\_nearest\_stations}, para
+localizar estaciones cercanas a unas coordenadas. El modelo analiza la
+intención de la consulta y toma una de tres decisiones: responder
+directamente si la pregunta no requiere datos en tiempo real, invocar
+\texttt{get\_prices} si el usuario pregunta por precios en una zona, o
+invocar \texttt{get\_nearest\_stations} si pregunta por estaciones
+cercanas. Cuando el modelo solicita ejecutar una función, el servicio
+extrae los parámetros inferidos, realiza la llamada correspondiente
+contra el API Gateway y devuelve los resultados al modelo en una segunda
+llamada, que genera así la respuesta final fundamentada en datos reales
+en lugar de en conocimiento interno del modelo. Este mecanismo garantiza
+que el asistente nunca fabrique precios ni ubicaciones.
 
 Este diseño con tres llamadas separadas, en lugar de una única llamada multimodal, ofrece
 mayor control sobre cada etapa y facilita el manejo de errores y los fallbacks por modelo.
@@ -806,6 +865,15 @@ identificaron problemas de estabilidad de conexión con el transporte WebSocket 
 entorno de Cloud Run, asociados al comportamiento de las peticiones de larga duración en
 infraestructura serverless. Por ello, el cliente frontend utiliza actualmente el endpoint
 HTTP, que ofrece un comportamiento predecible en todos los entornos de despliegue.
+
+El paradigma de comunicación basado en WebSockets complementa las limitaciones
+del protocolo HTTP tradicional en escenarios de alta interactividad. Mientras que HTTP opera
+bajo un esquema síncrono de petición-respuesta de corta duración (lo que introduce una sobrecarga
+considerable de cabeceras en interacciones frecuentes), WebSockets establece una conexión única,
+persistente y full-duplex sobre una misma conexión TCP. Esto permite un canal bidireccional puro donde
+tanto el cliente como el servidor pueden enviar flujos de datos (streaming) de manera asíncrona con
+una latencia mínima, característica que resultaba ideal en el diseño preliminar para procesar las
+ráfagas continuas de audio del asistente conversacional
 
 % ─────────────────────────────────────────────
 \subsection{Frontend: React PWA con Nginx}
@@ -849,10 +917,13 @@ La interfaz soporta tres idiomas (español, inglés y euskera) mediante
 diseño sigue un enfoque \textit{mobile-first} con \textbf{TailwindCSS}~\cite{tailwind},
 garantizando que la experiencia sea funcional tanto en pantallas de escritorio como en
 dispositivos móviles, donde el caso de uso de búsqueda de gasolineras en ruta es
-predominante. El mapa interactivo se implementa con \textbf{Leaflet}~\cite{leaflet} a
-través de la librería \texttt{react-leaflet}, con soporte para clustering de marcadores
-a niveles de zoom bajos para evitar la saturación visual cuando hay muchas estaciones en
-el área visible.
+predominante. El mapa interactivo se implementa con \textbf{Leaflet}~\cite{leaflet} a través
+de la librería \texttt{react-leaflet}, alimentado por mapas de teselas (\textit{tiles}) de
+OpenStreetMap~\cite{openstreetmap}, un sistema que divide la cartografía en imágenes cuadradas
+independientes que se cargan dinámicamente según la región visible. El componente cuenta además
+con soporte para el agrupamiento (\textit{clustering}) de marcadores a niveles de zoom bajos,
+evitando así la saturación visual cuando existe una alta densidad de estaciones en el área
+visible.
 
 % ─────────────────────────────────────────────
 \subsection{Despliegue en GCP y pipeline CI/CD}
@@ -1600,34 +1671,34 @@ del navegador.
 
 \subsubsection*{Algoritmo de recomendación: estaciones cercanas y cálculo de desvíos}
 
-El servicio de recomendación de ruta ha presentado varias dificultades durante su 
-implementación. El primer problema radicaba en definir la \textit{cercanía} a un trayecto: 
-una búsqueda por radio desde el origen no es viable en rutas largas, ya que excluye 
-las estaciones situadas a lo largo del camino. 
+El servicio de recomendación de ruta ha presentado varias dificultades durante su
+implementación. El primer problema radicaba en definir la \textit{cercanía} a un trayecto:
+una búsqueda por radio desde el origen no es viable en rutas largas, ya que excluye
+las estaciones situadas a lo largo del camino.
 
-Para solucionarlo, se ha adoptado un enfoque basado en un corredor geométrico alrededor de la 
-polilínea de la ruta. Este mecanismo se ha implementado mediante la extensión 
-\textbf{PostGIS} \cite{postgis}, empleando la función \texttt{ST\_\allowbreak DWithin} sobre 
-la geometría del trazado, y se ha refinado con la librería \textbf{Shapely} para el 
+Para solucionarlo, se ha adoptado un enfoque basado en un corredor geométrico alrededor de la
+polilínea de la ruta. Este mecanismo se ha implementado mediante la extensión
+\textbf{PostGIS} \cite{postgis}, empleando la función \texttt{ST\_\allowbreak DWithin} sobre
+la geometría del trazado, y se ha refinado con la librería \textbf{Shapely} para el
 cálculo de \textit{buffers} vectoriales.
 
-El segundo reto ha consistido en calcular el tiempo de desvío real para cada estación candidata. 
-Las primeras versiones estimaban el desvío mediante la distancia \textit{haversine} al punto 
-más cercano de la ruta; sin embargo, este valor no correlaciona de forma óptima con el tiempo 
-en carretera, el cual depende estrictamente de la red viaria real. 
+El segundo reto ha consistido en calcular el tiempo de desvío real para cada estación candidata.
+Las primeras versiones estimaban el desvío mediante la distancia \textit{haversine} al punto
+más cercano de la ruta; sin embargo, este valor no correlaciona de forma óptima con el tiempo
+en carretera, el cual depende estrictamente de la red viaria real.
 
-La solución definitiva consiste en utilizar la herramienta \textbf{Matrix API} de 
-OpenRouteService \cite{gisops_routing_overview} para obtener matrices de tiempos reales. 
-Posteriormente, estos resultados se refinan realizando llamadas individuales a la 
+La solución definitiva consiste en utilizar la herramienta \textbf{Matrix API} de
+OpenRouteService \cite{openrouteservice_api} para obtener matrices de tiempos reales.
+Posteriormente, estos resultados se refinan realizando llamadas individuales a la
 \textit{Directions API} para aquellos candidatos que presentan una mejor puntuación.
 
-Adicionalmente, la evasión de peajes solicitada como parámetro no siempre ofrecía los resultados 
-esperados. Esto se debe a que la API de Matrix de OpenRouteService no computa esta variable 
-al calcular tiempos de desvío, lo que provocaba la recomendación de estaciones cercanas 
-pero que requerían transitar por vías de pago. 
+Adicionalmente, la evasión de peajes solicitada como parámetro no siempre ofrecía los resultados
+esperados. Esto se debe a que la API de Matrix de OpenRouteService no computa esta variable
+al calcular tiempos de desvío, lo que provocaba la recomendación de estaciones cercanas
+pero que requerían transitar por vías de pago.
 
-Por el contrario, la llamada empleada para trazar el recorrido final sí que permite activar 
-esta restricción. Esta limitación del backend quedó correctamente documentada como una 
+Por el contrario, la llamada empleada para trazar el recorrido final sí que permite activar
+esta restricción. Esta limitación del backend quedó correctamente documentada como una
 restricción conocida del sistema (véase la sección~\ref{sec:alcance}).
 
 % ─────────────────────────────────────────────

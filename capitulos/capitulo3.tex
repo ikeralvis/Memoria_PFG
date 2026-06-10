@@ -173,7 +173,7 @@ además los intervalos de confianza mediante la función de pérdida por cuantil
 
 El cálculo de matrices de costes temporales y trazados de rutas se realiza a través de la API
 de \textbf{OpenRouteService} (ORS) (código abierto, licencias principales GPLv3/LGPL-3.0 según componente)
-\cite{gisops_routing_overview}. Motores alternativos como OSRM \cite{osm_wiki_routers},
+\cite{openrouteservice_api}. Motores alternativos como OSRM \cite{osm_wiki_routers},
 a pesar de su alta velocidad de respuesta, demandan el despliegue de instancias dedicadas con una carga considerable
 de memoria RAM para indexar el grafo vial completo, lo que invalida su viabilidad en arquitecturas serverless elásticas. ORS
 solventa este requerimiento al proveer funciones analíticas parametrizables de enrutamiento y matrices de distancia directamente consumibles de forma externa.
@@ -212,23 +212,11 @@ las funciones de recuperación de datos geoespaciales y precios actuales del sis
 % ---------------------------------------------------------
 \section{Plataforma de despliegue: Google Cloud}
 % ---------------------------------------------------------
-El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) para asegurar la compatibilidad 
-con el ecosistema de ejecución serverless y los modelos de lenguaje utilizados. La orquestación de contenedores 
-se ejecuta sobre \textbf{Cloud Run} \cite{cloud_run2026}, mientras que la automatización de despliegues (CI/CD) 
-se gestiona mediante \textbf{Cloud Build} \cite{cloud_build2026} aislando la lógica en manifiestos independientes 
-por servicio.
+El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) adoptando una arquitectura orientada a servicios mediante microservicios independientes y un enfoque \textit{serverless} (sin servidor). Esta decisión arquitectónica permite desacoplar los componentes del sistema, garantizando que cada módulo (como la API o el motor de predicción) se ejecute de forma aislada. Al delegar por completo la gestión, el aprovisionamiento y el mantenimiento de la infraestructura subyacente en el proveedor de la nube, el sistema obtiene escalabilidad automática inmediata: los servicios se dimensionan dinámicamente en respuesta a la demanda y son capaces de escalar a cero cuando no hay peticiones activas, eliminando el desperdicio de recursos.
 
-El control de acceso y seguridad se rige bajo el principio de privilegios mínimos a través de
-\textbf{Cloud IAM} \cite{gcp_products2026}, asignando identidades y roles independientes a cada contenedor para 
-segmentar el acceso a los recursos de almacenamiento (\textbf{Cloud Storage} \cite{cloud_storage2026}) y custodia de claves (\textbf{Secret Manager}). 
+Bajo este paradigma, la orquestación de los contenedores de cada microservicio se ejecuta sobre \textbf{Cloud Run}~\cite{cloud_run2026}, mientras que la automatización de despliegues (CI/CD) se gestiona mediante \textbf{Cloud Build}~\cite{cloud_build2026}, aislando la lógica en manifiestos independientes por servicio. El control de acceso y seguridad se rige bajo el principio de privilegios mínimos a través de \textbf{Cloud IAM}~\cite{gcp_products2026}, asignando identidades y roles independientes a cada contenedor para segmentar el acceso a los recursos de almacenamiento (\textbf{Cloud Storage}~\cite{cloud_storage2026}) y custodia de claves (\textbf{Secret Manager}).
 
-Frente a AWS y Azure, GCP ofrece integración nativa con Gemini y las APIs de
-Google. El modelo de costes de GCP
-para los servicios utilizados sigue un esquema de pago por uso: Cloud Run factura
-por tiempo de CPU y memoria consumidos durante la ejecución efectiva de
-peticiones, Cloud Storage por volumen almacenado y operaciones de lectura/escritura,
-y Cloud Build por minutos de compilación, con niveles gratuitos mensuales que
-cubren parcialmente la carga del proyecto en su estado inicial~\cite{gcp_products2026}.
+Esta selección tecnológica frente a alternativas como AWS o Azure responde tanto a su integración nativa con el ecosistema de Gemini como a la eficiencia de su modelo de costes, ligado a la naturaleza \textit{serverless}. El esquema de pago por uso de GCP asegura que solo se factura por la ejecución efectiva de las peticiones: Cloud Run computa exclusivamente el tiempo exacto de CPU y memoria consumidos durante el procesamiento, Cloud Storage tarifa por volumen almacenado y operaciones realizadas, y Cloud Build por minutos de compilación. De este modo, los niveles gratuitos mensuales cubren sustancialmente la carga del proyecto en su estado inicial, reduciendo los costes operativos fijos a cero.
 
 % ---------------------------------------------------------
 \section{Síntesis: justificación del stack tecnológico}

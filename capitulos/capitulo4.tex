@@ -59,35 +59,27 @@ siguiendo el criterio SMART (\textit{Specific, Measurable, Achievable, Relevant,
 \subsection{Recomendación basada en rutas}
 
 \begin{itemize}
-      \item \textbf{OE-08.} Desarrollar un motor de recomendación para trayectos
-            entre dos puntos que identifique las estaciones óptimas dentro de un corredor
-            geométrico, aplicando una función de puntuación ponderada basada en el coste
-            económico y el tiempo de desvío.
-      \item \textbf{OE-09.} Garantizar la resiliencia del módulo de enrutamiento
-            en el entorno de producción mediante el diseño de políticas de control de
-            concurrencia y mecanismos de contingencia (\textit{fallback}) ante la indisponibilidad
-            de las APIs geoespaciales externas.
+      \item \textbf{OE-08.} Desarrollar un motor de recomendación para trayectos entre dos puntos que identifique las estaciones óptimas dentro de un corredor geométrico, aplicando una función de puntuación ponderada basada en el coste económico y el tiempo de desvío para generar un listado optimizado de alternativas.
+      \item \textbf{OE-09.} Garantizar la resiliencia del módulo de enrutamiento en el entorno de producción mediante el diseño de políticas de control de concurrencia y mecanismos de contingencia (\textit{fallback}) ante la indisponibilidad de las APIs geoespaciales externas
 \end{itemize}
 
 \subsection{Arquitectura, despliegue y calidad}
 
 \begin{itemize}
-      \item \textbf{OE-10.} Diseñar una arquitectura orientada a microservicios
-            desacoplados mediante un API Gateway centralizado, asegurando que cada componente
-            sea gobernable, desplegable y escalable de forma independiente \cite{Gartner2026Trends}.
+      \item \textbf{OE-10.} Diseñar una arquitectura basada en patrones de microservicios desacoplados mediante un API Gateway centralizado, asegurando que cada componente sea gestionable, desplegable y escalable de forma independiente \cite{Gartner2026Trends}.
 
       \item \textbf{OE-11.} Desplegar la plataforma en Google Cloud Run mediante
             la automatización de flujos de integración y entrega continua (CI/CD)
             distribuidos en siete pipelines independientes en Google Cloud Build.
 
-      \item \textbf{OE-12.} Implementar un módulo de identidad basado en el estándar 
-      JWT transmitido mediante \textit{cookies} seguras (\textit{httpOnly}), compatible 
-      con autenticación federada a través de Google OAuth 2.0.
-      
-      \item \textbf{OE-13.} Integrar un asistente de voz basado en un pipeline síncrono 
-      (STT $\rightarrow$ LLM $\rightarrow$ TTS) utilizando la API de Gemini \cite{gemini_2_5}, 
-      habilitando capacidades de \textit{tool calling} \cite{genai_tool_calling} para interactuar 
-      con los servicios internos a través del gateway.
+      \item \textbf{OE-12.} Implementar un módulo de identidad basado en el estándar
+            JWT transmitido mediante \textit{cookies} seguras (\textit{httpOnly}), compatible
+            con autenticación federada a través de Google OAuth 2.0.
+
+      \item \textbf{OE-13.} Integrar un asistente de voz basado en un pipeline síncrono
+            (STT $\rightarrow$ LLM $\rightarrow$ TTS) utilizando la API de Gemini \cite{gemini_2_5},
+            habilitando capacidades de \textit{tool calling} \cite{genai_tool_calling} para interactuar
+            con los servicios internos a través del gateway.
 \end{itemize}
 
 \section{Alcance del sistema}
@@ -96,8 +88,8 @@ siguiendo el criterio SMART (\textit{Specific, Measurable, Achievable, Relevant,
 El alcance define los límites funcionales y técnicos de la solución entregada, delimitando las capacidades operativas del sistema.
 
 \subsection{Ámbito geográfico y de datos}
-La plataforma cubre la totalidad del territorio español. 
-La ingesta de datos de carburantes utiliza la API pública del Ministerio de Industria, Comercio y Turismo 
+La plataforma cubre la totalidad del territorio español.
+La ingesta de datos de carburantes utiliza la API pública del Ministerio de Industria, Comercio y Turismo
 \cite{datosgob_carburantes}, que publica precios de aproximadamente 11.000 estaciones de servicio activas
 en España. Los puntos de recarga eléctrica se obtienen del portal
 mapareve.es, complementando la oferta de datos de movilidad eléctrica
@@ -105,59 +97,16 @@ disponible institucionalmente \cite{reve_mapa}.
 
 \subsection{Componentes funcionales incluidos}
 
-La plataforma especificada comprende los siguientes componentes funcionales:
+La plataforma comprende los siguientes componentes funcionales que delimitan el alcance del sistema desarrollado:
 
 \begin{enumerate}
-      \item \textbf{Servicio de gasolineras:} ingesta, normalización,
-            persistencia y consulta de precios de carburantes con historial
-            temporal. Ofrece búsqueda geoespacial por radio, filtrado por
-            provincia, municipio, marca y tipo de combustible, e integra
-            los puntos de recarga eléctrica en el mismo modelo de datos.
-
-      \item \textbf{Servicio de usuarios:} registro, autenticación
-            (tradicional y OAuth Google), gestión de perfiles con
-            preferencias de combustible y vehículo, y sistema de favoritos
-            sincronizado. Emite credenciales mediante JWT almacenado en
-            \textit{httpOnly cookie} y expone endpoints internos para la
-            comunicación entre servicios.
-
-      \item \textbf{Servicio de recomendación:} cálculo de las gasolineras
-            óptimas para un trayecto A$\rightarrow$B definido por el usuario,
-            mediante identificación de candidatas en el corredor geográfico
-            de la ruta, cálculo de desvíos reales respecto al trayecto
-            original, evaluación mediante función de puntuación ponderada
-            por precio y desvío, y presentación de un ranking con estimación
-            del ahorro económico. Soporta configuración del tipo de
-            combustible, desvío máximo aceptable y capacidad del depósito,
-            e integra un backend de enrutamiento externo para el cálculo
-            preciso de distancias y tiempos de desvío.
-
-      \item \textbf{Servicio de predicción:} generación de predicciones de
-            precio a corto plazo por estación, basadas en modelos de
-            \textit{gradient boosting} entrenados sobre series históricas
-            de precios. Incorpora el precio del crudo Brent como variable
-            exógena y cubre las estaciones con historial suficiente y
-            mayor demanda de uso.
-
-      \item \textbf{Asistente de voz:} interfaz conversacional en lenguaje
-            natural que permite al usuario consultar precios y estaciones
-            cercanas mediante voz. Implementa un pipeline
-            STT$\rightarrow$LLM$\rightarrow$TTS con capacidad de
-            \textit{tool calling} para acceder en tiempo real a los datos
-            del sistema a través del API Gateway.
-
-      \item \textbf{API Gateway:} punto de entrada único para el frontend,
-            que actúa como proxy reverso hacia los servicios internos,
-            agrega la documentación OpenAPI de todos ellos, gestiona la
-            autenticación mediante cookies y sirve de bridge WebSocket
-            para el asistente de voz.
-
-      \item \textbf{Frontend PWA:} aplicación web progresiva instalable
-            con mapa interactivo, historial de precios, gestión de
-            favoritos, recomendación de ruta y asistente de voz integrado.
-            Ofrece soporte \textit{offline}, modo oscuro e
-            internacionalización en tres idiomas
-            \cite{web_dev_pwa,i18next}.
+      \item \textbf{Gestión e ingesta de datos de carburantes:} Servicio encargado de la recopilación automatizada, normalización e historial de precios de combustibles tradicionales y puntos de recarga eléctrica. Incluye las capacidades de búsqueda geoespacial por radio y filtrado avanzado (por marca, provincia, municipio y tipo de energía).
+      \item \textbf{Gestión de usuarios y preferencias:} Módulo para el registro, perfilado y autenticación de usuarios (mediante canales tradicionales y proveedores externos). Permite la sincronización de estaciones favoritas y la configuración de preferencias de consumo según el vehículo.
+      \item \textbf{Motor de recomendación en ruta:} Componente de cálculo para la identificación de gasolineras óptimas en trayectos entre dos puntos. Evalúa las estaciones dentro del corredor geométrico de la ruta según el coste y el tiempo de desvío real, devolviendo una clasificación ordenada por el ahorro económico estimado.
+      \item \textbf{Módulo de predicción de precios:} Servicio de análisis predictivo a corto plazo por estación de servicio. Utiliza modelos basados en series históricas e incorpora indicadores macroeconómicos exógenos (precio del crudo Brent) para modelar la incertidumbre del mercado en las estaciones de mayor demanda.
+      \item \textbf{Asistente de voz conversacional:} Interfaz interactiva en lenguaje natural que habilita la consulta manos libres de precios y ubicaciones, procesando la voz del usuario para transformarla en comandos del sistema en tiempo real.
+      \item \textbf{Pasarela de servicios (API Gateway):} Componente centralizador que unifica, documenta y securiza el acceso del cliente hacia las diferentes capacidades del backend, garantizando el aislamiento de las lógicas de negocio.
+      \item \textbf{Aplicación de usuario (Frontend PWA):} Aplicación web progresiva e instalable que sirve de interfaz gráfica. Agrupa el mapa interactivo, la consulta de históricos, el recomendador de rutas y el asistente de voz, con soporte multiplataforma, capacidades de funcionamiento \textit{offline} básico e internacionalización en tres idiomas.
 \end{enumerate}
 
 
