@@ -92,9 +92,9 @@ carburantes, con API REST de acceso público \cite{datosgob_carburantes}. Su int
 permite la consulta de precios actuales pero carece de análisis histórico, capacidad
 predictiva y recomendación basada en ruta.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
-  %\includegraphics[width=0.85\textwidth]{imgs/geoportal_miteco.png}
+  \includegraphics[width=0.7\textwidth]{imgs/geoportal_miteco.png}
   \caption{Interfaz web del Geoportal de Hidrocarburos del MITECO, con consulta de precios por estación.}
   \label{fig:geoportal_miteco}
 \end{figure}
@@ -105,9 +105,9 @@ filtros por tipo de combustible, precio y horario. Supone un avance respecto a l
 fragmentación previa, aunque sigue siendo una herramienta de consulta estática sin
 capacidad analítica ni predictiva.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
-  %\includegraphics[width=0.45\textwidth]{imgs/rutae_detalle.png}
+  \includegraphics[width=0.3\textwidth]{imgs/rutae_detalle.png}
   \caption{Vista de detalle de una estación de servicio en la aplicación móvil Ruta-e.}
   \label{fig:rutae_detalle}
 \end{figure}
@@ -118,9 +118,9 @@ impulsado bajo el Real Decreto-ley 4/2024, ofrece desde abril de 2025 informaci�
 dinámica en tiempo real sobre disponibilidad y tarifas de más de 40.000 puntos de
 recarga. En diciembre de 2025 lanzó su aplicación móvil con planificador de rutas
 básico para vehículos eléctricos. Aunque representa el mayor avance institucional en la materia, la herramienta se limita a 
-la recarga eléctrica y carece tanto de integración con combustibles convencionales como de módulos predictivos..
+la recarga eléctrica y carece tanto de integración con combustibles convencionales como de módulos predictivos.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imgs/reve_detalle.png}
   \caption{Mapa REVE con detalle de un punto de recarga: disponibilidad, potencia y tarifa en tiempo real.}
@@ -150,13 +150,13 @@ soluciones existentes frente al sistema propuesto.
     \textbf{Funcionalidad}             & \textbf{Geoportal}     & \textbf{Ruta-e} & \textbf{REVE}
                                        & \textbf{Apps terceros} & \textbf{TankGo}                 \\
     \hline
-    Precios combustible en tiempo real & \checkmark             & \checkmark      & --
+    Precios en tiempo real & \checkmark             & \checkmark      & \checkmark
                                        & \checkmark             & \checkmark                      \\
     Historial de precios               & --                     & --              & --
                                        & Parcial                & \checkmark                      \\
     Predicción de precios              & --                     & --              & --
                                        & --                     & \checkmark                      \\
-    Recomendación por ruta             & --                     & \checkmark      & Parcial EV
+    Recomendación por ruta             & --                     & \checkmark      & \checkmark
                                        & Parcial                & \checkmark                      \\
     Integración combustible + EV       & --                     & \checkmark      & --
                                        & --                     & \checkmark                      \\
@@ -219,18 +219,19 @@ estado del arte \cite{Gartner2026Trends}, incorporar una planificación formal d
 
 \subsection{Alineación con los Objetivos de Desarrollo Sostenible}
 
-La Agenda 2030 \cite{onu_ods_goals} establece el marco global de referencia en
+La Agenda 2030~\cite{onu_ods_goals} establece el marco global de referencia en
 sostenibilidad. La plataforma se alinea con dos objetivos directamente relevantes
 para el ámbito de la movilidad inteligente:
 
 \begin{itemize}
   \item \textbf{ODS 7 (Energía asequible y no contaminante):} al integrar en una
-        única interfaz precios de combustibles y puntos de recarga eléctrica, la plataforma
-        facilita la transición hacia modelos de movilidad más sostenibles y promueve la
-        eficiencia energética en el transporte por carretera.
-  \item \textbf{ODS 9 (Industria, innovación e infraestructura):} la transformación de
+        única interfaz precios de combustibles y puntos de recarga eléctrica, la
+        plataforma facilita la transición hacia modelos de movilidad más sostenibles
+        y promueve la eficiencia energética en el transporte por carretera.
+  \item \textbf{ODS 11 (Ciudades y comunidades sostenibles):} la transformación de
         fuentes de datos heterogéneas en un sistema de soporte a la decisión mediante
-        \textit{cloud computing} e inteligencia artificial promueve infraestructuras digitales
-        resilientes e innovadoras \cite{mitma_esmovilidad}, en línea con los principios de
-        la Agenda Digital española \cite{gob_agenda2030_espana}.
+        \textit{cloud computing} e inteligencia artificial contribuye a disponer de
+        infraestructuras digitales resilientes e innovadoras~\cite{mitma_esmovilidad},
+        facilitando una movilidad urbana más informada y económicamente accesible,
+        en línea con los principios de la Agenda Digital española~\cite{gob_agenda2030_espana}.
 \end{itemize}

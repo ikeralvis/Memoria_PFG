@@ -11,7 +11,7 @@ de alternativas en el que se han ponderado criterios de rendimiento, madurez del
 ecosistema, compatibilidad con el modelo de despliegue \textit{cloud-native}, coste
 operativo y alineación con las competencias adquiridas durante el grado. Este capítulo
 presenta las tecnologías seleccionadas organizadas por capa arquitectónica, la
-justificación técnica detallada de cada decisión se recoge en el Capítulo~8.
+justificación técnica detallada de cada decisión se recoge en el Capítulo \ref{cap:desarrollo_sistema}.
 
 % ---------------------------------------------------------
 \section{Patrón de diseño: Microservicios}
@@ -66,7 +66,7 @@ operativos, y Mapbox GL JS debido al cambio a una licencia propietaria en
 eficiente la renderización de las más de 11.000 estaciones del catálogo mediante la agrupación dinámica de marcadores.
 
 El frontend está concebido como \textbf{Progressive Web App (PWA)}, con
-\textit{service worker} gestionado por Workbox \cite{web_dev_pwa, mdn_service_workers,
+\textit{service worker} gestionado por Workbox \cite{pwa_spec, mdn_service_workers,
     workbox} para soporte offline limitado e instalación en dispositivos móviles.
 La internacionalización en castellano, euskera e inglés se implementa mediante
 \texttt{i18next} \cite{i18next, react_i18next}.
@@ -212,7 +212,7 @@ las funciones de recuperación de datos geoespaciales y precios actuales del sis
 % ---------------------------------------------------------
 \section{Plataforma de despliegue: Google Cloud}
 % ---------------------------------------------------------
-El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) adoptando una arquitectura orientada a servicios mediante microservicios independientes y un enfoque \textit{serverless} (sin servidor). Esta decisión arquitectónica permite desacoplar los componentes del sistema, garantizando que cada módulo (como la API o el motor de predicción) se ejecute de forma aislada. Al delegar por completo la gestión, el aprovisionamiento y el mantenimiento de la infraestructura subyacente en el proveedor de la nube, el sistema obtiene escalabilidad automática inmediata: los servicios se dimensionan dinámicamente en respuesta a la demanda y son capaces de escalar a cero cuando no hay peticiones activas, eliminando el desperdicio de recursos.
+El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) adoptando una arquitectura orientada a servicios mediante microservicios independientes y un enfoque \textit{serverless} (sin servidor). Esta decisión arquitectónica permite desacoplar los componentes del sistema, garantizando que cada módulo (como la API o el motor de predicción) se ejecute de forma aislada. Al delegar la gestión, el aprovisionamiento y el mantenimiento de la infraestructura la realiza el proveedor de la nube, el sistema obtiene escalabilidad automática inmediata: los servicios se dimensionan dinámicamente en respuesta a la demanda y son capaces de escalar a cero cuando no hay peticiones activas, eliminando el desperdicio de recursos.
 
 Bajo este paradigma, la orquestación de los contenedores de cada microservicio se ejecuta sobre \textbf{Cloud Run}~\cite{cloud_run2026}, mientras que la automatización de despliegues (CI/CD) se gestiona mediante \textbf{Cloud Build}~\cite{cloud_build2026}, aislando la lógica en manifiestos independientes por servicio. El control de acceso y seguridad se rige bajo el principio de privilegios mínimos a través de \textbf{Cloud IAM}~\cite{gcp_products2026}, asignando identidades y roles independientes a cada contenedor para segmentar el acceso a los recursos de almacenamiento (\textbf{Cloud Storage}~\cite{cloud_storage2026}) y custodia de claves (\textbf{Secret Manager}).
 

@@ -17,6 +17,11 @@ Desde el punto de vista de la calidad del software, la plataforma se ha estructu
 Los servicios del núcleo de negocio registran una cobertura de pruebas unitarias superior al 95\% y el análisis estático de código en SonarCloud otorga al proyecto
 una calificación de mantenibilidad de grado A. Estos indicadores garantizan la viabilidad operativa del software, asegurando su capacidad de escalado y mantenimiento evolutivo.
 
+En términos de impacto, la plataforma contribuye directamente al ODS 7 
+(Energía asequible y no contaminante) y al ODS 11 (Ciudades y comunidades 
+sostenibles), facilitando decisiones de repostaje más eficientes y apoyando 
+la transición hacia la movilidad eléctrica.
+
 % ─────────────────────────────────────────────
 \section{Dificultades encontradas}
 \label{sec:dificultades}
@@ -29,7 +34,7 @@ de confianza cuantílicos.
 
 El motor de recomendación de rutas ha requerido resolver problemas de rendimiento geométrico. La integración de operaciones vectoriales
 con la librería Shapely, el indexado espacial en PostGIS y el consumo asíncrono de la API de enrutamiento de OpenRouteService
-ha demandado una optimización estricta de las peticiones para mitigar las latencias de red sin penalizar la precisión en el cálculo de los costes de desvío.
+ha demandado optimizar las peticiones para evitar las latencias de red sin penalizar la precisión en el cálculo de los costes de desvío.
 
 En el plano de la infraestructura, se identificaron limitaciones en el entorno \textbf{serverless}  de Google Cloud Run. La gestión de conexiones
 persistentes mediante WebSockets para el asistente conversacional mostró dificultades ante el autoescalado y la naturaleza efímera de
@@ -45,7 +50,8 @@ La ejecución de este proyecto ha permitido completar de forma autónoma el cicl
 El desarrollo ha abarcado desde el modelado de datos geoespaciales y la definición de contratos de API REST, hasta el entrenamiento
 e inferencia de modelos de machine learning, la gestión de sesiones sin estado mediante tokens JWT y el despliegue elástico en la nube.
 Asimismo, el marco de colaboración técnica con el grupo de investigación DEUSTEK/MORElab ha aportado una metodología rigurosa para la toma de
-decisiones tecnológicas, fundamentada en la evaluación de alternativas.
+decisiones tecnológicas, fundamentada en la evaluación de alternativas. Asimismo, la visión crítica aportada por el director del PFG
+ha permitido identificar áreas de mejora. 
 
 En un análisis retrospectivo, el flujo de trabajo habría mejorado mediante la adopción de una estrategia de desarrollo guiado por pruebas
 (TDD) en fases más tempranas y la definición de contratos de interfaz más estrictos entre microservicios. Estas carencias iniciales generaron

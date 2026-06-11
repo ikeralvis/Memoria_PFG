@@ -35,7 +35,7 @@ El sistema define dos roles de acceso diferenciados:
         Accede a la visualización cartográfica y tabular de estaciones de servicio, fichas de detalle técnico y tarifas vigentes.
   \item[\textbf{usuario registrado:}] Rol con acceso extendido. Además de las capacidades de consulta pública,
         dispone de persistencia para una lista de estaciones favoritas, acceso a la representación visual de series
-        históricas de precios y consulta del pronóstico de tarifas a 7 días generado por el modelo predictivo, ademas del uso del agente conversacional.
+        históricas de precios y consulta del pronóstico de tarifas a 7 días generado por el modelo predictivo, además del uso del agente conversacional.
 \end{description}
 
 Estos perfiles cubren tres casos de uso operativos: el conductor particular que optimiza su gasto local,
@@ -79,21 +79,29 @@ ofrece~\cite{sommerville2011}.
 sistema debe garantizar un tiempo de actividad superior al 99\%, respaldado por la
 infraestructura de Google Cloud Platform.
 
-\textbf{Latencia (RNF-02):} El tiempo de respuesta de las consultas de precios y el
-asistente conversacional no deben ser muy elevados, requisito crítico para garantizar
-la seguridad vial en uso móvil.
+\textbf{Latencia (RNF-02):} El tiempo de respuesta de las consultas de precios
+debe ser inferior a \textbf{2~segundos} para el percentil~95 bajo carga normal,
+medido desde la petición del cliente hasta la recepción de la respuesta en el
+\textit{API Gateway}. El asistente conversacional debe completar el ciclo
+STT\,→\,LLM\,→\,TTS en menos de \textbf{8~segundos} por consulta, umbral
+definido por las directrices de seguridad vial para interacción en manos libres.
 
-\textbf{Escalabilidad (RNF-03):} La arquitectura de microservicios y el despliegue en
-la nube permiten escalar cada componente de forma independiente según la demanda, sin
-afectar al resto del sistema.
+\textbf{Escalabilidad (RNF-03):} La arquitectura debe soportar un incremento de
+la carga de \textbf{10x} respecto al tráfico base sin degradar la latencia por
+encima del umbral definido en RNF-02, aprovechando el escalado automático de
+Google Cloud Run sin intervención manual.
 
-\textbf{Usabilidad (RNF-04):} El frontend está diseñado con criterio \textit{mobile-first}
-y es completamente responsivo, priorizando la experiencia en dispositivos móviles sin
-renunciar a la usabilidad en escritorio.
+\textbf{Usabilidad (RNF-04):} La interfaz debe obtener una puntuación mínima de
+\textbf{85/100 en la auditoría Lighthouse} para las categorías de
+\textit{Accessibility} y \textit{Performance} en dispositivo móvil, y debe ser
+completamente operativa en pantallas a partir de \textbf{320~px} de anchura.
 
-\textbf{Seguridad (RNF-05):} Las comunicaciones se realizan sobre HTTPS, la autenticación
-se gestiona mediante tokens JWT y el acceso a los microservicios internos está restringido
-a través del API Gateway.
+\textbf{Seguridad (RNF-05):} Todas las comunicaciones deben realizarse sobre
+\textbf{HTTPS} (TLS~1.2 o superior); los tokens JWT deben transmitirse
+exclusivamente mediante \textit{cookies} con los atributos \texttt{httpOnly},
+\texttt{Secure} y \texttt{SameSite=None}; y el acceso a los microservicios
+internos debe requerir la cabecera \texttt{X-Internal-Secret}, rechazando con
+\texttt{403~Forbidden} cualquier petición sin ella.
 
 \subsection{Restricciones}
 \label{subsec:restricciones}
@@ -522,7 +530,7 @@ que, dada una ruta entre origen y destino, sugiere las paradas de repostaje ópt
 ponderando el precio del combustible y el desvío necesario para alcanzar cada estación.
 Está implementado en \textbf{FastAPI}~\cite{fastapi} con Python, y
 combina consultas geoespaciales sobre PostGIS, geometría vectorial con
-\textbf{Shapely} \cite{shapely} y llamadas a la API de \textbf{OpenRouteService}~\cite{openrouteservice}
+\textbf{Shapely} \cite{shapely} y llamadas a la API de \textbf{OpenRouteService}~\cite{openrouteservice_api}
 para el cálculo de rutas y matrices de tiempos.
 
 \subsubsection*{Flujo del algoritmo}
@@ -549,7 +557,7 @@ El algoritmo se ejecuta en siete etapas secuenciales:
         dentro del corredor geométrico, superan claramente el umbral de desvío configurado.
 
   \item \textbf{Refinamiento con Matrix API.} El subconjunto de candidatas que supera el
-        filtro aproximado se envía a la \textbf{Matrix API de OpenRouteService} \cite{openrouteservice} para obtener
+        filtro aproximado se envía a la \textbf{Matrix API de OpenRouteService} \cite{openrouteservice_matrix_api} para obtener
         tiempos de desvío reales en red viaria, que son significativamente más precisos que la
         distancia en línea recta, especialmente en entornos con orografía compleja o vías de
         acceso limitado.
@@ -1300,7 +1308,7 @@ Se evalúan tres métricas sobre conjuntos de datos etiquetados manualmente:
 \end{table}
 
 Para la monitorización en producción, el pipeline emite trazas a
-Langfuse~\cite{ai_studio} con scores \texttt{task\_success},
+Langfuse~\cite{langfuse} con scores \texttt{task\_success},
 \texttt{guardrails\_triggered} y \texttt{tool\_called} cuando las variables de
 entorno \texttt{LANGFUSE\_PUBLIC\_KEY} y \texttt{LANGFUSE\_SECRET\_KEY} están
 configuradas. En ausencia de dichas variables el servicio opera con un trazador

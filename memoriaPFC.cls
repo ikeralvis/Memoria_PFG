@@ -92,20 +92,18 @@
 %% Definición de metadatos y formato general
 %% ------------------------------
 \makeatletter
-\newcommand{\@autorUno}{Iker Alvis Veloso}
+\newcommand{\@autor}{Iker Alvis Veloso}
 \newcommand{\@autorDos}{}
-\newcommand{\@autores}{\@autorUno}
-\newcommand{\autores}[2]{\def\@autorUno{#1}\def\@autorDos{#2}}
-\newcommand{\titulacion}[1]{\def\@titulacion{#1}}
+
+\newcommand{\titulacion}[1]{\def\@titulacion{Ingeniería Informática}}
 \newcommand{\director}[1]{\def\@director{Director: Diego López de Ipiña}}
-\newcommand{\directora}[1]{\def\@director{Directora: #1}}
 \gdef\@resumen{}
 \gdef\@descriptores{}
 \newcommand{\resumen}[1]{\gdef\@resumen{#1}}
 \newcommand{\descriptores}[1]{\gdef\@descriptores{#1}}
 
 \AtBeginDocument{
-  \ifthenelse{\equal{\@autorDos}{}}{\def\@autores{\@autorUno}}{\def\@autores{\@autorUno{} y \@autorDos}}
+  \hypersetup{pdftitle={\@title}, pdfauthor={\@autor}}
   \pagestyle{scrheadings}
   \setstretch{1.5}          % Interlineado 15 pt para cuerpo 10 pt
   \setlength{\parskip}{12pt}  % Espacio entre párrafos
@@ -113,7 +111,7 @@
   \hypersetup{
       linktoc=all,
       pdftitle={\@title},
-      pdfauthor={\@autores},
+      pdfauthor={\@autor},
       pdfsubject={Proyecto Fin de Grado},
       pdfkeywords={\@descriptores}
   }
@@ -124,15 +122,13 @@
 %% Márgenes y disposición
 %% ------------------------------
 \RequirePackage[a4paper,
-  top=1.0cm,
-  headheight=12.0pt,
-  headsep=2.4cm,
-  bottom=1.2cm,
-  footskip=3.3cm,
+  top=3.5cm,
+  bottom=2.5cm,
   inner=2.5cm,
   outer=2.5cm,
-  includehead,
-  includefoot
+  headheight=12pt,
+  headsep=0.5cm,
+  footskip=1.0cm
 ]{geometry}
 
 %% ------------------------------
@@ -146,8 +142,17 @@
 \ifoot{}
 \cfoot{}
 \ofoot{\raisebox{6pt}{{\fontsize{11}{13}\selectfont\pagemark}}}      % Número de página
-% Make chapter starting pages use the same scrheadings style so page numbers appear
+
+\addtokomafont{pageheadfoot}{\normalfont\sffamily}
+
+
+% Usar scrheadings como estilo base
+\pagestyle{scrheadings}
 \renewcommand*{\chapterpagestyle}{scrheadings}
+\renewcommand*{\partpagestyle}{scrheadings}
+
+% Solución clave: Forzar que 'plain' use 'scrheadings'
+\DeclarePageStyleAlias{plain}{scrheadings}
 
 %% ------------------------------
 %% Estructura del documento
@@ -273,7 +278,51 @@
 ]{paragraph}
 \renewcommand*{\paragraphformat}{\theparagraph.\enskip}
 
+%%% -------------------------
+%%% Cabeceras para listas
+%%% -------------------------
+
+%% ------------------------------
+%% Restaurar encabezado tras listas (TOC, figuras, tablas, listados)
+%% ------------------------------
+\let\oldtableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{%
+	\cleardoublepage
+	\pagestyle{scrheadings}
+	\oldtableofcontents
+	\cleardoublepage
+	\pagestyle{scrheadings}
+}
+
+\let\oldlistoffigures\listoffigures
+\renewcommand{\listoffigures}{%
+	\cleardoublepage
+	\pagestyle{scrheadings}
+	\oldlistoffigures
+	\cleardoublepage
+	\pagestyle{scrheadings}
+}
+
+\let\oldlistoftables\listoftables
+\renewcommand{\listoftables}{%
+	\cleardoublepage
+	\pagestyle{scrheadings}
+	\oldlistoftables
+	\cleardoublepage
+	\pagestyle{scrheadings}
+}
+
+\let\oldlstlistoflistings\lstlistoflistings
+\renewcommand{\lstlistoflistings}{%
+	\cleardoublepage
+	\pagestyle{scrheadings}
+	\oldlstlistoflistings
+	\cleardoublepage
+	\pagestyle{scrheadings}
+}
+
 \RedeclareSectionCommand[runin=false]{subparagraph}
+
 
 \usepackage{pgfgantt}      % Para el diagrama de Gantt
 \usepackage{booktabs}      % Para \toprule, \midrule, \bottomrule en tablas

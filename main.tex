@@ -8,26 +8,22 @@
 
 \resumen{% 200-250 palabras
 Este proyecto tiene como objetivo el diseño e implementación de un sistema inteligente integrado 
-en una plataforma digital de comparación de precios de carburantes, desarrollada sobre Google 
-Cloud Platform con una arquitectura de microservicios desplegada mediante Cloud Run y 
-Cloud Functions. La solución, implementada con FastAPI en el backend y React en el frontend, 
-permite a los usuarios consultar precios actualizados en tiempo real a partir de la API oficial 
-del Ministerio para la Transición Ecológica, acceder a históricos de precios por estación 
-de servicio y visualizar predicciones a siete días generadas mediante modelos de machine 
-learning basados en LightGBM.
-Más allá de la simple visualización de información, el sistema incorpora un módulo de 
-recomendación de repostaje en ruta que, apoyándose en la API de Google Maps para el 
-análisis geoespacial y la optimización de recorridos, determina qué estación resulta más 
-conveniente económicamente para un trayecto definido por el usuario. Esta recomendación 
-combina el precio actual, la evolución prevista y la desviación necesaria respecto al 
-recorrido, evaluando el coste total del desplazamiento.
-Los datos son gestionados mediante Neon Tech como almacén analítico principal y Cloud Storage 
-para la persistencia de modelos y artefactos. La plataforma es accesible desde dispositivos 
-móviles mediante una interfaz web responsive y contempla adicionalmente un asistente conversacional, priorizando en todo momento la 
-experiencia de usuario.
-El proyecto integra competencias de ingeniería de software, análisis de datos e inteligencia 
-artificial aplicada, constituyendo una solución tecnológica orientada al ahorro económico, 
-la eficiencia energética y la toma de decisiones basada en datos.}
+en una plataforma digital de comparación de precios de carburantes. La solución permite a los usuarios 
+consultar precios actualizados en tiempo real, acceder a históricos de precios por estación de servicio y 
+visualizar predicciones a siete días mediante modelos de regresión cuantílica con LightGBM, entrenados sobre 
+históricos de precios e indicadores del mercado energético. Más allá de la simple visualización de información, 
+el sistema incorpora un módulo de recomendación de repostaje en ruta, capaz de analizar un trayecto definido por 
+el usuario y determinar qué estación resulta más conveniente económicamente. Esta recomendación considera el precio 
+actual, la evolución prevista y la desviación necesaria respecto al recorrido, combinando análisis geoespacial, 
+optimización de recorrido y evaluación del coste total del desplazamiento. La arquitectura del sistema se diseña 
+bajo un enfoque cloud-native, desplegada en Google Cloud Run mediante contenedores Docker, con un API Gateway 
+desarrollado en Hono (Node.js) y servicios backend implementados en FastAPI (Python) y Fastify (Node.js), 
+integrando APIs externas para la obtención de datos y garantizando eficiencia, disponibilidad y seguridad. 
+Asimismo, se contempla el diseño modular del backend y la separación de capas para facilitar la mantenibilidad 
+y futura ampliación del sistema. La plataforma es accesible desde dispositivos móviles mediante una interfaz 
+web Progressive Web App (PWA) desarrollada en React, priorizando la experiencia de usuario. El proyecto integra 
+competencias de ingeniería de software, análisis de datos e inteligencia artificial aplicada, constituyendo una 
+solución tecnológica orientada al ahorro económico, la eficiencia energética y la toma de decisiones basada en datos.}
 
 \descriptores{Computación en la nube, predicción de precios, plataforma de carburantes, recomendación geoespacial.}
 
@@ -47,47 +43,27 @@ la eficiencia energética y la toma de decisiones basada en datos.}
 
 \frontmatter
 
-%\includepdf[pages=1]{../portada.pdf}          % Portada delantera (opcional)
-%\includepdf[pages=1]{../portada_firmada.pdf}  % Portada firmada (opcional)
+%\includepdf[pages=1]{portadas/portada1.pdf}          % Portada delantera (opcional)
+%\includepdf[pages=1]{portadas/portadaFirmada.pdf}          % Portada delantera (opcional)
 
 \resumenPersonalizado{
 Este proyecto tiene como objetivo el diseño e implementación de un sistema inteligente integrado 
-en una plataforma digital de comparación de precios de carburantes, desarrollada sobre Google 
-Cloud Platform con una arquitectura de microservicios desplegada mediante Cloud Run y 
-Cloud Functions. La solución, implementada con FastAPI en el backend y React en el frontend, 
-permite a los usuarios consultar precios actualizados en tiempo real a partir de la API oficial 
-del Ministerio para la Transición Ecológica, acceder a históricos de precios por estación 
-de servicio y visualizar predicciones a siete días generadas mediante modelos de machine 
-learning basados en LightGBM.
-Más allá de la simple visualización de información, el sistema incorpora un módulo de 
-recomendación de repostaje en ruta que, apoyándose en la API de Google Maps para el 
-análisis geoespacial y la optimización de recorridos, determina qué estación resulta más 
-conveniente económicamente para un trayecto definido por el usuario. Esta recomendación 
-combina el precio actual, la evolución prevista y la desviación necesaria respecto al 
-recorrido, evaluando el coste total del desplazamiento.
-Los datos son gestionados mediante Neon Tech como almacén analítico principal y Cloud Storage 
-para la persistencia de modelos y artefactos. La plataforma es accesible desde dispositivos 
-móviles mediante una interfaz web responsive y contempla adicionalmente un asistente conversacional, priorizando en todo momento la 
-experiencia de usuario.
-El proyecto integra competencias de ingeniería de software, análisis de datos e inteligencia 
-artificial aplicada, constituyendo una solución tecnológica orientada al ahorro económico, 
-la eficiencia energética y la toma de decisiones basada en datos.
-
-Este proyecto tiene como objetivo el diseño e implementación de un sistema inteligente integrado en una plataforma digital de comparación de precios de 
-carburantes. La solución permite a los usuarios consultar precios actualizados en tiempo real, acceder a históricos de precios por estación de servicio y 
-visualizar predicciones a siete días mediante modelos de análisis de datos.
-Más allá de la simple visualización de información, el sistema incorpora un módulo de recomendación de repostaje en ruta, capaz de analizar un trayecto definido 
-por el usuario y determinar qué estación resulta más conveniente económicamente. Esta recomendación considera el precio actual, la evolución prevista y la 
-desviación necesaria respecto al recorrido, combinando análisis geoespacial, optimización de recorrido y evaluación del coste total del desplazamiento.
-La arquitectura del sistema se diseña bajo un enfoque cloud, desplegada en infraestructura escalable y orientada a servicios, integrando APIs externas para la 
-obtención de datos y garantizando eficiencia, disponibilidad y seguridad. Asimismo, se contempla el diseño modular del backend y la separación de capas para 
-facilitar la mantenibilidad y futura ampliación del sistema. La plataforma es accesible desde dispositivos móviles mediante una interfaz web responsive, 
-priorizando la experiencia de usuario.
-El proyecto integra competencias de ingeniería de software, análisis de datos e inteligencia artificial aplicada, constituyendo una solución tecnológica 
-orientada al ahorro económico, la eficiencia energética y la toma de decisiones basada en datos.
-
-
-
+en una plataforma digital de comparación de precios de carburantes. La solución permite a los usuarios 
+consultar precios actualizados en tiempo real, acceder a históricos de precios por estación de servicio y 
+visualizar predicciones a siete días mediante modelos de regresión cuantílica con LightGBM, entrenados sobre 
+históricos de precios e indicadores del mercado energético. Más allá de la simple visualización de información, 
+el sistema incorpora un módulo de recomendación de repostaje en ruta, capaz de analizar un trayecto definido por 
+el usuario y determinar qué estación resulta más conveniente económicamente. Esta recomendación considera el precio 
+actual, la evolución prevista y la desviación necesaria respecto al recorrido, combinando análisis geoespacial, 
+optimización de recorrido y evaluación del coste total del desplazamiento. La arquitectura del sistema se diseña 
+bajo un enfoque cloud-native, desplegada en Google Cloud Run mediante contenedores Docker, con un API Gateway 
+desarrollado en Hono (Node.js) y servicios backend implementados en FastAPI (Python) y Fastify (Node.js), 
+integrando APIs externas para la obtención de datos y garantizando eficiencia, disponibilidad y seguridad. 
+Asimismo, se contempla el diseño modular del backend y la separación de capas para facilitar la mantenibilidad 
+y futura ampliación del sistema. La plataforma es accesible desde dispositivos móviles mediante una interfaz 
+web Progressive Web App (PWA) desarrollada en React, priorizando la experiencia de usuario. El proyecto integra 
+competencias de ingeniería de software, análisis de datos e inteligencia artificial aplicada, constituyendo una 
+solución tecnológica orientada al ahorro económico, la eficiencia energética y la toma de decisiones basada en datos.
 }{Computación en la nube, predicción de precios, plataforma de carburantes, recomendación geoespacial.}
 
 %% Índices
@@ -102,9 +78,6 @@ orientada al ahorro económico, la eficiencia energética y la toma de decisione
 %% ----------------------
 
 \mainmatter
-
-%\chapter*{Agradecimientos}
-%Deseo expresar mi agradecimiento a Diego López de Ipiña por el apoyo y la orientación prestados durante la realización de este Proyecto Fin de Grado. Asimismo, agradezco su labor en la asignatura en la que surgió la idea inicial de este trabajo, cuyo enfoque y desarrollo han sido fundamentales para la materialización del proyecto.
 
 %% Contenido principal 
 \input{capitulos/capitulo1.tex}
@@ -173,7 +146,100 @@ orientada al ahorro económico, la eficiencia energética y la toma de decisione
   \item[XSS] \textit{Cross-Site Scripting}. Tipo de vulnerabilidad de inyección de código malicioso en aplicaciones web.
 \end{description}
 
-%\appendix
-%\chapter{Ejemplo Apéndice 1}
+% 3. AGRADECIMIENTOS (entre bibliografía y anexos, sin numerar)
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Agradecimientos}
+\chapter*{Agradecimientos}
+
+En primer lugar, quiero expresar mi agradecimiento a mi director, Diego López de Ipiña,
+por su orientación, disponibilidad y los comentarios constructivos aportados a lo largo
+del desarrollo de este proyecto.
+
+Agradezco también al grupo de investigación MORElab y al proyecto NextEdge de DEUSTEK
+por el contexto académico e investigador en el que se ha enmarcado este trabajo, así
+como por el acceso a recursos y conocimiento especializado que han enriquecido su desarrollo.
+
+Por último, agradezco a mi familia y amigos su apoyo incondicional durante estos meses.
+
+
+% 4. ANEXOS (formato libre, numerados con letras)
+\appendix
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Anexo A: Declaración de uso de Inteligencia Artificial}
+\chapter*{Anexo A: Declaración de uso de Inteligencia Artificial}
+
+De conformidad con las directrices de la Universidad de Deusto sobre el uso de
+herramientas de Inteligencia Artificial generativa (IAg) y con la política editorial
+del IEEE (IEEE Editorial Style Manual, marzo 2025), se declara a continuación el uso
+de herramientas de IAg durante la elaboración de este Proyecto Fin de Grado.
+
+En todos los casos descritos, el autor ha ejercido un rol activo de supervisión,
+verificación y decisión. Las herramientas de IAg han actuado como apoyo y asesoramiento,
+sin sustituir en ningún momento el juicio técnico, el análisis ni la autoría del trabajo.
+
+\section*{Herramientas utilizadas y finalidad}
+
+\begin{description}
+
+  \item[Claude (Anthropic)] Utilizado como asistente durante la fase de documentación.
+  Su uso ha abarcado la revisión de coherencia y estructura en distintas secciones de la
+  memoria, la mejora de la redacción técnica en determinados apartados, y el asesoramiento
+  en la elaboración de diagramas. En todos los casos, el contenido ha sido revisado,
+  contrastado con fuentes reales y reescrito o validado por el autor antes de su
+  incorporación al documento.
+
+  \item[GitHub Copilot (modelos Claude Opus 4.5, Claude Sonnet 4.5 y ChatGPT Codex 5.2)]
+  Empleado como asistente de programación durante las fases de implementación y resolución
+  de incidencias. Ha proporcionado sugerencias en la resolución de problemas técnicos,
+  mejoras de complejidad algorítmica, asesoramiento sobre decisiones arquitectónicas,
+  simplificación y refactorización de código, y revisiones orientadas a la detección y
+  prevención de fallos de seguridad. Todas las sugerencias han sido evaluadas y aplicadas
+  de forma selectiva por el autor, quien ha tomado en todo momento las decisiones de diseño
+  e implementación.
+
+  \item[Google Gemini (Google DeepMind)] Utilizado como apoyo durante las fases de
+  investigación y documentación. Ha facilitado la localización de fuentes relevantes,
+  la síntesis inicial de contenidos y la estructuración de determinadas secciones.
+  Toda la información obtenida ha sido posteriormente verificada con fuentes primarias
+  antes de ser incorporada a la memoria.
+  
+\end{description}
+
+\section*{Resumen por etapa del proyecto}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{3.5cm} p{3.5cm} p{6cm}}
+\toprule
+\textbf{Herramienta} & \textbf{Etapa} & \textbf{Finalidad} \\
+\midrule
+Claude (Anthropic)
+  & Documentación
+  & Revisión de redacción, coherencia textual y asesoramiento en diagramas. \\
+\addlinespace
+GitHub Copilot
+  & Implementación y resolución de incidencias
+  & Sugerencias de código, mejoras arquitectónicas, refactorización y revisiones de seguridad. \\
+\addlinespace
+Google Gemini
+  & Investigación y documentación
+  & Localización de fuentes, síntesis de contenidos y estructuración de secciones. \\
+\bottomrule
+\end{tabular}
+\caption{Resumen del uso de herramientas de IAg por etapa del PFG.}
+\label{tab:uso-ia}
+\end{table}
+
+\section*{Declaración de responsabilidad}
+
+El autor asume plena responsabilidad sobre la totalidad del contenido de esta memoria
+y del sistema desarrollado. El uso de herramientas de IAg se ha limitado en todo
+momento a funciones de apoyo, asesoramiento y revisión. Las decisiones técnicas,
+el diseño del sistema, el análisis de resultados y las conclusiones son de elaboración
+propia. Ninguna sección ha sido generada íntegramente por IAg ni incorporada sin
+revisión crítica previa por parte del autor.
 
 \end{document}
