@@ -212,7 +212,17 @@ las funciones de recuperación de datos geoespaciales y precios actuales del sis
 % ---------------------------------------------------------
 \section{Plataforma de despliegue: Google Cloud}
 % ---------------------------------------------------------
-El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) adoptando una arquitectura orientada a servicios mediante microservicios independientes y un enfoque \textit{serverless} (sin servidor). Esta decisión arquitectónica permite desacoplar los componentes del sistema, garantizando que cada módulo (como la API o el motor de predicción) se ejecute de forma aislada. Al delegar la gestión, el aprovisionamiento y el mantenimiento de la infraestructura la realiza el proveedor de la nube, el sistema obtiene escalabilidad automática inmediata: los servicios se dimensionan dinámicamente en respuesta a la demanda y son capaces de escalar a cero cuando no hay peticiones activas, eliminando el desperdicio de recursos.
+El entorno de producción se centraliza en \textbf{Google Cloud Platform} (GCP) adoptando una arquitectura 
+orientada a servicios mediante microservicios independientes y un enfoque \textit{serverless} (sin servidor). 
+Esta decisión arquitectónica permite desacoplar los componentes del sistema, garantizando que cada módulo 
+(como la API o el motor de predicción) se ejecute de forma aislada. Esta elección elimina la necesidad de 
+gestionar instancias o clústeres, lo que resulta especialmente relevante en un proyecto académico individual: la carga
+de trabajo es variable e impredecible, y mantener servidores activos durante
+los periodos sin tráfico supondría un coste operativo injustificado. El modelo
+de facturación por uso de Cloud Run asegura que el coste se ajuste a la
+actividad real del sistema, y la capacidad de escalar a cero durante los
+periodos de inactividad ha permitido mantener la infraestructura operativa
+prácticamente sin coste durante toda la fase de desarrollo.
 
 Bajo este paradigma, la orquestación de los contenedores de cada microservicio se ejecuta sobre \textbf{Cloud Run}~\cite{cloud_run2026}, mientras que la automatización de despliegues (CI/CD) se gestiona mediante \textbf{Cloud Build}~\cite{cloud_build2026}, aislando la lógica en manifiestos independientes por servicio. El control de acceso y seguridad se rige bajo el principio de privilegios mínimos a través de \textbf{Cloud IAM}~\cite{gcp_products2026}, asignando identidades y roles independientes a cada contenedor para segmentar el acceso a los recursos de almacenamiento (\textbf{Cloud Storage}~\cite{cloud_storage2026}) y custodia de claves (\textbf{Secret Manager}).
 
